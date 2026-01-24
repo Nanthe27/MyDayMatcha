@@ -2,459 +2,760 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Day Matcha POS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Day Matcha</title>
+    
+    <link rel="icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
+    
     <style>
-        /* RESET & BASE */
+        /* --- 1. VARIABLES & THEMES --- */
+        :root {
+            /* Light Theme (Default) */
+            --primary: #2e7d32;
+            --bg: #f4f6f9;
+            --surface: #ffffff;
+            --text: #2d3436;
+            --text-sec: #636e72;
+            --border: #eeeeee;
+            --input-bg: #f9f9f9;
+            --radius: 16px;
+            --anim: cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Dark Theme Override */
+        [data-theme="dark"] {
+            --bg: #121212;         /* Deep Black-Grey */
+            --surface: #1e1e1e;    /* Card Surface */
+            --text: #e0e0e0;       /* Soft White */
+            --text-sec: #a0a0a0;   /* Dimmed Text */
+            --border: #333333;     /* Dark Borders */
+            --input-bg: #2c2c2c;   /* Dark Inputs */
+        }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: #eef1f5; 
-            margin: 0; padding: 0; 
-            height: 100vh; 
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: var(--bg); color: var(--text);
+            margin: 0; padding: 0; height: 100vh; 
+            display: flex; flex-direction: column; overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- 2. HEADER --- */
+        .app-header {
+            background: var(--surface); height: 60px; padding: 0 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 50; flex-shrink: 0;
+            transition: background 0.3s ease;
         }
         
-        /* HEADER */
-        .top-bar {
-            background: #2e7d32; 
-            color: white; 
-            padding: 0 15px; 
-            height: 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .brand { 
+            font-size: 20px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;
+            display: flex; align-items: center;
+        }
+        
+        .app-logo {
+            height: 40px; width: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid var(--border);
+            background: #fff; 
+        }
+
+        .header-actions { display: flex; gap: 10px; }
+        .icon-btn {
+            background: var(--input-bg); border: none; font-size: 18px; cursor: pointer;
+            width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; color: var(--text);
+        }
+        .icon-btn:hover { background: var(--border); color: var(--primary); transform: translateY(-2px); }
+        .icon-btn:active { transform: scale(0.9); }
+
+        /* --- 3. MAIN STAGE --- */
+        .main-stage {
+            flex: 1; display: flex; overflow: hidden; position: relative;
+        }
+
+        /* MENU AREA */
+        .menu-area {
+            background: var(--bg);
+            flex: 2; padding: 15px; overflow-y: auto; 
+            border-right: 1px solid var(--border);
+            transition: background 0.3s ease;
+        }
+        
+        .category-section { 
+            margin-bottom: 25px; animation: fadeIn 0.4s ease-out; 
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
+
+        .category-title {
+            font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--primary);
+            margin: 0 0 10px 5px; letter-spacing: 0.5px; opacity: 0.9;
+            border-left: 4px solid var(--primary); padding-left: 8px;
+        }
+
+        .menu-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
+            gap: 12px;
+        }
+
+        /* CART AREA */
+        .cart-area {
+            background: var(--surface);
+            display: flex; flex-direction: column; z-index: 10;
+            flex: 1; box-shadow: none; 
+            border-left: 1px solid var(--border);
+            transition: background 0.3s ease;
+        }
+
+        /* --- 4. MOBILE LAYOUT --- */
+        @media (max-width: 768px) {
+            .main-stage { flex-direction: column; }
+
+            .menu-area {
+                flex: 1; height: 50%; border-right: none; width: 100%;
+                display: flex; flex-direction: row; overflow-x: auto; overflow-y: hidden;
+                padding: 15px 10px; gap: 20px;
+            }
+
+            .category-section {
+                flex: 0 0 auto; width: auto; min-width: 0;
+                background: transparent; box-shadow: none; border-radius: 0;
+                padding: 0; margin-bottom: 0; display: flex; flex-direction: column;
+            }
+
+            .category-title {
+                margin-bottom: 8px; font-size: 12px; border-left: none; 
+                padding-left: 2px; color: var(--text-sec);
+            }
+            
+            .menu-grid {
+                display: grid;
+                grid-template-rows: repeat(2, 1fr); 
+                grid-auto-flow: column; 
+                gap: 8px; height: 100%; 
+            }
+            
+            .drink-card { width: 140px; height: 100%; min-height: 0; }
+
+            .cart-area {
+                flex: 1; height: 50%;
+                border-top-left-radius: 24px; border-top-right-radius: 24px;
+                box-shadow: 0 -5px 20px rgba(0,0,0,0.15); border-left: none;
+            }
+        }
+
+        /* --- 5. COMPONENT STYLES --- */
+        .drink-card {
+            background: var(--card-color); color: white; 
+            border: none; padding: 15px 10px; border-radius: var(--radius); cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            min-height: 100px; position: relative; overflow: hidden;
+            transition: transform 0.2s var(--anim), box-shadow 0.2s;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .drink-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
+        .drink-card:active { transform: scale(0.92); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .drink-card::after {
+            content:''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(to bottom right, rgba(255,255,255,0.25), rgba(0,0,0,0.05));
+            pointer-events: none;
+        }
+        .drink-name { font-size: 15px; font-weight: 700; line-height: 1.3; z-index: 2; position: relative; }
+
+        /* Cart */
+        .cart-header {
+            padding: 15px 20px; font-size: 12px; font-weight: 700; color: var(--text-sec);
+            text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border);
             flex-shrink: 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 10;
         }
-        .top-bar h1 { margin: 0; font-size: 18px; font-weight: 700; }
-        
-        .device-badge {
-            background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-right: 10px;
-        }
-
-        .export-btn {
-            background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.2);
-            padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
-            transition: all 0.2s;
-        }
-        .export-btn:hover { background: rgba(255,255,255,0.3); }
-
-        /* DASHBOARD LAYOUT */
-        .dashboard {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 50px);
-            gap: 2px;
-        }
-
-        /* COLUMNS */
-        .col {
-            background: #f8f9fa;
-            border-right: 1px solid #ddd;
-            display: flex;
-            flex-direction: column;
-            overflow-y: hidden;
-        }
-
-        .col-menu { flex: 0.8; background: #fff; padding: 10px; overflow-y: auto; }
-        .col-preview { 
-            flex: 1.4; background: #fff; display: flex; flex-direction: column; 
-            box-shadow: -2px 0 5px rgba(0,0,0,0.05); z-index: 5; 
-        }
-        .col-history { flex: 1; background: #f4f5f7; padding: 10px; overflow-y: auto; }
-
-        .col-header {
-            font-size: 14px; font-weight: 700; color: #555; text-transform: uppercase;
-            letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 8px;
-            border-bottom: 2px solid #eee; flex-shrink: 0;
-        }
-
-        /* MENU GRID */
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        /* --- ANIMATED BUTTONS --- */
-        .drink-btn { 
-            color: white; 
-            border: none; 
-            padding: 8px 4px; 
-            border-radius: 10px; 
-            font-size: 13px; 
-            font-weight: 600; 
-            cursor: pointer; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            min-height: 70px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            line-height: 1.2;
-            position: relative;
-            overflow: hidden; 
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .drink-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-            filter: brightness(1.1);
-        }
-
-        .drink-btn:active {
-            transform: scale(0.95) translateY(0);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: 0.05s; 
-        }
-
-        .drink-btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -120%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        .drink-btn:hover::after { left: 120%; }
-        
-        /* Button Colors */
-        .matcha-latte { background: #4CAF50; }
-        .matcha-strawberry { background: #E91E63; }
-        .matcha-coconut-cream { background: #00BCD4; }
-        .coconut-matcha { background: #FFC107; color: #333 !important; }
-        .coffee-condensed { background: #795548; }
-        .black-coffee { background: #212121; }
-
-        /* PREVIEW SECTION */
-        .cart-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .cart-list { flex: 1; overflow-y: auto; padding: 0 15px; }
         .cart-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid #eee;
-            animation: slideIn 0.3s ease-out;
+            padding: 12px 0; border-bottom: 1px dashed var(--border);
+            animation: slideUp 0.3s var(--anim);
         }
-        @keyframes slideIn { 
-            from { opacity: 0; transform: translateX(-10px); } 
-            to { opacity: 1; transform: translateX(0); } 
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
+
+        .item-info { display: flex; flex-direction: column; gap: 4px; }
+        .item-title { font-weight: 700; font-size: 14px; color: var(--text); }
+        .item-opts { display: flex; gap: 6px; }
+        .opt-select { 
+            background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; 
+            font-size: 11px; padding: 2px 6px; color: var(--text); font-weight: 600;
         }
 
-        .cart-details { 
-            display: flex; 
-            flex-direction: row; 
-            flex-wrap: wrap; 
-            align-items: center; 
-            gap: 6px; 
-            width: 80%; 
+        .cart-footer {
+            padding: 15px 20px; background: var(--surface); border-top: 1px solid var(--border);
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
-        .cart-name { font-weight: 600; font-size: 14px; color: #333; margin-right: 2px; }
-        .dropdown-select { padding: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; background: #fff;}
-        
-        .cart-action { display: flex; align-items: center; gap: 8px; }
-        .delete-btn { 
-            background: #ffebee; color: #c62828; border: none; width: 28px; height: 28px; border-radius: 4px; 
-            font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-size: 16px;
-            transition: all 0.2s;
-        }
-        .delete-btn:hover { background: #ffcdd2; transform: scale(1.1); }
+        .total-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+        .total-label { font-size: 12px; color: var(--text-sec); font-weight: 600; }
+        .total-value { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1; }
 
-        .cart-footer { background: #f9f9f9; border-top: 1px solid #ddd; padding: 15px; }
-        .total-display { font-size: 24px; font-weight: 800; color: #2e7d32; text-align: right; margin-bottom: 10px; }
-        .controls { display: flex; gap: 10px; }
-        .btn { 
-            flex: 1; padding: 12px; border: none; border-radius: 6px; 
-            cursor: pointer; font-size: 15px; font-weight: bold; 
+        .action-grid { display: flex; gap: 10px; }
+        .btn {
+            flex: 1; border: none; border-radius: 12px; padding: 14px;
+            font-size: 14px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
             transition: transform 0.1s;
         }
         .btn:active { transform: scale(0.96); }
-        .btn-primary { background: #4CAF50; color: white; }
-        .btn-secondary { background: #b0bec5; color: white; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); }
+        .btn-secondary { background: var(--input-bg); color: var(--text-sec); border: 1px solid var(--border); }
 
-        /* HISTORY SECTION */
-        .record-item { background: white; padding: 10px; margin-bottom: 6px; border-radius: 6px; border: 1px solid #eee; }
-        .record-top { display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-bottom: 2px; }
-        .record-body { font-size: 13px; color: #333; margin-bottom: 2px; line-height: 1.3; }
-        .record-price { font-weight: bold; color: #2e7d32; font-size: 13px; display: flex; justify-content: space-between; align-items: center;}
-        .del-btn { color: #d32f2f; background: none; border: none; cursor: pointer; font-weight: bold; font-size: 16px;}
-        .del-btn:hover { transform: scale(1.2); }
-        .daily-total { text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; color: #333;}
-
-        /* MOBILE */
-        @media (max-width: 900px) {
-            body { overflow: auto; height: auto; }
-            .dashboard { flex-direction: column; height: auto; gap: 10px; }
-            .col { border-right: none; border-bottom: 1px solid #ddd; overflow-y: visible; }
-            .col-menu { flex: none; }
-            .col-preview { flex: none; order: 2; border-top: 4px solid #eee; }
-            .col-history { flex: none; order: 3; max-height: 400px; overflow-y: auto;}
-            .cart-footer { position: sticky; bottom: 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        /* --- 6. POPUP WINDOWS --- */
+        .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 200; opacity: 0; pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.2s;
         }
+        .modal-backdrop.active { opacity: 1; pointer-events: auto; }
+        
+        .modal-window {
+            background: var(--surface); width: 85%; max-width: 380px; max-height: 80vh;
+            border-radius: 20px; padding: 25px;
+            transform: scale(0.9); transition: transform 0.2s var(--anim);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow-y: auto;
+            display: flex; flex-direction: column; color: var(--text);
+        }
+        .modal-backdrop.active .modal-window { transform: scale(1); }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 12px; color: var(--text-sec); margin-bottom: 5px; font-weight: 600; }
+        .form-input { 
+            width: 100%; padding: 12px; border: 1px solid var(--border); background: var(--input-bg);
+            border-radius: 10px; font-size: 14px; outline: none; color: var(--text);
+        }
+        .form-input:focus { border-color: var(--primary); background: var(--surface); }
+        .color-swatch:hover { transform: scale(1.1); border-color: var(--text); }
+
+        /* HISTORY PAGE */
+        .page-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 100;
+            transform: translateX(100%); transition: transform 0.3s var(--anim);
+            display: flex; flex-direction: column;
+        }
+        .page-overlay.open { transform: translateX(0); }
+        .page-header {
+            background: var(--surface); padding: 15px 20px;
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .back-btn { color: var(--text); }
+
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div style="display:flex; align-items:center;">
-            <h1>My Day Matcha</h1>
-            <span id="deviceDisplay" class="device-badge" style="margin-left:15px; color:#cfd8dc; font-weight:normal;"></span>
+    <header class="app-header">
+        <div class="brand">
+            <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="app-logo" alt="Logo">
+            My Day Matcha
         </div>
-        <button class="export-btn" onclick="exportToExcel()">📊 Export CSV</button>
-    </div>
-
-    <div class="dashboard">
-        <div class="col col-menu">
-            <div class="col-header">Select Drink</div>
-            <div class="menu-grid">
-                <button class="drink-btn matcha-latte" onclick="addDrink('Matcha Latte', 5500, true)">Matcha Latte</button>
-                <button class="drink-btn matcha-strawberry" onclick="addDrink('Matcha Strawberry', 7000, true)">Matcha Strawberry</button>
-                <button class="drink-btn matcha-coconut-cream" onclick="addDrink('Matcha Coconut Cream', 7000, false)">Matcha Coconut Cream</button>
-                <button class="drink-btn coconut-matcha" onclick="addDrink('Coconut Matcha', 6000, false)">Coconut Matcha</button>
-                <button class="drink-btn coffee-condensed" onclick="addDrink('Coffee Condensed Milk', 4000, false)">Coffee Condensed Milk</button>
-                <button class="drink-btn black-coffee" onclick="addDrink('Black Coffee', 3000, false)">Black Coffee</button>
-            </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+            <button class="icon-btn" onclick="openHistory()" title="Today's Sales">🕒</button>
+            <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
         </div>
+    </header>
 
-        <div class="col col-preview">
-            <div class="col-header" style="padding: 15px 15px 0 15px; margin-bottom: 5px; border:none;">Current Order</div>
-            <div class="cart-list" id="orderList">
-                <div style="text-align:center; color:#ccc; margin-top:20px;">Empty Cart</div>
+    <div class="main-stage">
+        <div class="menu-area" id="menuContainer">
             </div>
+
+        <div class="cart-area">
+            <div class="cart-header">Current Order</div>
+            <div id="cartList" class="cart-list">
+                <div style="text-align:center; margin-top:40px; color:var(--text-sec);">Cart is empty</div>
+            </div>
+            
             <div class="cart-footer">
-                <div class="total-display" id="total">0 KHR</div>
-                <div class="controls">
-                    <button class="btn btn-primary" onclick="completeOrder()">CHARGE</button>
-                    <button class="btn btn-secondary" onclick="clearOrder()">Clear</button>
+                <div class="total-row">
+                    <span class="total-label">Total Amount</span>
+                    <span class="total-value" id="totalDisplay">0 KHR</span>
+                </div>
+                <div class="action-grid">
+                    <button class="btn btn-secondary" onclick="confirmClear()">Clear All</button>
+                    <button class="btn btn-primary" onclick="confirmOrder()">Confirm Order</button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col col-history">
-            <div class="col-header">History <button style="float:right; border:none; background:none; color:red; cursor:pointer;" onclick="clearRecords()">Reset</button></div>
-            <div id="recordList">
-                <div style="text-align:center; color:#999; font-size:12px;">No sales yet.</div>
+    <div id="historyPage" class="page-overlay">
+        <div class="page-header">
+            <button class="back-btn" style="background:none;border:none;font-size:24px;cursor:pointer;" onclick="closeHistory()">←</button>
+            <span style="font-size:18px; font-weight:800;">Today's Sales</span>
+            <button style="margin-left:auto; color:#ff6b6b; background:none; border:none; font-weight:bold; cursor:pointer;" onclick="resetHistory()">RESET</button>
+        </div>
+        <div id="historyList" style="flex:1; overflow-y:auto; padding:15px; background:var(--bg);"></div>
+    </div>
+
+    <div id="modalBackdrop" class="modal-backdrop">
+        <div class="modal-window">
+            <h3 id="modalTitle" style="margin:0 0 10px 0;">Title</h3>
+            <div id="modalContent" style="flex:1; overflow-y:auto;"></div>
+            <div style="display:flex; gap:10px; margin-top:20px; justify-content:flex-end;" id="modalActions">
+                <button class="btn btn-secondary" style="padding:10px;" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" style="padding:10px;" id="modalConfirmBtn">Confirm</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURATION: YOUR DATA CONNECTION
-        // ==========================================
+        // --- CONFIGURATION ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2sAhVj0OvaUW_90iDg4D0e7xgnJagQVIumqeYljT9h2IgA6GsJoHTo6d_ENsieEbW/exec'; 
-        
-        // --- REAL COST CONFIGURATION ---
-        const drinkCosts = {
-            'Matcha Latte': 4500,
-            'Matcha Strawberry': 5000,
-            'Matcha Coconut Cream': 5000,
-            'Coconut Matcha': 4500,
-            'Coffee Condensed Milk': 3000,
-            'Black Coffee': 2000
-        };
 
+        const DEFAULT_MENU = [
+            { id: 1, category: 'Tea', name: 'Matcha Latte', price: 5500, cost: 4500, color: '#4CAF50', hasMilk: true, oatPrice: 2000 },
+            { id: 2, category: 'Mix', name: 'Matcha Strawberry', price: 7000, cost: 5000, color: '#E91E63', hasMilk: true, oatPrice: 2000 },
+            { id: 3, category: 'Mix', name: 'Matcha Coconut Cream', price: 7000, cost: 5000, color: '#009688', hasMilk: false, oatPrice: 0 },
+            { id: 4, category: 'Mix', name: 'Coconut Matcha', price: 6000, cost: 4500, color: '#FFC107', hasMilk: false, oatPrice: 0 },
+            { id: 5, category: 'Coffee', name: 'Coffee Condensed Milk', price: 4000, cost: 3000, color: '#795548', hasMilk: false, oatPrice: 0 },
+            { id: 6, category: 'Coffee', name: 'Black Coffee', price: 3000, cost: 2000, color: '#3E2723', hasMilk: false, oatPrice: 0 }
+        ];
+
+        // STATE (Key changed to 'v3' to force update)
+        let menuItems = JSON.parse(localStorage.getItem('myday_menu_v3')) || DEFAULT_MENU;
+        // Default Order: Tea -> Mix -> Coffee
+        let categoryOrder = JSON.parse(localStorage.getItem('myday_categories')) || ['Tea', 'Mix', 'Coffee'];
+        
         let currentOrder = [];
-        let orderIndex = 0;
-        let todayRecords = JSON.parse(localStorage.getItem('cafeRecords_' + new Date().toDateString())) || [];
-        const sweetnessLevels = ['100%', '75%', '50%', '30%', '10%', '0%'];
-        const milkOptions = ['Milk', 'Oat Milk'];
-        
-        // --- DEVICE / USER IDENTITY ---
-        let deviceName = localStorage.getItem('matcha_device_name');
-        if (!deviceName) {
-            deviceName = prompt("Enter Device Name (e.g. 'Phone', 'Laptop', 'Staff 1'):") || "Unknown Device";
-            localStorage.setItem('matcha_device_name', deviceName);
-        }
-        document.getElementById('deviceDisplay').innerText = deviceName;
+        let todayRecords = JSON.parse(localStorage.getItem('myday_records_' + new Date().toDateString())) || [];
+        let deviceName = localStorage.getItem('myday_device') || "Main Device";
 
-        function addDrink(name, price, hasMilk) {
-            const myCost = drinkCosts[name] || 0;
-            currentOrder.push({
-                id: orderIndex++, 
-                name: name, 
-                price: price, 
-                cost: myCost, 
-                sweetness: '100%', 
-                milk: hasMilk ? 'Milk' : null
-            });
-            updateOrderDisplay();
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', next);
+            localStorage.setItem('myday_theme', next);
+            updateThemeIcon(next);
         }
 
-        function updateOrderDisplay() {
-            const list = document.getElementById('orderList');
-            const total = document.getElementById('total');
-            let html = '';
-            let subtotal = 0;
+        function updateThemeIcon(theme) {
+            const btn = document.getElementById('themeBtn');
+            btn.innerText = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('myday_theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+
+
+        // --- SELF-FIXER: SYNC CATEGORIES ---
+        menuItems.forEach(item => {
+            if(!categoryOrder.includes(item.category)) {
+                categoryOrder.push(item.category);
+            }
+        });
+        localStorage.setItem('myday_categories', JSON.stringify(categoryOrder));
+
+
+        // --- RENDER MENU BY DYNAMIC CATEGORY ORDER ---
+        function renderMenu() {
+            const container = document.getElementById('menuContainer');
+            container.innerHTML = '';
             
+            categoryOrder.forEach(catName => {
+                const items = menuItems.filter(i => i.category === catName);
+                
+                if (items.length > 0) {
+                    const div = document.createElement('div');
+                    div.className = 'category-section';
+                    div.innerHTML = `
+                        <div class="category-title">${catName}</div>
+                        <div class="menu-grid">
+                            ${items.map(item => `
+                                <button class="drink-card" style="--card-color:${item.color}" onclick="addToCart(${item.id})">
+                                    <span class="drink-name">${item.name}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                }
+            });
+        }
+        
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            if(item) {
+                currentOrder.push({
+                    uid: Date.now() + Math.random(),
+                    id: item.id,
+                    name: item.name,
+                    basePrice: item.price,
+                    baseCost: item.cost,
+                    oatPrice: item.oatPrice || 0,
+                    hasMilk: item.hasMilk,
+                    milkOption: item.hasMilk ? 'Milk' : null,
+                    sweetness: '100%'
+                });
+                renderCart();
+            }
+        }
+
+        // --- CART LOGIC ---
+        function renderCart() {
+            const list = document.getElementById('cartList');
+            const totalEl = document.getElementById('totalDisplay');
+            
+            if(currentOrder.length === 0) {
+                list.innerHTML = '<div style="text-align:center; margin-top:40px; color:var(--text-sec);">Cart is empty</div>';
+                totalEl.innerText = "0 KHR";
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
             currentOrder.forEach(item => {
+                let finalPrice = item.basePrice;
+                if(item.milkOption === 'Oat') finalPrice += item.oatPrice;
+                total += finalPrice;
+
                 html += `
-                    <div class="cart-item">
-                        <div class="cart-details">
-                            <span class="cart-name">${item.name}</span>
-                            ${item.milk ? `<select class="dropdown-select" onchange="updateMilk(${item.id}, this.value)">${milkOptions.map(opt => `<option value="${opt}" ${opt === item.milk ? 'selected' : ''}>${opt}</option>`).join('')}</select>` : ''}
-                            <select class="dropdown-select" onchange="updateSweetness(${item.id}, this.value)">
-                                ${sweetnessLevels.map(lvl => `<option value="${lvl}" ${lvl === item.sweetness ? 'selected' : ''}>${lvl}</option>`).join('')}
+                <div class="cart-item">
+                    <div class="item-info">
+                        <span class="item-title">${item.name}</span>
+                        <div class="item-opts">
+                            ${item.hasMilk ? `
+                                <select class="opt-select" onchange="updateCartItem(${item.uid}, 'milk', this.value)">
+                                    <option value="Milk" ${item.milkOption==='Milk'?'selected':''}>Milk</option>
+                                    <option value="Oat" ${item.milkOption==='Oat'?'selected':''}>Oat (+${item.oatPrice})</option>
+                                </select>
+                            ` : ''}
+                            <select class="opt-select" onchange="updateCartItem(${item.uid}, 'sweet', this.value)">
+                                <option ${item.sweetness==='100%'?'selected':''}>100%</option>
+                                <option ${item.sweetness==='75%'?'selected':''}>75%</option>
+                                <option ${item.sweetness==='50%'?'selected':''}>50%</option>
+                                <option ${item.sweetness==='25%'?'selected':''}>25%</option>
+                                <option ${item.sweetness==='0%'?'selected':''}>0%</option>
                             </select>
                         </div>
-                        <div class="cart-action">
-                            <span style="font-weight:bold; font-size:13px;">${item.price.toLocaleString()}</span>
-                            <button class="delete-btn" onclick="removeItem(${item.id})">×</button>
-                        </div>
-                    </div>`;
-                subtotal += item.price;
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-weight:700; font-size:14px;">${finalPrice.toLocaleString()}</span>
+                        <button onclick="removeFromCart(${item.uid})" style="border:none; background:rgba(255,0,0,0.1); color:#d32f2f; width:24px; height:24px; border-radius:50%; font-weight:bold;">×</button>
+                    </div>
+                </div>`;
             });
-            
-            list.innerHTML = html || '<div style="text-align:center; color:#ccc; margin-top:20px;">Empty Cart</div>';
-            total.textContent = `${subtotal.toLocaleString()} KHR`;
+
+            list.innerHTML = html;
+            totalEl.innerText = total.toLocaleString() + ' KHR';
             list.scrollTop = list.scrollHeight;
         }
 
-        function updateSweetness(id, val) {
-            const item = currentOrder.find(i => i.id === id);
-            if (item) item.sweetness = val;
+        function updateCartItem(uid, type, val) {
+            const item = currentOrder.find(i => i.uid === uid);
+            if(item) {
+                if(type === 'milk') item.milkOption = val;
+                if(type === 'sweet') item.sweetness = val;
+                renderCart();
+            }
+        }
+        function removeFromCart(uid) {
+            currentOrder = currentOrder.filter(i => i.uid !== uid);
+            renderCart();
         }
 
-        function updateMilk(id, val) {
-            const item = currentOrder.find(i => i.id === id);
-            if (item) item.milk = val;
+        // --- ORDER PROCESSING & CLEARING ---
+        function confirmOrder() {
+            if(currentOrder.length === 0) return;
+            showSimpleModal("Confirm Order", "Are you ready to charge this order?", processPayment);
+        }
+        
+        function confirmClear() {
+            if(currentOrder.length === 0) return;
+            showSimpleModal("Clear Cart", "Remove all items?", () => { 
+                currentOrder = []; 
+                renderCart(); 
+            });
         }
 
-        function removeItem(id) {
-            const idx = currentOrder.findIndex(i => i.id === id);
-            if(idx > -1) currentOrder.splice(idx, 1);
-            updateOrderDisplay();
-        }
-
-        function completeOrder() {
-            if (currentOrder.length === 0) return;
-            const subtotal = currentOrder.reduce((s, i) => s + i.price, 0);
+        function processPayment() {
             const now = new Date();
-            
-            // 1. Group for history & Cloud
-            const groupedOrder = {};
+            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const dateStr = now.toDateString();
+            const orderId = Date.now();
+            let totalSale = 0;
             const cloudItems = [];
+            const historyGroup = {};
 
             currentOrder.forEach(item => {
-                let key = `${item.name} (${item.sweetness})`;
-                if (item.milk && item.name !== 'Coffee Condensed Milk') key += ` ${item.milk}`;
-                
-                if (!groupedOrder[key]) {
-                    groupedOrder[key] = {
-                        name: key, // Full name
-                        qty: 0, 
-                        unitPrice: item.price,
-                        unitCost: item.cost
-                    };
-                }
-                groupedOrder[key].qty++;
+                let finalPrice = item.basePrice;
+                if(item.milkOption === 'Oat') finalPrice += item.oatPrice;
+                totalSale += finalPrice;
+
+                let fullName = `${item.name} (${item.sweetness})`;
+                if(item.milkOption) fullName += ` [${item.milkOption}]`;
+
+                cloudItems.push({
+                    date: dateStr, time: timeStr, id: orderId,
+                    name: fullName, price: finalPrice, cost: item.baseCost,
+                    qty: 1, profit: finalPrice - item.baseCost
+                });
+
+                if(!historyGroup[fullName]) historyGroup[fullName] = { qty:0, price:finalPrice };
+                historyGroup[fullName].qty++;
             });
 
-            // Convert for Cloud Upload
-            for (let k in groupedOrder) {
-                let i = groupedOrder[k];
-                cloudItems.push({
-                    date: now.toDateString(),
-                    time: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                    id: Date.now(),
-                    name: i.name,
-                    price: i.unitPrice,
-                    cost: i.unitCost,
-                    qty: i.qty,
-                    profit: (i.unitPrice * i.qty) - (i.unitCost * i.qty)
-                });
-            }
-
-            // 2. SEND TO GOOGLE SHEETS (Automatic Backup)
-            // Using 'no-cors' mode which is required for Google Scripts to accept data without complex handshake
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors', 
+                method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user: deviceName, items: cloudItems })
-            }).then(() => console.log("Data synced to sheet"))
-              .catch(err => console.error("Sync failed", err));
-            
-            // 3. Save to Local Storage (Instant feel)
-            const record = {
-                id: Date.now(),
-                time: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                drinks: groupedOrder, 
-                total: subtotal
-            };
-            
-            todayRecords.unshift(record);
-            localStorage.setItem('cafeRecords_' + now.toDateString(), JSON.stringify(todayRecords));
-            currentOrder = []; orderIndex = 0;
-            updateOrderDisplay();
-            updateRecordsDisplay();
+            }).catch(e => console.log('Offline'));
+
+            todayRecords.unshift({ id: orderId, time: timeStr, items: historyGroup, total: totalSale });
+            localStorage.setItem('myday_records_' + dateStr, JSON.stringify(todayRecords));
+
+            currentOrder = [];
+            renderCart();
+            renderHistoryList();
         }
 
-        function updateRecordsDisplay() {
-            const list = document.getElementById('recordList');
-            if (todayRecords.length === 0) { list.innerHTML = '<div style="text-align:center; color:#999; font-size:12px;">No sales yet.</div>'; return; }
-            let html = ''; let dailyTotal = 0;
-            
-            todayRecords.forEach(r => {
-                let dStr = ''; 
-                for(let k in r.drinks) dStr += `${k} x${r.drinks[k].qty}, `;
-                dStr = dStr.slice(0, -2);
-                
-                html += `<div class="record-item">
-                    <div class="record-top">
-                        <span>${r.time}</span>
-                        <button class="del-btn" onclick="deleteRecord(${r.id})">×</button>
-                    </div>
-                    <div class="record-body">${dStr}</div>
-                    <div class="record-price">${r.total.toLocaleString()} KHR</div>
+        // --- HISTORY ---
+        function openHistory() { renderHistoryList(); document.getElementById('historyPage').classList.add('open'); }
+        function closeHistory() { document.getElementById('historyPage').classList.remove('open'); }
+        function renderHistoryList() {
+            const list = document.getElementById('historyList');
+            if(todayRecords.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-sec); margin-top:20px;">No sales today</div>'; return; }
+            let html = ''; let grandTotal = 0;
+            todayRecords.forEach(rec => {
+                grandTotal += rec.total;
+                let desc = []; for(let k in rec.items) desc.push(`${rec.items[k].qty}x ${k}`);
+                html += `<div style="background:var(--surface); padding:15px; border-radius:12px; margin-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,0.02);">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-sec); margin-bottom:5px;"><span>${rec.time}</span><span>#${rec.id.toString().slice(-4)}</span></div>
+                    <div style="font-size:14px; color:var(--text); margin-bottom:8px;">${desc.join(', ')}</div>
+                    <div style="font-weight:800; color:var(--primary); text-align:right;">${rec.total.toLocaleString()}</div>
                 </div>`;
-                dailyTotal += r.total;
             });
-            html += `<div class="daily-total">Today: ${dailyTotal.toLocaleString()} KHR</div>`;
-            list.innerHTML = html;
+            list.innerHTML = `<div style="text-align:center; font-size:18px; font-weight:800; padding:15px; color:var(--text);">Total: ${grandTotal.toLocaleString()} KHR</div>` + html;
         }
+        function resetHistory() { showSimpleModal("Reset History", "Delete all local records for today?", () => { todayRecords = []; localStorage.removeItem('myday_records_' + new Date().toDateString()); renderHistoryList(); }); }
 
-        function clearOrder() { currentOrder = []; updateOrderDisplay(); }
-        function deleteRecord(id) {
-            if(confirm('Delete?')) {
-                todayRecords = todayRecords.filter(r => r.id !== id);
-                localStorage.setItem('cafeRecords_' + new Date().toDateString(), JSON.stringify(todayRecords));
-                updateRecordsDisplay();
-            }
-        }
-        function clearRecords() {
-            if(confirm('Reset all?')) {
-                todayRecords = [];
-                localStorage.removeItem('cafeRecords_' + new Date().toDateString());
-                updateRecordsDisplay();
-            }
-        }
+        // --- SETTINGS (REORDER CATS & DRINKS) ---
+        function openSettings() {
+            const mContent = document.getElementById('modalContent');
+            
+            // Generate Category Options from Dynamic List
+            const catOptions = categoryOrder.map(c => `<option value="${c}">${c}</option>`).join('');
 
-        function exportToExcel() {
-            if (todayRecords.length === 0) { alert('No records!'); return; }
-            let csv = "\uFEFF"; 
-            csv += "Date,Time,Device,Order ID,Item Name,Unit Sell Price,Unit Real Cost,Quantity,Total Sell,Total Cost,Total Profit\n";
-            todayRecords.forEach(r => {
-                for (let drinkName in r.drinks) {
-                    const item = r.drinks[drinkName];
-                    const qty = item.qty;
-                    const totalSell = item.unitPrice * qty;
-                    const totalCost = item.unitCost * qty;
-                    const cleanName = drinkName.replace(/"/g, '""');
-                    csv += `"${new Date().toDateString()}",${r.time},"${deviceName}","${r.id}","${cleanName}",${item.unitPrice},${item.unitCost},${qty},${totalSell},${totalCost},${totalSell - totalCost}\n`;
+            // Palette
+            const palette = [
+                {c:'#3E2723', n:'Dark Coffee'}, {c:'#795548', n:'Light Coffee'}, {c:'#D7CCC8', n:'Latte/Milk'},
+                {c:'#4CAF50', n:'Matcha'}, {c:'#8BC34A', n:'Light Green'}, {c:'#FF5722', n:'Thai Tea'},
+                {c:'#E91E63', n:'Strawberry'}, {c:'#F48FB1', n:'Pink'}, {c:'#9C27B0', n:'Taro/Purple'},
+                {c:'#FFC107', n:'Mango/Yellow'}, {c:'#009688', n:'Teal'}, {c:'#2196F3', n:'Soda/Blue'}
+            ];
+
+            const html = `
+                <div style="background:rgba(230,81,0,0.1); padding:10px; border-radius:8px; margin-bottom:15px;">
+                    <div style="font-weight:700; margin-bottom:5px; font-size:13px; color:#e65100;">MANAGE CATEGORIES</div>
+                    <div id="cat_list_ui"></div>
+                    <div style="display:flex; gap:5px; margin-top:5px;">
+                        <input type="text" id="new_cat_input" placeholder="New Category" class="form-input" style="padding:6px; font-size:12px;">
+                        <button onclick="addNewCategory()" style="background:#e65100; color:white; border:none; border-radius:6px; padding:0 10px; font-weight:bold;">+</button>
+                    </div>
+                </div>
+
+                <div style="border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:15px;">
+                    <div style="font-weight:700; margin-bottom:10px;">Add New Drink</div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="set_cat" class="form-input">
+                            ${catOptions}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="set_name" class="form-input" placeholder="Drink Name">
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <input type="number" id="set_price" class="form-input" placeholder="Price">
+                        <input type="number" id="set_cost" class="form-input" placeholder="Cost">
+                    </div>
+                    
+                    <div style="background:var(--bg); padding:10px; border-radius:8px; margin:10px 0;">
+                        <label style="display:flex; align-items:center; gap:10px; font-size:14px; margin-bottom:5px;">
+                            <input type="checkbox" id="set_milk" onchange="document.getElementById('oat_field').style.display=this.checked?'block':'none'">
+                            Enable Milk Options?
+                        </label>
+                        <div id="oat_field" style="display:none;">
+                            <input type="number" id="set_oat" class="form-input" value="2000" placeholder="Oat +Price">
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:5px; margin-bottom:15px; flex-wrap:wrap;">
+                        ${palette.map(p => 
+                            `<div title="${p.n}" onclick="document.getElementById('set_color').value='${p.c}'; highlightColor(this);" class="color-swatch" style="width:24px; height:24px; background:${p.c}; border-radius:50%; cursor:pointer; border:1px solid #ddd;"></div>`
+                        ).join('')}
+                        <input type="hidden" id="set_color" value="#4CAF50">
+                    </div>
+                </div>
+                
+                <div style="font-weight:700; margin-bottom:10px;">Reorder Drinks</div>
+                <div id="manage_list" style="max-height:200px; overflow-y:auto; font-size:12px;"></div>
+            `;
+            
+            mContent.innerHTML = html;
+            renderCategoryListUI();
+            renderManageList();
+
+            showModal("Menu Settings", () => {
+                const name = document.getElementById('set_name').value;
+                const price = parseInt(document.getElementById('set_price').value);
+                
+                if(name && price) {
+                    menuItems.push({
+                        id: Date.now(),
+                        category: document.getElementById('set_cat').value,
+                        name: name,
+                        price: price,
+                        cost: parseInt(document.getElementById('set_cost').value) || 0,
+                        color: document.getElementById('set_color').value,
+                        hasMilk: document.getElementById('set_milk').checked,
+                        oatPrice: parseInt(document.getElementById('set_oat').value) || 0
+                    });
+                    saveMenu();
                 }
             });
-            const link = document.createElement("a");
-            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-            link.download = `Sales_${new Date().toISOString().slice(0,10)}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        }
+        
+        // --- CATEGORY MANAGER LOGIC ---
+        function renderCategoryListUI() {
+            const ui = document.getElementById('cat_list_ui');
+            if(!ui) return;
+            ui.innerHTML = '';
+            categoryOrder.forEach((cat, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = "display:flex; justify-content:space-between; margin-bottom:5px; background:var(--surface); padding:4px; border-radius:4px;";
+                row.innerHTML = `
+                    <span style="font-weight:bold; font-size:12px; color:var(--text);">${cat}</span>
+                    <div style="display:flex; gap:2px;">
+                        <button onclick="moveCat(${idx}, -1)" style="font-size:10px;">↑</button>
+                        <button onclick="moveCat(${idx}, 1)" style="font-size:10px;">↓</button>
+                    </div>
+                `;
+                ui.appendChild(row);
+            });
         }
 
-        updateOrderDisplay();
-        updateRecordsDisplay();
+        function moveCat(idx, dir) {
+            const newIdx = idx + dir;
+            if (newIdx >= 0 && newIdx < categoryOrder.length) {
+                [categoryOrder[idx], categoryOrder[newIdx]] = [categoryOrder[newIdx], categoryOrder[idx]];
+                localStorage.setItem('myday_categories', JSON.stringify(categoryOrder));
+                renderCategoryListUI();
+                renderMenu();
+                // We also need to re-render dropdown options
+                openSettings(); // Brute force refresh the modal
+            }
+        }
+
+        function addNewCategory() {
+            const val = document.getElementById('new_cat_input').value;
+            if(val && !categoryOrder.includes(val)) {
+                categoryOrder.push(val);
+                localStorage.setItem('myday_categories', JSON.stringify(categoryOrder));
+                openSettings(); // Refresh
+            }
+        }
+
+        // --- DRINK MANAGER LOGIC ---
+        window.highlightColor = function(el) {
+            document.querySelectorAll('.color-swatch').forEach(d => d.style.transform = 'scale(1)');
+            el.style.transform = 'scale(1.3)';
+            el.style.border = '2px solid #333';
+        }
+
+        function renderManageList() {
+            const list = document.getElementById('manage_list');
+            if(!list) return;
+            list.innerHTML = '';
+            menuItems.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid var(--border); background:var(--surface);";
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <div style="width:12px; height:12px; background:${item.color}; border-radius:50%;"></div>
+                        <span style="font-weight:600; color:var(--text);">${item.name}</span>
+                        <span style="color:var(--text-sec); font-size:10px;">(${item.category})</span>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button onclick="moveItem(${index}, -1)" style="border:1px solid var(--border); background:var(--bg); cursor:pointer; color:var(--text);">↑</button>
+                        <button onclick="moveItem(${index}, 1)" style="border:1px solid var(--border); background:var(--bg); cursor:pointer; color:var(--text);">↓</button>
+                        <button onclick="deleteItem(${item.id})" style="border:none; background:rgba(255,0,0,0.1); color:red; cursor:pointer; font-weight:bold;">×</button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function moveItem(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < menuItems.length) {
+                [menuItems[index], menuItems[newIndex]] = [menuItems[newIndex], menuItems[index]];
+                saveMenu();
+                renderManageList(); 
+                renderMenu(); 
+            }
+        }
+
+        function deleteItem(id) {
+            if(confirm("Delete item?")) {
+                menuItems = menuItems.filter(i => i.id !== id);
+                saveMenu();
+                renderManageList();
+            }
+        }
+
+        function saveMenu() {
+            localStorage.setItem('myday_menu_v3', JSON.stringify(menuItems));
+            renderMenu();
+        }
+
+        // --- MODAL UTILS (FIXED) ---
+        const modal = document.getElementById('modalBackdrop');
+        const mTitle = document.getElementById('modalTitle');
+        const mContent = document.getElementById('modalContent');
+        
+        function showSimpleModal(title, msg, action) {
+            mContent.innerHTML = `<p style="color:var(--text-sec); padding:10px 0;">${msg}</p>`;
+            showModal(title, action);
+        }
+
+        function showModal(title, action) {
+            mTitle.innerText = title;
+            modal.classList.add('active');
+            
+            // Re-find buttons every time to prevent detached node error
+            // (Previous bugs were due to holding onto old references)
+            const oldBtn = document.getElementById('modalConfirmBtn');
+            const newBtn = oldBtn.cloneNode(true);
+            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+            
+            newBtn.onclick = () => {
+                if(action) action();
+                closeModal();
+            };
+        }
+
+        function closeModal() { modal.classList.remove('active'); }
+
+        // INIT
+        renderMenu();
     </script>
 </body>
 </html>
