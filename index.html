@@ -31,6 +31,11 @@
             z-index: 10;
         }
         .top-bar h1 { margin: 0; font-size: 18px; font-weight: 700; }
+        
+        .device-badge {
+            background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-right: 10px;
+        }
+
         .export-btn {
             background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.2);
             padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
@@ -192,8 +197,11 @@
 <body>
 
     <div class="top-bar">
-        <h1>My Day Matcha</h1>
-        <button class="export-btn" onclick="exportToExcel()">📊 Export</button>
+        <div style="display:flex; align-items:center;">
+            <h1>My Day Matcha</h1>
+            <span id="deviceDisplay" class="device-badge" style="margin-left:15px; color:#cfd8dc; font-weight:normal;"></span>
+        </div>
+        <button class="export-btn" onclick="exportToExcel()">📊 Export CSV</button>
     </div>
 
     <div class="dashboard">
@@ -232,6 +240,11 @@
     </div>
 
     <script>
+        // ==========================================
+        // CONFIGURATION: YOUR DATA CONNECTION
+        // ==========================================
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2sAhVj0OvaUW_90iDg4D0e7xgnJagQVIumqeYljT9h2IgA6GsJoHTo6d_ENsieEbW/exec'; 
+        
         // --- REAL COST CONFIGURATION ---
         const drinkCosts = {
             'Matcha Latte': 4500,
@@ -247,17 +260,22 @@
         let todayRecords = JSON.parse(localStorage.getItem('cafeRecords_' + new Date().toDateString())) || [];
         const sweetnessLevels = ['100%', '75%', '50%', '30%', '10%', '0%'];
         const milkOptions = ['Milk', 'Oat Milk'];
-        const milkDrinks = ['Matcha Latte', 'Matcha Strawberry'];
+        
+        // --- DEVICE / USER IDENTITY ---
+        let deviceName = localStorage.getItem('matcha_device_name');
+        if (!deviceName) {
+            deviceName = prompt("Enter Device Name (e.g. 'Phone', 'Laptop', 'Staff 1'):") || "Unknown Device";
+            localStorage.setItem('matcha_device_name', deviceName);
+        }
+        document.getElementById('deviceDisplay').innerText = deviceName;
 
         function addDrink(name, price, hasMilk) {
-            // Lookup Cost
             const myCost = drinkCosts[name] || 0;
-
             currentOrder.push({
                 id: orderIndex++, 
                 name: name, 
                 price: price, 
-                cost: myCost, // Store cost here
+                cost: myCost, 
                 sweetness: '100%', 
                 milk: hasMilk ? 'Milk' : null
             });
@@ -312,33 +330,62 @@
         function completeOrder() {
             if (currentOrder.length === 0) return;
             const subtotal = currentOrder.reduce((s, i) => s + i.price, 0);
+            const now = new Date();
             
-            // Group for history display
+            // 1. Group for history & Cloud
             const groupedOrder = {};
+            const cloudItems = [];
+
             currentOrder.forEach(item => {
                 let key = `${item.name} (${item.sweetness})`;
                 if (item.milk && item.name !== 'Coffee Condensed Milk') key += ` ${item.milk}`;
                 
-                // IMPORTANT: Save BOTH Price and Cost into the record
                 if (!groupedOrder[key]) {
                     groupedOrder[key] = {
+                        name: key, // Full name
                         qty: 0, 
                         unitPrice: item.price,
-                        unitCost: item.cost // Saving cost for export
+                        unitCost: item.cost
                     };
                 }
                 groupedOrder[key].qty++;
             });
+
+            // Convert for Cloud Upload
+            for (let k in groupedOrder) {
+                let i = groupedOrder[k];
+                cloudItems.push({
+                    date: now.toDateString(),
+                    time: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    id: Date.now(),
+                    name: i.name,
+                    price: i.unitPrice,
+                    cost: i.unitCost,
+                    qty: i.qty,
+                    profit: (i.unitPrice * i.qty) - (i.unitCost * i.qty)
+                });
+            }
+
+            // 2. SEND TO GOOGLE SHEETS (Automatic Backup)
+            // Using 'no-cors' mode which is required for Google Scripts to accept data without complex handshake
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: deviceName, items: cloudItems })
+            }).then(() => console.log("Data synced to sheet"))
+              .catch(err => console.error("Sync failed", err));
             
+            // 3. Save to Local Storage (Instant feel)
             const record = {
                 id: Date.now(),
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                time: now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                 drinks: groupedOrder, 
                 total: subtotal
             };
             
             todayRecords.unshift(record);
-            localStorage.setItem('cafeRecords_' + new Date().toDateString(), JSON.stringify(todayRecords));
+            localStorage.setItem('cafeRecords_' + now.toDateString(), JSON.stringify(todayRecords));
             currentOrder = []; orderIndex = 0;
             updateOrderDisplay();
             updateRecordsDisplay();
@@ -350,7 +397,8 @@
             let html = ''; let dailyTotal = 0;
             
             todayRecords.forEach(r => {
-                let dStr = ''; for(let k in r.drinks) dStr += `${k} x${r.drinks[k].qty}, `;
+                let dStr = ''; 
+                for(let k in r.drinks) dStr += `${k} x${r.drinks[k].qty}, `;
                 dStr = dStr.slice(0, -2);
                 
                 html += `<div class="record-item">
@@ -385,29 +433,18 @@
 
         function exportToExcel() {
             if (todayRecords.length === 0) { alert('No records!'); return; }
-            
             let csv = "\uFEFF"; 
-            // UPDATED HEADERS: Added Cost and Profit columns
-            csv += "Date,Time,Order ID,Item Name,Unit Sell Price (KHR),Unit Real Cost (KHR),Quantity,Total Sell (KHR),Total Cost (KHR),Total Profit (KHR)\n";
-            
+            csv += "Date,Time,Device,Order ID,Item Name,Unit Sell Price,Unit Real Cost,Quantity,Total Sell,Total Cost,Total Profit\n";
             todayRecords.forEach(r => {
                 for (let drinkName in r.drinks) {
                     const item = r.drinks[drinkName];
                     const qty = item.qty;
-                    
-                    const unitPrice = item.unitPrice || 0; 
-                    const unitCost = item.unitCost || 0; // The real price
-                    
-                    const totalSell = unitPrice * qty;
-                    const totalCost = unitCost * qty;
-                    const totalProfit = totalSell - totalCost;
-                    
+                    const totalSell = item.unitPrice * qty;
+                    const totalCost = item.unitCost * qty;
                     const cleanName = drinkName.replace(/"/g, '""');
-                    
-                    csv += `"${new Date().toDateString()}",${r.time},"${r.id}","${cleanName}",${unitPrice},${unitCost},${qty},${totalSell},${totalCost},${totalProfit}\n`;
+                    csv += `"${new Date().toDateString()}",${r.time},"${deviceName}","${r.id}","${cleanName}",${item.unitPrice},${item.unitCost},${qty},${totalSell},${totalCost},${totalSell - totalCost}\n`;
                 }
             });
-            
             const link = document.createElement("a");
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
             link.download = `Sales_${new Date().toISOString().slice(0,10)}.csv`;
