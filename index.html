@@ -8,249 +8,329 @@
     <link rel="icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- 1. VARIABLES & THEMES --- */
+        /* --- 1. VARIABLES --- */
         :root {
-            /* Light Theme (Default) */
             --primary: #2e7d32;
-            --bg: #f4f6f9;
-            --surface: #ffffff;
-            --text: #2d3436;
-            --text-sec: #636e72;
-            --border: #eeeeee;
-            --input-bg: #f9f9f9;
-            --radius: 16px;
-            --anim: cubic-bezier(0.25, 0.8, 0.25, 1);
+            --primary-soft: rgba(46, 125, 50, 0.08);
+            --bg: #F2F4F6;
+            --surface: #FFFFFF;
+            --text: #1a1a1a;
+            --text-sec: #8e8e93;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --spacing: 20px;
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
+            --anim: cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Dark Theme Override */
         [data-theme="dark"] {
-            --bg: #121212;         /* Deep Black-Grey */
-            --surface: #1e1e1e;    /* Card Surface */
-            --text: #e0e0e0;       /* Soft White */
-            --text-sec: #a0a0a0;   /* Dimmed Text */
-            --border: #333333;     /* Dark Borders */
-            --input-bg: #2c2c2c;   /* Dark Inputs */
+            --bg: #000000; --surface: #1c1c1e; --text: #ffffff;
+            --text-sec: #98989d; --primary-soft: rgba(255, 255, 255, 0.1);
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
             background: var(--bg); color: var(--text);
-            margin: 0; padding: 0; height: 100vh; 
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
             display: flex; flex-direction: column; overflow: hidden;
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: background 0.4s var(--anim), color 0.4s var(--anim);
         }
 
         /* --- 2. HEADER --- */
         .app-header {
-            background: var(--surface); height: 60px; padding: 0 20px;
+            height: 70px; padding: 0 var(--spacing);
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); z-index: 50; flex-shrink: 0;
-            transition: background 0.3s ease;
+            background: transparent; z-index: 50; flex-shrink: 0;
         }
         
         .brand { 
-            font-size: 20px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;
-            display: flex; align-items: center;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px;
+            display: flex; align-items: center; 
+            backdrop-filter: blur(20px);
+            padding: 8px 16px 8px 8px; border-radius: 100px;
+            background: var(--surface); box-shadow: var(--shadow);
         }
         
-        .app-logo {
-            height: 40px; width: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
-            object-fit: cover;
-            border: 2px solid var(--border);
-            background: #fff; 
+        .app-logo { 
+            height: 36px; width: 36px; border-radius: 50%; margin-right: 12px; 
+            object-fit: cover; background: var(--bg);
         }
 
-        .header-actions { display: flex; gap: 10px; }
-        .icon-btn {
-            background: var(--input-bg); border: none; font-size: 18px; cursor: pointer;
-            width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s; color: var(--text);
+        .header-actions { 
+            display: flex; gap: 12px; 
+            background: var(--surface); padding: 6px; border-radius: 100px;
+            box-shadow: var(--shadow);
         }
-        .icon-btn:hover { background: var(--border); color: var(--primary); transform: translateY(-2px); }
+        
+        .icon-btn {
+            background: transparent; border: none; font-size: 18px; cursor: pointer;
+            width: 40px; height: 40px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text); transition: transform 0.2s var(--anim), background 0.2s;
+        }
+        .icon-btn:hover { background: var(--bg); transform: scale(1.05); }
         .icon-btn:active { transform: scale(0.9); }
 
-        /* --- 3. MAIN STAGE --- */
+        /* --- 3. MAIN STAGE (DESKTOP DEFAULT) --- */
         .main-stage {
-            flex: 1; display: flex; overflow: hidden; position: relative;
-        }
-
-        /* MENU AREA */
-        .menu-area {
-            background: var(--bg);
-            flex: 2; padding: 15px; overflow-y: auto; 
-            border-right: 1px solid var(--border);
-            transition: background 0.3s ease;
-        }
-        
-        .category-section { 
-            margin-bottom: 25px; animation: fadeIn 0.4s ease-out; 
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
-
-        .category-title {
-            font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--primary);
-            margin: 0 0 10px 5px; letter-spacing: 0.5px; opacity: 0.9;
-            border-left: 4px solid var(--primary); padding-left: 8px;
-        }
-
-        .menu-grid {
+            flex: 1; padding: 0 var(--spacing) var(--spacing) var(--spacing);
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
-            gap: 12px;
+            grid-template-columns: 1.6fr 1fr;
+            gap: var(--spacing);
+            overflow: hidden;
         }
 
-        /* CART AREA */
+        /* MENU (DESKTOP) */
+        .menu-area {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-auto-rows: 90px;
+            gap: 16px;
+            box-shadow: var(--shadow);
+            align-content: start;
+        }
+
+        /* BUTTONS (DESKTOP) */
+        .drink-btn {
+            background: var(--card-color); color: white;
+            border: none; border-radius: var(--radius-md);
+            width: 100%; height: 100%;
+            padding: 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; line-height: 1.3; text-align: center;
+            position: relative; cursor: pointer; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s var(--anim);
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        }
+        .drink-btn:hover { transform: translateY(-4px) scale(1.02); z-index: 2; }
+        .drink-btn:active { transform: scale(0.95); }
+
+        /* Animations */
+        @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .drink-btn { animation: floatUp 0.6s var(--anim) backwards; }
+        .drink-btn:nth-child(odd) { animation-delay: 0.1s; }
+        .drink-btn:nth-child(even) { animation-delay: 0.2s; }
+
+        /* CART (DESKTOP) */
         .cart-area {
             background: var(--surface);
-            display: flex; flex-direction: column; z-index: 10;
-            flex: 1; box-shadow: none; 
-            border-left: 1px solid var(--border);
-            transition: background 0.3s ease;
+            border-radius: var(--radius-lg);
+            display: flex; flex-direction: column;
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
 
-        /* --- 4. MOBILE LAYOUT --- */
-        @media (max-width: 768px) {
-            .main-stage { flex-direction: column; }
-
-            .menu-area {
-                flex: 1; height: 50%; border-right: none; width: 100%;
-                display: flex; flex-direction: row; overflow-x: auto; overflow-y: hidden;
-                padding: 15px 10px; gap: 20px;
-            }
-
-            .category-section {
-                flex: 0 0 auto; width: auto; min-width: 0;
-                background: transparent; box-shadow: none; border-radius: 0;
-                padding: 0; margin-bottom: 0; display: flex; flex-direction: column;
-            }
-
-            .category-title {
-                margin-bottom: 8px; font-size: 12px; border-left: none; 
-                padding-left: 2px; color: var(--text-sec);
-            }
-            
-            .menu-grid {
-                display: grid;
-                grid-template-rows: repeat(2, 1fr); 
-                grid-auto-flow: column; 
-                gap: 8px; height: 100%; 
-            }
-            
-            .drink-card { width: 140px; height: 100%; min-height: 0; }
-
-            .cart-area {
-                flex: 1; height: 50%;
-                border-top-left-radius: 24px; border-top-right-radius: 24px;
-                box-shadow: 0 -5px 20px rgba(0,0,0,0.15); border-left: none;
-            }
-        }
-
-        /* --- 5. COMPONENT STYLES --- */
-        .drink-card {
-            background: var(--card-color); color: white; 
-            border: none; padding: 15px 10px; border-radius: var(--radius); cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            min-height: 100px; position: relative; overflow: hidden;
-            transition: transform 0.2s var(--anim), box-shadow 0.2s;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-        .drink-card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.2); }
-        .drink-card:active { transform: scale(0.92); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .drink-card::after {
-            content:''; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(to bottom right, rgba(255,255,255,0.25), rgba(0,0,0,0.05));
-            pointer-events: none;
-        }
-        .drink-name { font-size: 15px; font-weight: 700; line-height: 1.3; z-index: 2; position: relative; }
-
-        /* Cart */
         .cart-header {
-            padding: 15px 20px; font-size: 12px; font-weight: 700; color: var(--text-sec);
-            text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
+            padding: 24px 24px 10px 24px;
+            font-size: 11px; font-weight: 800; color: var(--text-sec);
+            text-transform: uppercase; letter-spacing: 2px;
         }
-        .cart-list { flex: 1; overflow-y: auto; padding: 0 15px; }
+        
+        .cart-list { flex: 1; overflow-y: auto; padding: 0 24px; scrollbar-width: none; }
+        .cart-list::-webkit-scrollbar { display: none; }
+
         .cart-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px dashed var(--border);
-            animation: slideUp 0.3s var(--anim);
-        }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
-
-        .item-info { display: flex; flex-direction: column; gap: 4px; }
-        .item-title { font-weight: 700; font-size: 14px; color: var(--text); }
-        .item-opts { display: flex; gap: 6px; }
-        .opt-select { 
-            background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; 
-            font-size: 11px; padding: 2px 6px; color: var(--text); font-weight: 600;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 0; border-bottom: 1px solid var(--primary-soft);
+            animation: floatUp 0.4s var(--anim);
         }
 
-        .cart-footer {
-            padding: 15px 20px; background: var(--surface); border-top: 1px solid var(--border);
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
+        .item-left { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
+        .item-name {
+            font-size: 14px; font-weight: 600; color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;
         }
-        .total-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
-        .total-label { font-size: 12px; color: var(--text-sec); font-weight: 600; }
-        .total-value { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1; }
 
-        .action-grid { display: flex; gap: 10px; }
-        .btn {
-            flex: 1; border: none; border-radius: 12px; padding: 14px;
-            font-size: 14px; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: transform 0.1s;
+        .mini-select {
+            background: var(--bg); border: none;
+            border-radius: 8px; font-size: 11px; font-weight: 600;
+            color: var(--text); padding: 4px 8px; text-align: center;
+            outline: none; cursor: pointer; appearance: none;
+        }
+
+        .item-right { display: flex; align-items: center; gap: 12px; }
+        .item-price { font-weight: 700; font-size: 14px; color: var(--text); }
+        
+        .del-btn {
+            color: var(--text-sec); background: transparent; border: none;
+            font-size: 20px; font-weight: 400; cursor: pointer; padding: 0;
+        }
+        .del-btn:hover { color: #FF3B30; }
+
+        .cart-footer { padding: 24px; background: var(--surface); }
+        
+        .total-row {
+            display: flex; justify-content: space-between; align-items: baseline;
+            margin-bottom: 20px;
+        }
+        .total-label { font-size: 14px; color: var(--text-sec); font-weight: 600; }
+        .total-display { font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+
+        .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; }
+        .btn { 
+            padding: 16px; border: none; border-radius: var(--radius-md); 
+            font-weight: 700; font-size: 15px; cursor: pointer; 
+            transition: transform 0.2s var(--anim), box-shadow 0.2s;
         }
         .btn:active { transform: scale(0.96); }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); }
-        .btn-secondary { background: var(--input-bg); color: var(--text-sec); border: 1px solid var(--border); }
+        .btn-confirm { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15); }
+        .btn-clear { background: var(--bg); color: var(--text); }
 
-        /* --- 6. POPUP WINDOWS --- */
-        .modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-            z-index: 200; opacity: 0; pointer-events: none;
-            display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.2s;
+        /* --- 4. MOBILE TRANSFORMATION --- */
+        @media (max-width: 768px) {
+            :root { --spacing: 0px; --radius-lg: 20px; }
+            
+            .app-header { padding: 0 20px; height: 60px; }
+            .brand { box-shadow: none; background: transparent; padding: 0; }
+            .header-actions { box-shadow: none; background: transparent; padding: 0; }
+
+            .main-stage {
+                display: block; position: relative;
+            }
+
+            /* MENU: Full Screen Scroll */
+            .menu-area {
+                border-radius: 0; box-shadow: none;
+                width: 100%;
+                height: calc(100vh - 60px); 
+                padding: 10px 20px 80px 20px; /* Space for mini bar */
+                background: transparent;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-auto-rows: min-content;
+                gap: 10px;
+                align-content: start;
+                overflow-y: auto;
+            }
+
+            .drink-btn {
+                width: 100%; height: 45px; max-height: 45px; padding: 5px;
+                font-size: 13px; border-radius: 16px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            }
+
+            /* CART: Floating Mini Bar */
+            .cart-area {
+                position: fixed; 
+                bottom: 0; left: 0; width: 100%;
+                height: 60px; /* Collapsed Height */
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+                box-shadow: 0 -5px 30px rgba(0,0,0,0.15);
+                border: none;
+                z-index: 100;
+                transition: height 0.4s cubic-bezier(0.2, 0.9, 0.1, 1);
+                
+                background: var(--primary);
+                color: white;
+            }
+            
+            .cart-header {
+                height: 60px; padding: 0 25px;
+                display: flex; justify-content: space-between; align-items: center;
+                cursor: pointer; border-bottom: none;
+                color: white; 
+                position: relative;
+            }
+            
+            /* --- VISUAL CUE: THE HANDLE --- */
+            .cart-header::before {
+                content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+                width: 50px; height: 6px; /* Wider and thicker handle */
+                background: rgba(255,255,255,0.4); /* Semi-transparent white on green */
+                border-radius: 10px;
+                transition: background 0.3s;
+            }
+
+            /* --- VISUAL CUE: THE BOUNCING ARROW --- */
+            @keyframes bounceArrow {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-4px); }
+            }
+
+            .cart-arrow {
+                font-size: 18px; /* Larger arrow */
+                font-weight: bold;
+                animation: bounceArrow 1.5s infinite ease-in-out; /* Bouncing attention grabber */
+                margin-left: 10px;
+            }
+
+            /* Hide internals when collapsed */
+            .cart-area:not(.expanded) .cart-list,
+            .cart-area:not(.expanded) .cart-footer { display: none; }
+
+            /* EXPANDED STATE (FULL SCREEN) */
+            .cart-area.expanded {
+                height: 100%; 
+                background: var(--surface); 
+                color: var(--text);
+            }
+            
+            .cart-area.expanded .cart-header {
+                color: var(--text-sec);
+                border-bottom: 1px solid var(--primary-soft);
+                padding-top: 40px; 
+                align-items: flex-end; 
+                height: 90px;
+            }
+            
+            /* Change handle color when expanded (White background) */
+            .cart-area.expanded .cart-header::before {
+                background: rgba(0,0,0,0.1); 
+                top: 12px;
+            }
+
+            /* Stop bouncing and rotate arrow when expanded */
+            .cart-area.expanded .cart-arrow { 
+                animation: none;
+                transform: rotate(180deg); 
+                color: var(--primary); 
+            }
+
+            .mobile-summary { display: inline; font-size: 16px; font-weight: 700; }
+            .desktop-title { display: none; }
+            
+            .cart-area.expanded .cart-list { display: block; padding-top: 10px; }
+            .cart-area.expanded .cart-footer { display: block; padding-bottom: 30px; }
         }
-        .modal-backdrop.active { opacity: 1; pointer-events: auto; }
         
-        .modal-window {
-            background: var(--surface); width: 85%; max-width: 380px; max-height: 80vh;
-            border-radius: 20px; padding: 25px;
-            transform: scale(0.9); transition: transform 0.2s var(--anim);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow-y: auto;
-            display: flex; flex-direction: column; color: var(--text);
+        @media (min-width: 769px) {
+            .mobile-summary { display: none; }
+            .cart-arrow { display: none; }
         }
-        .modal-backdrop.active .modal-window { transform: scale(1); }
 
-        /* Form Elements */
-        .form-group { margin-bottom: 15px; }
-        .form-label { display: block; font-size: 12px; color: var(--text-sec); margin-bottom: 5px; font-weight: 600; }
-        .form-input { 
-            width: 100%; padding: 12px; border: 1px solid var(--border); background: var(--input-bg);
-            border-radius: 10px; font-size: 14px; outline: none; color: var(--text);
-        }
-        .form-input:focus { border-color: var(--primary); background: var(--surface); }
-        .color-swatch:hover { transform: scale(1.1); border-color: var(--text); }
-
-        /* HISTORY PAGE */
-        .page-overlay {
+        /* --- MODALS --- */
+        .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 100;
-            transform: translateX(100%); transition: transform 0.3s var(--anim);
-            display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.6); z-index: 200; 
+            display: none; align-items: center; justify-content: center; 
+            backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s;
         }
-        .page-overlay.open { transform: translateX(0); }
-        .page-header {
-            background: var(--surface); padding: 15px 20px;
-            display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        .modal-overlay.open { opacity: 1; }
+        
+        .modal-box {
+            background: var(--surface); width: 85%; max-width: 340px; padding: 30px;
+            border-radius: 24px; color: var(--text); text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            transform: scale(0.9); transition: transform 0.4s var(--anim);
         }
-        .back-btn { color: var(--text); }
+        .modal-overlay.open .modal-box { transform: scale(1); }
+        
+        #historyPage { z-index: 150; background: var(--bg); }
+        #historyPage .app-header { background: var(--surface); box-shadow: var(--shadow); }
 
     </style>
 </head>
@@ -258,503 +338,296 @@
 
     <header class="app-header">
         <div class="brand">
-            <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="app-logo" alt="Logo">
+            <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="app-logo">
             My Day Matcha
         </div>
         <div class="header-actions">
             <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
-            <button class="icon-btn" onclick="openHistory()" title="Today's Sales">🕒</button>
-            <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
+            <button class="icon-btn" onclick="openHistory()">🕒</button>
         </div>
     </header>
 
     <div class="main-stage">
-        <div class="menu-area" id="menuContainer">
-            </div>
+        <div class="menu-area" id="menuArea"></div>
 
-        <div class="cart-area">
-            <div class="cart-header">Current Order</div>
-            <div id="cartList" class="cart-list">
-                <div style="text-align:center; margin-top:40px; color:var(--text-sec);">Cart is empty</div>
+        <div class="cart-area" id="cartSheet">
+            <div class="cart-header" onclick="toggleCart()">
+                <span class="mobile-summary" id="mobileSummary">0 Items • 0 KHR</span>
+                
+                <span class="desktop-title">Current Order</span>
+                
+                <span class="cart-arrow">▲</span>
             </div>
+            
+            <div class="cart-list" id="cartList"></div>
             
             <div class="cart-footer">
                 <div class="total-row">
-                    <span class="total-label">Total Amount</span>
-                    <span class="total-value" id="totalDisplay">0 KHR</span>
+                    <span class="total-label">Total</span>
+                    <span class="total-display" id="totalDisplay">0</span>
                 </div>
-                <div class="action-grid">
-                    <button class="btn btn-secondary" onclick="confirmClear()">Clear All</button>
-                    <button class="btn btn-primary" onclick="confirmOrder()">Confirm Order</button>
+                <div class="controls">
+                    <button class="btn btn-clear" onclick="confirmClear()">Clear</button>
+                    <button class="btn btn-confirm" onclick="confirmOrder()">Confirm Order</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="historyPage" class="page-overlay">
-        <div class="page-header">
-            <button class="back-btn" style="background:none;border:none;font-size:24px;cursor:pointer;" onclick="closeHistory()">←</button>
-            <span style="font-size:18px; font-weight:800;">Today's Sales</span>
-            <button style="margin-left:auto; color:#ff6b6b; background:none; border:none; font-weight:bold; cursor:pointer;" onclick="resetHistory()">RESET</button>
-        </div>
-        <div id="historyList" style="flex:1; overflow-y:auto; padding:15px; background:var(--bg);"></div>
-    </div>
-
-    <div id="modalBackdrop" class="modal-backdrop">
-        <div class="modal-window">
-            <h3 id="modalTitle" style="margin:0 0 10px 0;">Title</h3>
-            <div id="modalContent" style="flex:1; overflow-y:auto;"></div>
-            <div style="display:flex; gap:10px; margin-top:20px; justify-content:flex-end;" id="modalActions">
-                <button class="btn btn-secondary" style="padding:10px;" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" style="padding:10px;" id="modalConfirmBtn">Confirm</button>
+    <div id="modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="mTitle" style="margin:0 0 10px 0; font-size:20px;">Title</h3>
+            <p id="mText" style="color:var(--text-sec); font-size:15px; margin-bottom:25px; line-height:1.5;">Text</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <button class="btn btn-clear" style="padding:12px;" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-confirm" style="padding:12px;" id="mBtn">Yes</button>
             </div>
         </div>
+    </div>
+
+    <div id="historyPage" class="modal-overlay" style="display:none; flex-direction:column; justify-content:start;">
+        <div class="app-header" style="width:100%;">
+            <button class="icon-btn" onclick="document.getElementById('historyPage').classList.remove('open'); setTimeout(()=>document.getElementById('historyPage').style.display='none',300)">✕</button>
+            <span style="font-weight:800; font-size:18px;">Today's Sales</span>
+            <button class="icon-btn" style="color:#FF3B30;" onclick="resetHistory()">🗑️</button>
+        </div>
+        <div id="historyList" style="width:100%; max-width:600px; margin:0 auto; overflow-y:auto; padding:20px; color:var(--text);"></div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2sAhVj0OvaUW_90iDg4D0e7xgnJagQVIumqeYljT9h2IgA6GsJoHTo6d_ENsieEbW/exec'; 
 
-        const DEFAULT_MENU = [
-            { id: 1, category: 'Tea', name: 'Matcha Latte', price: 5500, cost: 4500, color: '#4CAF50', hasMilk: true, oatPrice: 2000 },
-            { id: 2, category: 'Mix', name: 'Matcha Strawberry', price: 7000, cost: 5000, color: '#E91E63', hasMilk: true, oatPrice: 2000 },
-            { id: 3, category: 'Mix', name: 'Matcha Coconut Cream', price: 7000, cost: 5000, color: '#009688', hasMilk: false, oatPrice: 0 },
-            { id: 4, category: 'Mix', name: 'Coconut Matcha', price: 6000, cost: 4500, color: '#FFC107', hasMilk: false, oatPrice: 0 },
-            { id: 5, category: 'Coffee', name: 'Coffee Condensed Milk', price: 4000, cost: 3000, color: '#795548', hasMilk: false, oatPrice: 0 },
-            { id: 6, category: 'Coffee', name: 'Black Coffee', price: 3000, cost: 2000, color: '#3E2723', hasMilk: false, oatPrice: 0 }
+        const MENU_DATA = [
+            // TEA
+            { category: "Tea", items: [
+                { id: 1, name: 'Matcha Latte', price: 5500, cost: 4000, color: '#4CAF50', hasMilk: false, oatPrice: 0 },
+                { id: 2, name: 'Matcha Strawberry', price: 7000, cost: 5000, color: '#E91E63', hasMilk: false, oatPrice: 0 },
+                { id: 3, name: 'Matcha Coconut Cream', price: 7000, cost: 5000, color: '#009688', hasMilk: false, oatPrice: 0 },
+                { id: 4, name: 'Matcha Egg Cream', price: 7000, cost: 5000, color: '#8BC34A', hasMilk: true, oatPrice: 500 },
+                { id: 5, name: 'Coconut Matcha', price: 6000, cost: 4500, color: '#FFC107', hasMilk: false, oatPrice: 0 },
+                { id: 6, name: 'Lime Tea', price: 3000, cost: 1500, color: '#CDDC39', hasMilk: false, oatPrice: 0 },
+                { id: 7, name: 'Green Tea Milk', price: 4000, cost: 2500, color: '#8BC34A', hasMilk: true, oatPrice: 500 },
+                { id: 8, name: 'Red Tea Milk', price: 4000, cost: 2500, color: '#FF5722', hasMilk: true, oatPrice: 500 }
+            ]},
+            // COFFEE
+            { category: "Coffee", items: [
+                { id: 9, name: 'Black Coffee', price: 3000, cost: 1500, color: '#3E2723', hasMilk: false, oatPrice: 0 },
+                { id: 10, name: 'Coffee Condensed Milk', price: 4000, cost: 2500, color: '#795548', hasMilk: false, oatPrice: 0 },
+                { id: 11, name: 'Coffee Coconut Cream', price: 7000, cost: 5000, color: '#5D4037', hasMilk: false, oatPrice: 0 },
+                { id: 12, name: 'Coffee Egg Cream', price: 5500, cost: 4000, color: '#8D6E63', hasMilk: true, oatPrice: 500 }
+            ]},
+            // MIX / COCOA
+            { category: "Mix", items: [
+                { id: 13, name: 'Cocoa Milk', price: 4000, cost: 2500, color: '#6D4C41', hasMilk: false, oatPrice: 0 },
+                { id: 14, name: 'Cocoa Coconut Cream', price: 7000, cost: 5000, color: '#4E342E', hasMilk: false, oatPrice: 0 }
+            ]}
         ];
 
-        // STATE (Key changed to 'v3' to force update)
-        let menuItems = JSON.parse(localStorage.getItem('myday_menu_v3')) || DEFAULT_MENU;
-        // Default Order: Tea -> Mix -> Coffee
-        let categoryOrder = JSON.parse(localStorage.getItem('myday_categories')) || ['Tea', 'Mix', 'Coffee'];
-        
+        // SAVE KEY 'v5' for menu updates
         let currentOrder = [];
         let todayRecords = JSON.parse(localStorage.getItem('myday_records_' + new Date().toDateString())) || [];
         let deviceName = localStorage.getItem('myday_device') || "Main Device";
 
-        // --- THEME LOGIC ---
-        function toggleTheme() {
-            const body = document.body;
-            const current = body.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', next);
-            localStorage.setItem('myday_theme', next);
-            updateThemeIcon(next);
-        }
-
-        function updateThemeIcon(theme) {
-            const btn = document.getElementById('themeBtn');
-            btn.innerText = theme === 'dark' ? '☀️' : '🌙';
-        }
-
-        // Init Theme
-        const savedTheme = localStorage.getItem('myday_theme') || 'light';
-        document.body.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-
-
-        // --- SELF-FIXER: SYNC CATEGORIES ---
-        menuItems.forEach(item => {
-            if(!categoryOrder.includes(item.category)) {
-                categoryOrder.push(item.category);
-            }
-        });
-        localStorage.setItem('myday_categories', JSON.stringify(categoryOrder));
-
-
-        // --- RENDER MENU BY DYNAMIC CATEGORY ORDER ---
         function renderMenu() {
-            const container = document.getElementById('menuContainer');
+            const container = document.getElementById('menuArea');
             container.innerHTML = '';
-            
-            categoryOrder.forEach(catName => {
-                const items = menuItems.filter(i => i.category === catName);
-                
-                if (items.length > 0) {
-                    const div = document.createElement('div');
-                    div.className = 'category-section';
-                    div.innerHTML = `
-                        <div class="category-title">${catName}</div>
-                        <div class="menu-grid">
-                            ${items.map(item => `
-                                <button class="drink-card" style="--card-color:${item.color}" onclick="addToCart(${item.id})">
-                                    <span class="drink-name">${item.name}</span>
-                                </button>
-                            `).join('')}
-                        </div>
-                    `;
-                    container.appendChild(div);
-                }
+            MENU_DATA.forEach(grp => {
+                grp.items.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'drink-btn';
+                    btn.style.setProperty('--card-color', item.color);
+                    btn.innerText = item.name;
+                    btn.onclick = () => addToCart(item);
+                    container.appendChild(btn);
+                });
             });
         }
-        
-        function addToCart(itemId) {
-            const item = menuItems.find(i => i.id === itemId);
-            if(item) {
-                currentOrder.push({
-                    uid: Date.now() + Math.random(),
-                    id: item.id,
-                    name: item.name,
-                    basePrice: item.price,
-                    baseCost: item.cost,
-                    oatPrice: item.oatPrice || 0,
-                    hasMilk: item.hasMilk,
-                    milkOption: item.hasMilk ? 'Milk' : null,
-                    sweetness: '100%'
-                });
-                renderCart();
-            }
+
+        function addToCart(item) {
+            currentOrder.push({
+                uid: Date.now() + Math.random(),
+                ...item,
+                milkOption: item.hasMilk ? 'Milk' : null,
+                sweetness: '100%'
+            });
+            renderCart();
         }
 
-        // --- CART LOGIC ---
         function renderCart() {
             const list = document.getElementById('cartList');
-            const totalEl = document.getElementById('totalDisplay');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const mobileSummary = document.getElementById('mobileSummary');
             
-            if(currentOrder.length === 0) {
-                list.innerHTML = '<div style="text-align:center; margin-top:40px; color:var(--text-sec);">Cart is empty</div>';
-                totalEl.innerText = "0 KHR";
-                return;
-            }
-
-            let html = '';
+            list.innerHTML = '';
+            
             let total = 0;
+            let count = currentOrder.length;
 
             currentOrder.forEach(item => {
-                let finalPrice = item.basePrice;
-                if(item.milkOption === 'Oat') finalPrice += item.oatPrice;
-                total += finalPrice;
+                let price = item.price;
+                if(item.milkOption === 'Oat') price += item.oatPrice;
+                total += price;
 
-                html += `
-                <div class="cart-item">
-                    <div class="item-info">
-                        <span class="item-title">${item.name}</span>
-                        <div class="item-opts">
-                            ${item.hasMilk ? `
-                                <select class="opt-select" onchange="updateCartItem(${item.uid}, 'milk', this.value)">
-                                    <option value="Milk" ${item.milkOption==='Milk'?'selected':''}>Milk</option>
-                                    <option value="Oat" ${item.milkOption==='Oat'?'selected':''}>Oat (+${item.oatPrice})</option>
-                                </select>
-                            ` : ''}
-                            <select class="opt-select" onchange="updateCartItem(${item.uid}, 'sweet', this.value)">
-                                <option ${item.sweetness==='100%'?'selected':''}>100%</option>
-                                <option ${item.sweetness==='75%'?'selected':''}>75%</option>
-                                <option ${item.sweetness==='50%'?'selected':''}>50%</option>
-                                <option ${item.sweetness==='25%'?'selected':''}>25%</option>
-                                <option ${item.sweetness==='0%'?'selected':''}>0%</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span style="font-weight:700; font-size:14px;">${finalPrice.toLocaleString()}</span>
-                        <button onclick="removeFromCart(${item.uid})" style="border:none; background:rgba(255,0,0,0.1); color:#d32f2f; width:24px; height:24px; border-radius:50%; font-weight:bold;">×</button>
-                    </div>
-                </div>`;
-            });
-
-            list.innerHTML = html;
-            totalEl.innerText = total.toLocaleString() + ' KHR';
-            list.scrollTop = list.scrollHeight;
-        }
-
-        function updateCartItem(uid, type, val) {
-            const item = currentOrder.find(i => i.uid === uid);
-            if(item) {
-                if(type === 'milk') item.milkOption = val;
-                if(type === 'sweet') item.sweetness = val;
-                renderCart();
-            }
-        }
-        function removeFromCart(uid) {
-            currentOrder = currentOrder.filter(i => i.uid !== uid);
-            renderCart();
-        }
-
-        // --- ORDER PROCESSING & CLEARING ---
-        function confirmOrder() {
-            if(currentOrder.length === 0) return;
-            showSimpleModal("Confirm Order", "Are you ready to charge this order?", processPayment);
-        }
-        
-        function confirmClear() {
-            if(currentOrder.length === 0) return;
-            showSimpleModal("Clear Cart", "Remove all items?", () => { 
-                currentOrder = []; 
-                renderCart(); 
-            });
-        }
-
-        function processPayment() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const dateStr = now.toDateString();
-            const orderId = Date.now();
-            let totalSale = 0;
-            const cloudItems = [];
-            const historyGroup = {};
-
-            currentOrder.forEach(item => {
-                let finalPrice = item.basePrice;
-                if(item.milkOption === 'Oat') finalPrice += item.oatPrice;
-                totalSale += finalPrice;
-
-                let fullName = `${item.name} (${item.sweetness})`;
-                if(item.milkOption) fullName += ` [${item.milkOption}]`;
-
-                cloudItems.push({
-                    date: dateStr, time: timeStr, id: orderId,
-                    name: fullName, price: finalPrice, cost: item.baseCost,
-                    qty: 1, profit: finalPrice - item.baseCost
-                });
-
-                if(!historyGroup[fullName]) historyGroup[fullName] = { qty:0, price:finalPrice };
-                historyGroup[fullName].qty++;
-            });
-
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user: deviceName, items: cloudItems })
-            }).catch(e => console.log('Offline'));
-
-            todayRecords.unshift({ id: orderId, time: timeStr, items: historyGroup, total: totalSale });
-            localStorage.setItem('myday_records_' + dateStr, JSON.stringify(todayRecords));
-
-            currentOrder = [];
-            renderCart();
-            renderHistoryList();
-        }
-
-        // --- HISTORY ---
-        function openHistory() { renderHistoryList(); document.getElementById('historyPage').classList.add('open'); }
-        function closeHistory() { document.getElementById('historyPage').classList.remove('open'); }
-        function renderHistoryList() {
-            const list = document.getElementById('historyList');
-            if(todayRecords.length === 0) { list.innerHTML = '<div style="text-align:center; color:var(--text-sec); margin-top:20px;">No sales today</div>'; return; }
-            let html = ''; let grandTotal = 0;
-            todayRecords.forEach(rec => {
-                grandTotal += rec.total;
-                let desc = []; for(let k in rec.items) desc.push(`${rec.items[k].qty}x ${k}`);
-                html += `<div style="background:var(--surface); padding:15px; border-radius:12px; margin-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,0.02);">
-                    <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-sec); margin-bottom:5px;"><span>${rec.time}</span><span>#${rec.id.toString().slice(-4)}</span></div>
-                    <div style="font-size:14px; color:var(--text); margin-bottom:8px;">${desc.join(', ')}</div>
-                    <div style="font-weight:800; color:var(--primary); text-align:right;">${rec.total.toLocaleString()}</div>
-                </div>`;
-            });
-            list.innerHTML = `<div style="text-align:center; font-size:18px; font-weight:800; padding:15px; color:var(--text);">Total: ${grandTotal.toLocaleString()} KHR</div>` + html;
-        }
-        function resetHistory() { showSimpleModal("Reset History", "Delete all local records for today?", () => { todayRecords = []; localStorage.removeItem('myday_records_' + new Date().toDateString()); renderHistoryList(); }); }
-
-        // --- SETTINGS (REORDER CATS & DRINKS) ---
-        function openSettings() {
-            const mContent = document.getElementById('modalContent');
-            
-            // Generate Category Options from Dynamic List
-            const catOptions = categoryOrder.map(c => `<option value="${c}">${c}</option>`).join('');
-
-            // Palette
-            const palette = [
-                {c:'#3E2723', n:'Dark Coffee'}, {c:'#795548', n:'Light Coffee'}, {c:'#D7CCC8', n:'Latte/Milk'},
-                {c:'#4CAF50', n:'Matcha'}, {c:'#8BC34A', n:'Light Green'}, {c:'#FF5722', n:'Thai Tea'},
-                {c:'#E91E63', n:'Strawberry'}, {c:'#F48FB1', n:'Pink'}, {c:'#9C27B0', n:'Taro/Purple'},
-                {c:'#FFC107', n:'Mango/Yellow'}, {c:'#009688', n:'Teal'}, {c:'#2196F3', n:'Soda/Blue'}
-            ];
-
-            const html = `
-                <div style="background:rgba(230,81,0,0.1); padding:10px; border-radius:8px; margin-bottom:15px;">
-                    <div style="font-weight:700; margin-bottom:5px; font-size:13px; color:#e65100;">MANAGE CATEGORIES</div>
-                    <div id="cat_list_ui"></div>
-                    <div style="display:flex; gap:5px; margin-top:5px;">
-                        <input type="text" id="new_cat_input" placeholder="New Category" class="form-input" style="padding:6px; font-size:12px;">
-                        <button onclick="addNewCategory()" style="background:#e65100; color:white; border:none; border-radius:6px; padding:0 10px; font-weight:bold;">+</button>
-                    </div>
-                </div>
-
-                <div style="border-bottom:1px solid var(--border); padding-bottom:15px; margin-bottom:15px;">
-                    <div style="font-weight:700; margin-bottom:10px;">Add New Drink</div>
-                    <div class="form-group">
-                        <label class="form-label">Category</label>
-                        <select id="set_cat" class="form-input">
-                            ${catOptions}
+                const div = document.createElement('div');
+                div.className = 'cart-item';
+                div.innerHTML = `
+                    <div class="item-left">
+                        <span class="item-name">${item.name}</span>
+                        ${item.hasMilk ? `
+                        <select class="mini-select" onchange="updateItem('${item.uid}', 'milk', this.value)">
+                            <option value="Milk" ${item.milkOption==='Milk'?'selected':''}>Milk</option>
+                            <option value="Oat" ${item.milkOption==='Oat'?'selected':''}>Oat (+${item.oatPrice})</option>
+                        </select>` : ''}
+                        <select class="mini-select" onchange="updateItem('${item.uid}', 'sweet', this.value)">
+                            <option value="100%" ${item.sweetness==='100%'?'selected':''}>100</option>
+                            <option value="75%" ${item.sweetness==='75%'?'selected':''}>75</option>
+                            <option value="50%" ${item.sweetness==='50%'?'selected':''}>50</option>
+                            <option value="25%" ${item.sweetness==='25%'?'selected':''}>25</option>
+                            <option value="0%" ${item.sweetness==='0%'?'selected':''}>0</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <input type="text" id="set_name" class="form-input" placeholder="Drink Name">
+                    <div class="item-right">
+                        <span class="item-price">${price.toLocaleString()}</span>
+                        <button class="del-btn" onclick="removeItem('${item.uid}')">×</button>
                     </div>
-                    <div style="display:flex; gap:10px;">
-                        <input type="number" id="set_price" class="form-input" placeholder="Price">
-                        <input type="number" id="set_cost" class="form-input" placeholder="Cost">
-                    </div>
-                    
-                    <div style="background:var(--bg); padding:10px; border-radius:8px; margin:10px 0;">
-                        <label style="display:flex; align-items:center; gap:10px; font-size:14px; margin-bottom:5px;">
-                            <input type="checkbox" id="set_milk" onchange="document.getElementById('oat_field').style.display=this.checked?'block':'none'">
-                            Enable Milk Options?
-                        </label>
-                        <div id="oat_field" style="display:none;">
-                            <input type="number" id="set_oat" class="form-input" value="2000" placeholder="Oat +Price">
+                `;
+                list.appendChild(div);
+            });
+            
+            // Update Totals
+            const totalStr = total.toLocaleString();
+            totalDisplay.innerText = totalStr + " KHR";
+            mobileSummary.innerText = `${count} Items • ${totalStr} KHR`;
+            
+            if(count === 0) list.innerHTML = '<div style="text-align:center; margin-top:40px; color:var(--text-sec);">Cart is empty</div>';
+        }
+
+        function updateItem(uid, key, val) {
+            const item = currentOrder.find(i => i.uid == uid);
+            if(key === 'milk') item.milkOption = val;
+            if(key === 'sweet') item.sweetness = val;
+            renderCart();
+        }
+
+        function removeItem(uid) {
+            currentOrder = currentOrder.filter(i => i.uid != uid);
+            renderCart();
+        }
+
+        function confirmOrder() {
+            if(currentOrder.length === 0) return;
+            openModal('Confirm Order', 'Send this to the kitchen?', () => {
+                const now = new Date();
+                const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+                const date = now.toDateString();
+                const oid = Date.now();
+                
+                const items = currentOrder.map(i => ({
+                    date: date, time: time, id: oid,
+                    name: `${i.name} (${i.sweetness})${i.milkOption ? ' '+i.milkOption : ''}`,
+                    price: (i.milkOption==='Oat' ? i.price+i.oatPrice : i.price),
+                    cost: i.cost, qty: 1, 
+                    profit: (i.milkOption==='Oat' ? i.price+i.oatPrice : i.price) - i.cost
+                }));
+
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ user: deviceName, items: items })
+                });
+
+                const total = items.reduce((sum, i) => sum + i.price, 0);
+                const grouped = {};
+                items.forEach(i => {
+                    if(!grouped[i.name]) grouped[i.name] = {qty:0};
+                    grouped[i.name].qty++;
+                });
+
+                todayRecords.unshift({ id: oid, time: time, items: grouped, total: total });
+                localStorage.setItem('myday_records_'+date, JSON.stringify(todayRecords));
+                
+                currentOrder = [];
+                renderCart();
+                document.getElementById('cartSheet').classList.remove('expanded');
+            });
+        }
+
+        function confirmClear() {
+            if(currentOrder.length === 0) return;
+            openModal('Clear Cart', 'Remove all items?', () => {
+                currentOrder = [];
+                renderCart();
+            });
+        }
+
+        function toggleCart() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('cartSheet').classList.toggle('expanded');
+            }
+        }
+
+        function openModal(title, text, action) {
+            document.getElementById('mTitle').innerText = title;
+            document.getElementById('mText').innerText = text;
+            const btn = document.getElementById('mBtn');
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.onclick = () => { action(); closeModal(); };
+            
+            const overlay = document.getElementById('modal');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('open'), 10);
+        }
+        function closeModal() { 
+            const overlay = document.getElementById('modal');
+            overlay.classList.remove('open');
+            setTimeout(() => overlay.style.display = 'none', 300);
+        }
+
+        function openHistory() {
+            const list = document.getElementById('historyList');
+            let html = '';
+            let total = 0;
+            if(todayRecords.length === 0) html = '<div style="text-align:center; opacity:0.5; margin-top:40px;">No sales today</div>';
+            else {
+                todayRecords.forEach(r => {
+                    total += r.total;
+                    let desc = Object.keys(r.items).map(k => `${r.items[k].qty}x ${k}`).join(', ');
+                    html += `
+                    <div style="background:var(--surface); padding:16px; margin-bottom:12px; border-radius:var(--radius-md); box-shadow:var(--shadow-float);">
+                        <div style="display:flex; justify-content:space-between; font-size:12px; opacity:0.6; margin-bottom:8px;">
+                            <span>${r.time}</span><span>#${r.id.toString().slice(-4)}</span>
                         </div>
-                    </div>
-
-                    <div style="display:flex; gap:5px; margin-bottom:15px; flex-wrap:wrap;">
-                        ${palette.map(p => 
-                            `<div title="${p.n}" onclick="document.getElementById('set_color').value='${p.c}'; highlightColor(this);" class="color-swatch" style="width:24px; height:24px; background:${p.c}; border-radius:50%; cursor:pointer; border:1px solid #ddd;"></div>`
-                        ).join('')}
-                        <input type="hidden" id="set_color" value="#4CAF50">
-                    </div>
-                </div>
-                
-                <div style="font-weight:700; margin-bottom:10px;">Reorder Drinks</div>
-                <div id="manage_list" style="max-height:200px; overflow-y:auto; font-size:12px;"></div>
-            `;
-            
-            mContent.innerHTML = html;
-            renderCategoryListUI();
-            renderManageList();
-
-            showModal("Menu Settings", () => {
-                const name = document.getElementById('set_name').value;
-                const price = parseInt(document.getElementById('set_price').value);
-                
-                if(name && price) {
-                    menuItems.push({
-                        id: Date.now(),
-                        category: document.getElementById('set_cat').value,
-                        name: name,
-                        price: price,
-                        cost: parseInt(document.getElementById('set_cost').value) || 0,
-                        color: document.getElementById('set_color').value,
-                        hasMilk: document.getElementById('set_milk').checked,
-                        oatPrice: parseInt(document.getElementById('set_oat').value) || 0
-                    });
-                    saveMenu();
-                }
+                        <div style="font-size:15px; margin-bottom:8px; line-height:1.4;">${desc}</div>
+                        <div style="font-weight:800; color:var(--primary); text-align:right; font-size:16px;">${r.total.toLocaleString()}</div>
+                    </div>`;
+                });
+                html = `<h2 style="text-align:center; margin-bottom:30px; font-size:24px;">Total: ${total.toLocaleString()}</h2>` + html;
+            }
+            list.innerHTML = html;
+            const page = document.getElementById('historyPage');
+            page.style.display = 'flex';
+            setTimeout(() => page.classList.add('open'), 10);
+        }
+        function resetHistory() {
+            openModal('Reset History', 'Are you sure you want to delete local history?', () => {
+                todayRecords = [];
+                localStorage.removeItem('myday_records_' + new Date().toDateString());
+                openHistory(); 
             });
+        }
+
+        function toggleTheme() {
+            const b = document.body;
+            const mode = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            b.setAttribute('data-theme', mode);
+            localStorage.setItem('myday_theme', mode);
+            document.getElementById('themeBtn').innerText = mode==='dark'?'☀️':'🌙';
         }
         
-        // --- CATEGORY MANAGER LOGIC ---
-        function renderCategoryListUI() {
-            const ui = document.getElementById('cat_list_ui');
-            if(!ui) return;
-            ui.innerHTML = '';
-            categoryOrder.forEach((cat, idx) => {
-                const row = document.createElement('div');
-                row.style.cssText = "display:flex; justify-content:space-between; margin-bottom:5px; background:var(--surface); padding:4px; border-radius:4px;";
-                row.innerHTML = `
-                    <span style="font-weight:bold; font-size:12px; color:var(--text);">${cat}</span>
-                    <div style="display:flex; gap:2px;">
-                        <button onclick="moveCat(${idx}, -1)" style="font-size:10px;">↑</button>
-                        <button onclick="moveCat(${idx}, 1)" style="font-size:10px;">↓</button>
-                    </div>
-                `;
-                ui.appendChild(row);
-            });
-        }
-
-        function moveCat(idx, dir) {
-            const newIdx = idx + dir;
-            if (newIdx >= 0 && newIdx < categoryOrder.length) {
-                [categoryOrder[idx], categoryOrder[newIdx]] = [categoryOrder[newIdx], categoryOrder[idx]];
-                localStorage.setItem('myday_categories', JSON.stringify(categoryOrder));
-                renderCategoryListUI();
-                renderMenu();
-                // We also need to re-render dropdown options
-                openSettings(); // Brute force refresh the modal
-            }
-        }
-
-        function addNewCategory() {
-            const val = document.getElementById('new_cat_input').value;
-            if(val && !categoryOrder.includes(val)) {
-                categoryOrder.push(val);
-                localStorage.setItem('myday_categories', JSON.stringify(categoryOrder));
-                openSettings(); // Refresh
-            }
-        }
-
-        // --- DRINK MANAGER LOGIC ---
-        window.highlightColor = function(el) {
-            document.querySelectorAll('.color-swatch').forEach(d => d.style.transform = 'scale(1)');
-            el.style.transform = 'scale(1.3)';
-            el.style.border = '2px solid #333';
-        }
-
-        function renderManageList() {
-            const list = document.getElementById('manage_list');
-            if(!list) return;
-            list.innerHTML = '';
-            menuItems.forEach((item, index) => {
-                const row = document.createElement('div');
-                row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid var(--border); background:var(--surface);";
-                row.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:5px;">
-                        <div style="width:12px; height:12px; background:${item.color}; border-radius:50%;"></div>
-                        <span style="font-weight:600; color:var(--text);">${item.name}</span>
-                        <span style="color:var(--text-sec); font-size:10px;">(${item.category})</span>
-                    </div>
-                    <div style="display:flex; gap:5px;">
-                        <button onclick="moveItem(${index}, -1)" style="border:1px solid var(--border); background:var(--bg); cursor:pointer; color:var(--text);">↑</button>
-                        <button onclick="moveItem(${index}, 1)" style="border:1px solid var(--border); background:var(--bg); cursor:pointer; color:var(--text);">↓</button>
-                        <button onclick="deleteItem(${item.id})" style="border:none; background:rgba(255,0,0,0.1); color:red; cursor:pointer; font-weight:bold;">×</button>
-                    </div>
-                `;
-                list.appendChild(row);
-            });
-        }
-
-        function moveItem(index, direction) {
-            const newIndex = index + direction;
-            if (newIndex >= 0 && newIndex < menuItems.length) {
-                [menuItems[index], menuItems[newIndex]] = [menuItems[newIndex], menuItems[index]];
-                saveMenu();
-                renderManageList(); 
-                renderMenu(); 
-            }
-        }
-
-        function deleteItem(id) {
-            if(confirm("Delete item?")) {
-                menuItems = menuItems.filter(i => i.id !== id);
-                saveMenu();
-                renderManageList();
-            }
-        }
-
-        function saveMenu() {
-            localStorage.setItem('myday_menu_v3', JSON.stringify(menuItems));
-            renderMenu();
-        }
-
-        // --- MODAL UTILS (FIXED) ---
-        const modal = document.getElementById('modalBackdrop');
-        const mTitle = document.getElementById('modalTitle');
-        const mContent = document.getElementById('modalContent');
-        
-        function showSimpleModal(title, msg, action) {
-            mContent.innerHTML = `<p style="color:var(--text-sec); padding:10px 0;">${msg}</p>`;
-            showModal(title, action);
-        }
-
-        function showModal(title, action) {
-            mTitle.innerText = title;
-            modal.classList.add('active');
-            
-            // Re-find buttons every time to prevent detached node error
-            // (Previous bugs were due to holding onto old references)
-            const oldBtn = document.getElementById('modalConfirmBtn');
-            const newBtn = oldBtn.cloneNode(true);
-            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-            
-            newBtn.onclick = () => {
-                if(action) action();
-                closeModal();
-            };
-        }
-
-        function closeModal() { modal.classList.remove('active'); }
-
-        // INIT
+        const savedTheme = localStorage.getItem('myday_theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeBtn').innerText = savedTheme==='dark'?'☀️':'🌙';
         renderMenu();
     </script>
 </body>
