@@ -7,334 +7,170 @@
     
     <link rel="icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- 1. VARIABLES --- */
-        :root {
-            --primary: #2e7d32;
-            --primary-soft: rgba(46, 125, 50, 0.08);
-            --bg: #F2F4F6;
-            --surface: #FFFFFF;
-            --text: #1a1a1a;
-            --text-sec: #8e8e93;
-            --radius-lg: 24px;
-            --radius-md: 16px;
-            --spacing: 20px;
-            --shadow: 0 12px 40px rgba(0, 0, 0, 0.04);
-            --anim: cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        [data-theme="dark"] {
-            --bg: #000000; --surface: #1c1c1e; --text: #ffffff;
-            --text-sec: #98989d; --primary-soft: rgba(255, 255, 255, 0.1);
-            --shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        }
-
+        :root { --primary: #2e7d32; --primary-soft: rgba(46, 125, 50, 0.08); --danger: #FF3B30; --bg: #F2F4F6; --surface: #FFFFFF; --text: #1a1a1a; --text-sec: #8e8e93; --border: #e0e0e0; --radius-lg: 24px; --radius-md: 16px; --spacing: 20px; --shadow: 0 12px 40px rgba(0, 0, 0, 0.04); --anim: cubic-bezier(0.4, 0.0, 0.2, 1); }
+        [data-theme="dark"] { --bg: #000000; --surface: #1c1c1e; --text: #ffffff; --text-sec: #98989d; --primary-soft: rgba(255, 255, 255, 0.1); --border: #333333; --shadow: 0 12px 40px rgba(0, 0, 0, 0.3); }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
-            background: var(--bg); color: var(--text);
-            margin: 0; padding: 0; height: 100vh; width: 100vw;
-            display: flex; flex-direction: column; overflow: hidden;
-            transition: background 0.4s var(--anim), color 0.4s var(--anim);
-        }
-
-        /* --- 2. HEADER --- */
-        .app-header {
-            height: 70px; padding: 0 var(--spacing);
-            display: flex; justify-content: space-between; align-items: center;
-            background: transparent; z-index: 50; flex-shrink: 0;
-        }
-        
-        .brand { 
-            font-family: 'Quicksand', sans-serif;
-            font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px;
-            display: flex; align-items: center; 
-            backdrop-filter: blur(20px);
-            padding: 8px 16px 8px 8px; border-radius: 100px;
-            background: var(--surface); box-shadow: var(--shadow);
-        }
-        
-        .app-logo { 
-            height: 36px; width: 36px; border-radius: 50%; margin-right: 12px; 
-            object-fit: cover; background: var(--bg);
-        }
-
-        .header-actions { 
-            display: flex; gap: 12px; 
-            background: var(--surface); padding: 6px; border-radius: 100px;
-            box-shadow: var(--shadow);
-        }
-        
-        .icon-btn {
-            background: transparent; border: none; font-size: 18px; cursor: pointer;
-            width: 40px; height: 40px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text); transition: transform 0.2s var(--anim), background 0.2s;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; height: 100vh; width: 100vw; display: flex; flex-direction: column; overflow: hidden; transition: background 0.5s var(--anim), color 0.5s var(--anim); }
+        .app-header { height: 70px; padding: 0 var(--spacing); display: flex; justify-content: space-between; align-items: center; background: transparent; z-index: 50; flex-shrink: 0; transition: background 0.5s var(--anim); }
+        .brand { font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; display: flex; align-items: center; backdrop-filter: blur(20px); padding: 8px 16px 8px 8px; border-radius: 100px; background: var(--surface); box-shadow: var(--shadow); transition: background 0.5s var(--anim), color 0.5s var(--anim); }
+        .app-logo { height: 36px; width: 36px; border-radius: 50%; margin-right: 12px; object-fit: cover; background: var(--bg); }
+        .header-actions { display: flex; gap: 12px; background: var(--surface); padding: 6px; border-radius: 100px; box-shadow: var(--shadow); transition: background 0.5s var(--anim); }
+        .icon-btn { background: transparent; border: none; font-size: 18px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text); transition: transform 0.2s var(--anim), background 0.2s; }
         .icon-btn:hover { background: var(--bg); transform: scale(1.05); }
         .icon-btn:active { transform: scale(0.9); }
-
-        /* --- 3. MAIN STAGE (DESKTOP DEFAULT) --- */
-        .main-stage {
-            flex: 1; padding: 0 var(--spacing) var(--spacing) var(--spacing);
-            display: grid; 
-            grid-template-columns: 1.6fr 1fr;
-            gap: var(--spacing);
-            overflow: hidden;
-        }
-
-        /* MENU (DESKTOP) */
-        .menu-area {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            grid-auto-rows: 90px;
-            gap: 16px;
-            box-shadow: var(--shadow);
-            align-content: start;
-        }
-
-        /* BUTTONS (DESKTOP) */
-        .drink-btn {
-            background: var(--card-color); color: white;
-            border: none; border-radius: var(--radius-md);
-            width: 100%; height: 100%;
-            padding: 10px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: 700; line-height: 1.3; text-align: center;
-            position: relative; cursor: pointer; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s var(--anim);
-            background-image: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
-        }
+        .main-stage { flex: 1; padding: 0 var(--spacing) var(--spacing) var(--spacing); display: grid; grid-template-columns: 1.6fr 1fr; gap: var(--spacing); overflow: hidden; }
+        .menu-area { background: var(--surface); border-radius: var(--radius-lg); padding: 24px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); grid-auto-rows: 90px; gap: 16px; box-shadow: var(--shadow); align-content: start; transition: background 0.5s var(--anim); }
+        .drink-btn { background: var(--card-color); color: white; border: none; border-radius: var(--radius-md); width: 100%; height: 100%; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; line-height: 1.3; text-align: center; position: relative; cursor: pointer; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s var(--anim), box-shadow 0.2s; background-image: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%); }
         .drink-btn:hover { transform: translateY(-4px) scale(1.02); z-index: 2; }
         .drink-btn:active { transform: scale(0.95); }
-
-        /* Animations */
         @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .drink-btn { animation: floatUp 0.6s var(--anim) backwards; }
         .drink-btn:nth-child(odd) { animation-delay: 0.1s; }
         .drink-btn:nth-child(even) { animation-delay: 0.2s; }
-
-        /* CART (DESKTOP) */
-        .cart-area {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            display: flex; flex-direction: column;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .cart-header {
-            padding: 24px 24px 10px 24px;
-            font-size: 11px; font-weight: 800; color: var(--text-sec);
-            text-transform: uppercase; letter-spacing: 2px;
-        }
-        
+        .cart-area { background: var(--surface); border-radius: var(--radius-lg); display: flex; flex-direction: column; box-shadow: var(--shadow); overflow: hidden; transition: background 0.5s var(--anim); }
+        .cart-header { padding: 24px 24px 10px 24px; font-size: 11px; font-weight: 800; color: var(--text-sec); text-transform: uppercase; letter-spacing: 2px; }
         .cart-list { flex: 1; overflow-y: auto; padding: 0 24px; scrollbar-width: none; }
         .cart-list::-webkit-scrollbar { display: none; }
-
-        .cart-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 0; border-bottom: 1px solid var(--primary-soft);
-            animation: floatUp 0.4s var(--anim);
-        }
-
+        .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--primary-soft); animation: floatUp 0.4s var(--anim); }
         .item-left { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
-        .item-name {
-            font-size: 14px; font-weight: 600; color: var(--text);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;
-        }
-
-        .mini-select {
-            background: var(--bg); border: none;
-            border-radius: 8px; font-size: 11px; font-weight: 600;
-            color: var(--text); padding: 4px 8px; text-align: center;
-            outline: none; cursor: pointer; appearance: none;
-        }
-
+        .item-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+        .mini-select { background: var(--bg); border: none; border-radius: 8px; font-size: 11px; font-weight: 600; color: var(--text); padding: 4px 8px; text-align: center; outline: none; cursor: pointer; appearance: none; }
         .item-right { display: flex; align-items: center; gap: 12px; }
         .item-price { font-weight: 700; font-size: 14px; color: var(--text); }
-        
-        .del-btn {
-            color: var(--text-sec); background: transparent; border: none;
-            font-size: 20px; font-weight: 400; cursor: pointer; padding: 0;
-        }
+        .del-btn { color: var(--text-sec); background: transparent; border: none; font-size: 20px; font-weight: 400; cursor: pointer; padding: 0; }
         .del-btn:hover { color: #FF3B30; }
-
-        .cart-footer { padding: 24px; background: var(--surface); }
-        
-        .total-row {
-            display: flex; justify-content: space-between; align-items: baseline;
-            margin-bottom: 20px;
-        }
+        .cart-footer { padding: 24px; background: var(--surface); transition: background 0.5s var(--anim); }
+        .total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
         .total-label { font-size: 14px; color: var(--text-sec); font-weight: 600; }
         .total-display { font-size: 28px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
-
         .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; }
-        .btn { 
-            padding: 16px; border: none; border-radius: var(--radius-md); 
-            font-weight: 700; font-size: 15px; cursor: pointer; 
-            transition: transform 0.2s var(--anim), box-shadow 0.2s;
-        }
+        .btn { padding: 16px; border: none; border-radius: var(--radius-md); font-weight: 700; font-size: 15px; cursor: pointer; transition: transform 0.2s var(--anim), box-shadow 0.2s; }
         .btn:active { transform: scale(0.96); }
-        .btn-confirm { background: var(--primary); color: white; box-shadow: 0 8px 20px rgba(46, 125, 50, 0.15); }
-        .btn-clear { background: var(--bg); color: var(--text); }
-
-        /* --- 4. MOBILE TRANSFORMATION --- */
+        .btn-confirm { background: var(--primary); color: white; box-shadow: var(--shadow-float); }
+        .btn-clear { background: var(--danger); color: white; }
+        .bottom-nav { display: none; }
+        
         @media (max-width: 768px) {
-            :root { --spacing: 0px; --radius-lg: 20px; }
-            
-            .app-header { padding: 0 20px; height: 60px; }
+            :root { --spacing: 0px; --radius-lg: 0px; }
+            .app-header { padding: 0 20px; height: 60px; background: var(--surface); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
             .brand { box-shadow: none; background: transparent; padding: 0; }
             .header-actions { box-shadow: none; background: transparent; padding: 0; }
-
-            .main-stage {
-                display: block; position: relative;
-            }
-
-            /* MENU: Full Screen Scroll */
-            .menu-area {
-                border-radius: 0; box-shadow: none;
-                width: 100%;
-                height: calc(100vh - 60px); 
-                padding: 10px 20px 80px 20px; /* Space for mini bar */
-                background: transparent;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                grid-auto-rows: min-content;
-                gap: 10px;
-                align-content: start;
-                overflow-y: auto;
-            }
-
-            .drink-btn {
-                width: 100%; height: 45px; max-height: 45px; padding: 5px;
-                font-size: 13px; border-radius: 16px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            }
-
-            /* CART: Floating Mini Bar */
-            .cart-area {
-                position: fixed; 
-                bottom: 0; left: 0; width: 100%;
-                height: 60px; /* Collapsed Height */
-                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-                box-shadow: 0 -5px 30px rgba(0,0,0,0.15);
-                border: none;
-                z-index: 100;
-                transition: height 0.4s cubic-bezier(0.2, 0.9, 0.1, 1);
-                
-                background: var(--primary);
-                color: white;
-            }
-            
-            .cart-header {
-                height: 60px; padding: 0 25px;
-                display: flex; justify-content: space-between; align-items: center;
-                cursor: pointer; border-bottom: none;
-                color: white; 
-                position: relative;
-            }
-            
-            /* --- VISUAL CUE: THE HANDLE --- */
-            .cart-header::before {
-                content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-                width: 50px; height: 6px; /* Wider and thicker handle */
-                background: rgba(255,255,255,0.4); /* Semi-transparent white on green */
-                border-radius: 10px;
-                transition: background 0.3s;
-            }
-
-            /* --- VISUAL CUE: THE BOUNCING ARROW --- */
-            @keyframes bounceArrow {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-4px); }
-            }
-
-            .cart-arrow {
-                font-size: 18px; /* Larger arrow */
-                font-weight: bold;
-                animation: bounceArrow 1.5s infinite ease-in-out; /* Bouncing attention grabber */
-                margin-left: 10px;
-            }
-
-            /* Hide internals when collapsed */
-            .cart-area:not(.expanded) .cart-list,
-            .cart-area:not(.expanded) .cart-footer { display: none; }
-
-            /* EXPANDED STATE (FULL SCREEN) */
-            .cart-area.expanded {
-                height: 100%; 
-                background: var(--surface); 
-                color: var(--text);
-            }
-            
-            .cart-area.expanded .cart-header {
-                color: var(--text-sec);
-                border-bottom: 1px solid var(--primary-soft);
-                padding-top: 40px; 
-                align-items: flex-end; 
-                height: 90px;
-            }
-            
-            /* Change handle color when expanded (White background) */
-            .cart-area.expanded .cart-header::before {
-                background: rgba(0,0,0,0.1); 
-                top: 12px;
-            }
-
-            /* Stop bouncing and rotate arrow when expanded */
-            .cart-area.expanded .cart-arrow { 
-                animation: none;
-                transform: rotate(180deg); 
-                color: var(--primary); 
-            }
-
-            .mobile-summary { display: inline; font-size: 16px; font-weight: 700; }
-            .desktop-title { display: none; }
-            
-            .cart-area.expanded .cart-list { display: block; padding-top: 10px; }
-            .cart-area.expanded .cart-footer { display: block; padding-bottom: 30px; }
+            .main-stage { display: block; position: relative; padding: 0; }
+            .menu-area { border-radius: 0; box-shadow: none; width: 100%; height: calc(100vh - 130px); padding: 15px 15px 20px 15px; background: var(--bg); display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: min-content; gap: 10px; align-content: start; overflow-y: auto; }
+            .drink-btn { width: 100%; height: 45px; max-height: 45px; padding: 5px; font-size: 13px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+            .cart-area { position: fixed; top: 60px; left: 0; width: 100%; height: calc(100vh - 130px); border-radius: 0; box-shadow: none; border: none; z-index: 100; background: var(--surface); opacity: 0; visibility: hidden; transform: translateY(20px) scale(0.98); transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; }
+            .cart-area.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+            .cart-header { display: none; } 
+            .cart-list { padding-top: 20px; }
+            .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--surface); border-top: 1px solid var(--border); justify-content: center; align-items: center; padding: 10px; gap: 15px; z-index: 200; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); transition: background 0.5s var(--anim); }
+            .nav-item { flex: 1; max-width: 160px; height: 100%; border-radius: 14px; font-weight: 700; font-size: 13px; color: var(--text-sec); background: transparent; border: none; transition: all 0.3s var(--anim); position: relative; display: flex; align-items: center; justify-content: center; }
+            .nav-item.active { color: white; background: var(--primary); box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); transform: scale(1); }
+            .nav-badge { position: absolute; top: 5px; right: 5px; background: var(--danger); color: white; font-size: 10px; min-width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0 4px; opacity: 0; transition: opacity 0.3s; border: 2px solid var(--surface); }
+            .nav-item.active .nav-badge { border-color: var(--primary); }
+            .nav-badge.show { opacity: 1; }
         }
+
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.4s var(--anim); padding: 20px; }
+        #loginScreen.hidden { transform: translateY(-100%); }
+        .login-brand-wrapper { display: flex; flex-direction: column; align-items: center; transition: all 0.4s var(--anim); margin-bottom: 30px; }
+        #loginScreen.mode-input .login-brand-wrapper { flex-direction: row; gap: 15px; margin-bottom: 20px; }
+        .login-logo { width: 80px; height: 80px; border-radius: 50%; box-shadow: var(--shadow); transition: all 0.4s var(--anim); }
+        #loginScreen.mode-input .login-logo { width: 50px; height: 50px; }
+        .login-title { font-size: 20px; font-weight: 800; margin-top: 15px; color: var(--text); transition: all 0.3s; }
+        #loginScreen.mode-input .login-title { margin-top: 0; font-size: 24px; }
+        .user-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; transition: opacity 0.3s, transform 0.3s; }
+        #loginScreen.mode-input .user-grid { opacity: 0; pointer-events: none; position: absolute; transform: scale(0.9); }
+        .user-btn { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 16px; width: 100%; height: 60px; font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: transform 0.2s, background 0.2s; }
+        .user-btn:hover { transform: scale(1.02); }
+        .pin-container { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 280px; opacity: 0; transform: translateY(20px); transition: all 0.4s var(--anim); }
+        #loginScreen.mode-input .pin-container { display: flex; opacity: 1; transform: translateY(0); }
+        .pin-input { font-size: 24px; padding: 10px; width: 100%; text-align: center; border: 2px solid var(--border); border-radius: 12px; margin-bottom: 15px; letter-spacing: 5px; background: var(--surface); color: var(--text); }
+        .pin-input:focus { border-color: var(--primary); outline: none; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .shake { animation: shake 0.3s ease-in-out; border-color: var(--danger) !important; color: var(--danger); }
+
+        /* LOADING SPINNER */
+        .spinner {
+            width: 24px; height: 24px;
+            border: 4px solid var(--primary-soft);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none; margin-bottom: 10px;
+        }
+        .spinner.show { display: block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 300; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s var(--anim), visibility 0.3s; }
+        .modal-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-box { background: var(--surface); width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; color: var(--text); text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); transform: scale(0.9) translateY(10px); transition: transform 0.4s var(--anim); max-height: 85vh; display: flex; flex-direction: column; }
+        .modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
         
-        @media (min-width: 769px) {
-            .mobile-summary { display: none; }
-            .cart-arrow { display: none; }
-        }
+        .preview-scroll-container { background: #e5e5ea; border-radius: 8px; padding: 15px; margin-bottom: 20px; overflow-y: auto; max-height: 300px; border: 1px solid #d1d1d6; display: flex; justify-content: center; }
+        .os-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px; text-align: left; }
+        .os-item:last-child { border-bottom: none; }
+        .os-name { font-weight: bold; font-size: 13px; color: #333; }
+        .os-detail { font-size: 11px; color: #666; }
+        .os-price { font-weight: bold; font-size: 13px; color: var(--primary); }
 
-        /* --- MODALS --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 200; 
-            display: none; align-items: center; justify-content: center; 
-            backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s;
-        }
-        .modal-overlay.open { opacity: 1; }
-        
-        .modal-box {
-            background: var(--surface); width: 85%; max-width: 340px; padding: 30px;
-            border-radius: 24px; color: var(--text); text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            transform: scale(0.9); transition: transform 0.4s var(--anim);
-        }
-        .modal-overlay.open .modal-box { transform: scale(1); }
-        
-        #historyPage { z-index: 150; background: var(--bg); }
+        .receipt-paper { background: white; width: 80mm; max-width: 100%; padding: 15px 10px; color: black; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 11px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin: 0 auto; }
+        .rp-header { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px dashed #000; }
+        .rp-logo { width: 24px; height: 24px; border-radius: 50%; filter: grayscale(100%); }
+        .rp-title { font-weight: bold; font-size: 14px; text-transform: uppercase; }
+        .rp-meta { font-size: 10px; margin-bottom: 4px; color: #000; }
+        .rp-items { margin-top: 10px; margin-bottom: 10px; text-align: left; }
+        .rp-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+        .rp-name-col { flex: 1; padding-right: 5px; }
+        .rp-name { font-weight: bold; font-size: 11px; }
+        .rp-opts { font-size: 10px; font-weight: normal; }
+        .rp-price { font-weight: bold; font-size: 11px; white-space: nowrap; }
+        .rp-total { border-top: 1px dashed #000; padding-top: 8px; margin-top: 8px; text-align: right; font-weight: bold; font-size: 14px; }
+        .rp-footer { margin-top: 15px; font-size: 10px; }
+
+        #historyPage { z-index: 250; background: var(--bg); }
         #historyPage .app-header { background: var(--surface); box-shadow: var(--shadow); }
 
+        #receiptContainer { display: none; }
+        @media print {
+            .app-header, .main-stage, .bottom-nav, .modal-overlay, #historyPage, #loginScreen { display: none !important; }
+            body { background: white !important; margin: 0 !important; padding: 0 !important; display: block !important; }
+            #receiptContainer { display: block !important; width: 100%; max-width: 80mm; margin: 0 auto; padding: 0; font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; color: black !important; }
+            @page { size: auto; margin: 0; }
+            .rp-header { border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; }
+            .rp-logo { width: 30px; height: 30px; }
+            .rp-title { font-size: 16px; }
+            .rp-meta { font-size: 11px; text-align: center; }
+            .rp-items { margin: 10px 0; }
+            .rp-name { font-size: 12px; }
+            .rp-opts { font-size: 11px; }
+            .rp-price { font-size: 12px; }
+            .rp-total { font-size: 16px; margin-top: 15px; padding-top: 10px; text-align: right; }
+            .rp-footer { margin-top: 20px; text-align: center; font-size: 11px; }
+        }
     </style>
 </head>
 <body>
+
+    <div id="loginScreen">
+        <div class="login-brand-wrapper">
+            <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo">
+            <h2 id="loginTitle" class="login-title">Select User</h2>
+        </div>
+        <div id="userListGrid" class="user-grid">
+            </div>
+        <div id="pinContainer" class="pin-container">
+            <div id="loginSpinner" class="spinner"></div> 
+            <input type="password" id="pinInput" class="pin-input" maxlength="4" placeholder="****" inputmode="numeric" onkeydown="if(event.key==='Enter') checkPin()">
+            <button class="btn btn-confirm" style="padding:10px 30px; width:100%; border-radius:12px;" onclick="checkPin()">Login</button>
+            <button class="btn btn-clear" style="padding:10px; margin-top:10px; background:transparent; color:var(--text-sec); width:100%;" onclick="cancelLogin()">Back</button>
+        </div>
+    </div>
 
     <header class="app-header">
         <div class="brand">
@@ -342,91 +178,190 @@
             My Day Matcha
         </div>
         <div class="header-actions">
-            <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+            <button class="icon-btn" onclick="showLogin()" title="Switch User" style="font-size:14px;">👤</button>
+            <button class="icon-btn" onclick="toggleTheme(true)" id="themeBtn">🌙</button>
             <button class="icon-btn" onclick="openHistory()">🕒</button>
         </div>
     </header>
 
     <div class="main-stage">
         <div class="menu-area" id="menuArea"></div>
-
-        <div class="cart-area" id="cartSheet">
-            <div class="cart-header" onclick="toggleCart()">
-                <span class="mobile-summary" id="mobileSummary">0 Items • 0 KHR</span>
-                
-                <span class="desktop-title">Current Order</span>
-                
-                <span class="cart-arrow">▲</span>
-            </div>
-            
+        <div class="cart-area" id="cartPanel">
+            <div class="cart-header">Current Order</div>
             <div class="cart-list" id="cartList"></div>
-            
             <div class="cart-footer">
                 <div class="total-row">
                     <span class="total-label">Total</span>
-                    <span class="total-display" id="totalDisplay">0</span>
+                    <span class="total-display" id="totalDisplay">0 KHR</span>
                 </div>
                 <div class="controls">
                     <button class="btn btn-clear" onclick="confirmClear()">Clear</button>
-                    <button class="btn btn-confirm" onclick="confirmOrder()">Confirm Order</button>
+                    <button class="btn btn-confirm" onclick="confirmOrder()">Confirm</button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('menu')" id="btnMenu">MENU</button>
+        <button class="nav-item" onclick="switchTab('cart')" id="btnCart">
+            CURRENT ORDER <span class="nav-badge" id="cartBadge">0</span>
+        </button>
     </div>
 
     <div id="modal" class="modal-overlay">
         <div class="modal-box">
             <h3 id="mTitle" style="margin:0 0 10px 0; font-size:20px;">Title</h3>
-            <p id="mText" style="color:var(--text-sec); font-size:15px; margin-bottom:25px; line-height:1.5;">Text</p>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <button class="btn btn-clear" style="padding:12px;" onclick="closeModal()">Cancel</button>
+            <div id="mText" style="color:var(--text-sec); font-size:15px; margin-bottom:25px; line-height:1.5;">Text</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:auto;">
+                <button id="mCloseBtn" class="btn btn-clear" style="padding:12px; background:var(--bg); color:var(--text);" onclick="closeModal()">Cancel</button>
                 <button class="btn btn-confirm" style="padding:12px;" id="mBtn">Yes</button>
             </div>
         </div>
     </div>
 
-    <div id="historyPage" class="modal-overlay" style="display:none; flex-direction:column; justify-content:start;">
+    <div id="historyPage" class="modal-overlay" style="flex-direction:column; justify-content:start;">
         <div class="app-header" style="width:100%;">
-            <button class="icon-btn" onclick="document.getElementById('historyPage').classList.remove('open'); setTimeout(()=>document.getElementById('historyPage').style.display='none',300)">✕</button>
-            <span style="font-weight:800; font-size:18px;">Today's Sales</span>
+            <button class="icon-btn" onclick="document.getElementById('historyPage').classList.remove('open')">✕</button>
+            <span style="font-weight:800; font-size:18px;">History</span>
             <button class="icon-btn" style="color:#FF3B30;" onclick="resetHistory()">🗑️</button>
         </div>
         <div id="historyList" style="width:100%; max-width:600px; margin:0 auto; overflow-y:auto; padding:20px; color:var(--text);"></div>
     </div>
 
-    <script>
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2sAhVj0OvaUW_90iDg4D0e7xgnJagQVIumqeYljT9h2IgA6GsJoHTo6d_ENsieEbW/exec'; 
+    <div id="receiptContainer"></div>
 
-        const MENU_DATA = [
-            // TEA
+    <script>
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
+
+        // SAFETY FALLBACK MENU
+        let MENU_DATA = [
             { category: "Tea", items: [
-                { id: 1, name: 'Matcha Latte', price: 5500, cost: 4000, color: '#4CAF50', hasMilk: false, oatPrice: 0 },
-                { id: 2, name: 'Matcha Strawberry', price: 7000, cost: 5000, color: '#E91E63', hasMilk: false, oatPrice: 0 },
-                { id: 3, name: 'Matcha Coconut Cream', price: 7000, cost: 5000, color: '#009688', hasMilk: false, oatPrice: 0 },
-                { id: 4, name: 'Matcha Egg Cream', price: 7000, cost: 5000, color: '#8BC34A', hasMilk: true, oatPrice: 500 },
-                { id: 5, name: 'Coconut Matcha', price: 6000, cost: 4500, color: '#FFC107', hasMilk: false, oatPrice: 0 },
-                { id: 6, name: 'Lime Tea', price: 3000, cost: 1500, color: '#CDDC39', hasMilk: false, oatPrice: 0 },
-                { id: 7, name: 'Green Tea Milk', price: 4000, cost: 2500, color: '#8BC34A', hasMilk: true, oatPrice: 500 },
-                { id: 8, name: 'Red Tea Milk', price: 4000, cost: 2500, color: '#FF5722', hasMilk: true, oatPrice: 500 }
-            ]},
-            // COFFEE
-            { category: "Coffee", items: [
-                { id: 9, name: 'Black Coffee', price: 3000, cost: 1500, color: '#3E2723', hasMilk: false, oatPrice: 0 },
-                { id: 10, name: 'Coffee Condensed Milk', price: 4000, cost: 2500, color: '#795548', hasMilk: false, oatPrice: 0 },
-                { id: 11, name: 'Coffee Coconut Cream', price: 7000, cost: 5000, color: '#5D4037', hasMilk: false, oatPrice: 0 },
-                { id: 12, name: 'Coffee Egg Cream', price: 5500, cost: 4000, color: '#8D6E63', hasMilk: true, oatPrice: 500 }
-            ]},
-            // MIX / COCOA
-            { category: "Mix", items: [
-                { id: 13, name: 'Cocoa Milk', price: 4000, cost: 2500, color: '#6D4C41', hasMilk: false, oatPrice: 0 },
-                { id: 14, name: 'Cocoa Coconut Cream', price: 7000, cost: 5000, color: '#4E342E', hasMilk: false, oatPrice: 0 }
+                { id: 1, name: 'Matcha Latte', price: 5500, cost: 4000, color: '#4CAF50', hasMilk: true, oatPrice: 500 }
             ]}
         ];
 
-        // SAVE KEY 'v5' for menu updates
         let currentOrder = [];
-        let todayRecords = JSON.parse(localStorage.getItem('myday_records_' + new Date().toDateString())) || [];
-        let deviceName = localStorage.getItem('myday_device') || "Main Device";
+        let todayRecords = [];
+        let deviceName = "Unknown"; 
+        let dailyOrderCount = parseInt(localStorage.getItem('myday_counter_' + new Date().toDateString())) || 0;
+        let tempSelectedUser = null;
+
+        window.onload = function() {
+            fetchUsers(); // Get users dynamically from sheet
+            fetchMenu();  // Get menu dynamically
+            initTheme(); 
+            fetchHistory();
+            showLogin();
+        };
+
+        // --- FETCH USERS AND BUILD BUTTONS ---
+        function fetchUsers() {
+            fetch(GOOGLE_SCRIPT_URL + '?action=get_users')
+            .then(res => res.json())
+            .then(data => {
+                const grid = document.getElementById('userListGrid');
+                grid.innerHTML = ''; // Clear old buttons
+                if(data && data.length > 0) {
+                    data.forEach(name => {
+                        const btn = document.createElement('button');
+                        btn.className = 'user-btn';
+                        btn.innerText = name;
+                        btn.onclick = () => selectUser(name);
+                        grid.appendChild(btn);
+                    });
+                } else {
+                    grid.innerHTML = '<p style="color:var(--text-sec);">No users found.</p>';
+                }
+            })
+            .catch(err => console.log("Error fetching users", err));
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            cancelLogin(); 
+        }
+
+        function selectUser(name) {
+            tempSelectedUser = name;
+            const loginScreen = document.getElementById('loginScreen');
+            loginScreen.classList.add('mode-input');
+            document.getElementById('loginTitle').innerText = name;
+            const input = document.getElementById('pinInput');
+            input.value = '';
+            setTimeout(() => { input.focus(); }, 300);
+        }
+
+        function checkPin() {
+            const input = document.getElementById('pinInput');
+            const spinner = document.getElementById('loginSpinner');
+            const val = input.value;
+            
+            spinner.classList.add('show');
+            
+            // Standard POST to check password on server
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                // Using standard CORS if allowed, otherwise no-cors means we assume success if no error 
+                // BUT for security validation we ideally want a response. 
+                // Since this is a simple web app, we rely on the script response.
+                // Standard fetch to GAS requires Text/Plain to avoid preflight issues often.
+                headers: {'Content-Type': 'text/plain'},
+                body: JSON.stringify({ action: 'login', user: tempSelectedUser, pin: val })
+            })
+            .then(res => res.json())
+            .then(data => {
+                spinner.classList.remove('show');
+                if (data.status === 'success') {
+                    deviceName = tempSelectedUser;
+                    document.getElementById('loginScreen').classList.add('hidden');
+                } else {
+                    input.classList.add('shake');
+                    input.value = '';
+                    setTimeout(() => input.classList.remove('shake'), 400);
+                }
+            })
+            .catch(err => {
+                // If fetch fails (network), we can't login securely.
+                spinner.classList.remove('show');
+                alert("Login Error: Check Internet");
+            });
+        }
+        
+        function cancelLogin() {
+            tempSelectedUser = null;
+            const loginScreen = document.getElementById('loginScreen');
+            loginScreen.classList.remove('mode-input');
+            document.getElementById('loginTitle').innerText = "Select User";
+        }
+
+        function initTheme() {
+            const hour = new Date().getHours();
+            const isNight = hour >= 18 || hour < 6;
+            const theme = isNight ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', theme);
+            document.getElementById('themeBtn').innerText = isNight ? '🌙' : '☀️';
+        }
+
+        function fetchMenu() {
+            fetch(GOOGLE_SCRIPT_URL + '?action=get_menu')
+            .then(res => res.json())
+            .then(data => {
+                if(data && data.length > 0) {
+                    let grouped = {};
+                    data.forEach(item => {
+                        if(!grouped[item.category]) grouped[item.category] = [];
+                        grouped[item.category].push(item);
+                    });
+                    MENU_DATA = Object.keys(grouped).map(cat => ({ category: cat, items: grouped[cat] }));
+                }
+                renderMenu();
+            })
+            .catch(err => {
+                console.log("Using Offline Menu");
+                renderMenu(); // Load fallback
+            });
+        }
 
         function renderMenu() {
             const container = document.getElementById('menuArea');
@@ -435,9 +370,9 @@
                 grp.items.forEach(item => {
                     const btn = document.createElement('button');
                     btn.className = 'drink-btn';
-                    btn.style.setProperty('--card-color', item.color);
+                    btn.style.setProperty('--card-color', item.color || '#666');
                     btn.innerText = item.name;
-                    btn.onclick = () => addToCart(item);
+                    btn.onclick = () => { addToCart(item); };
                     container.appendChild(btn);
                 });
             });
@@ -456,10 +391,9 @@
         function renderCart() {
             const list = document.getElementById('cartList');
             const totalDisplay = document.getElementById('totalDisplay');
-            const mobileSummary = document.getElementById('mobileSummary');
+            const badge = document.getElementById('cartBadge');
             
             list.innerHTML = '';
-            
             let total = 0;
             let count = currentOrder.length;
 
@@ -479,27 +413,24 @@
                             <option value="Oat" ${item.milkOption==='Oat'?'selected':''}>Oat (+${item.oatPrice})</option>
                         </select>` : ''}
                         <select class="mini-select" onchange="updateItem('${item.uid}', 'sweet', this.value)">
-                            <option value="100%" ${item.sweetness==='100%'?'selected':''}>100</option>
-                            <option value="75%" ${item.sweetness==='75%'?'selected':''}>75</option>
-                            <option value="50%" ${item.sweetness==='50%'?'selected':''}>50</option>
-                            <option value="25%" ${item.sweetness==='25%'?'selected':''}>25</option>
-                            <option value="0%" ${item.sweetness==='0%'?'selected':''}>0</option>
+                            <option value="100%" ${item.sweetness==='100%'?'selected':''}>100%</option>
+                            <option value="75%" ${item.sweetness==='75%'?'selected':''}>75%</option>
+                            <option value="50%" ${item.sweetness==='50%'?'selected':''}>50%</option>
+                            <option value="25%" ${item.sweetness==='25%'?'selected':''}>25%</option>
+                            <option value="0%" ${item.sweetness==='0%'?'selected':''}>0%</option>
                         </select>
                     </div>
                     <div class="item-right">
-                        <span class="item-price">${price.toLocaleString()}</span>
+                        <span class="item-price">${price.toLocaleString()} KHR</span>
                         <button class="del-btn" onclick="removeItem('${item.uid}')">×</button>
                     </div>
                 `;
                 list.appendChild(div);
             });
             
-            // Update Totals
-            const totalStr = total.toLocaleString();
-            totalDisplay.innerText = totalStr + " KHR";
-            mobileSummary.innerText = `${count} Items • ${totalStr} KHR`;
-            
-            if(count === 0) list.innerHTML = '<div style="text-align:center; margin-top:40px; color:var(--text-sec);">Cart is empty</div>';
+            totalDisplay.innerText = total.toLocaleString() + " KHR";
+            if(count > 0) { badge.innerText = count; badge.classList.add('show'); } 
+            else { badge.classList.remove('show'); list.innerHTML = '<div style="text-align:center; margin-top:40px; color:var(--text-sec);">No order</div>'; }
         }
 
         function updateItem(uid, key, val) {
@@ -514,44 +445,6 @@
             renderCart();
         }
 
-        function confirmOrder() {
-            if(currentOrder.length === 0) return;
-            openModal('Confirm Order', 'Send this to the kitchen?', () => {
-                const now = new Date();
-                const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-                const date = now.toDateString();
-                const oid = Date.now();
-                
-                const items = currentOrder.map(i => ({
-                    date: date, time: time, id: oid,
-                    name: `${i.name} (${i.sweetness})${i.milkOption ? ' '+i.milkOption : ''}`,
-                    price: (i.milkOption==='Oat' ? i.price+i.oatPrice : i.price),
-                    cost: i.cost, qty: 1, 
-                    profit: (i.milkOption==='Oat' ? i.price+i.oatPrice : i.price) - i.cost
-                }));
-
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ user: deviceName, items: items })
-                });
-
-                const total = items.reduce((sum, i) => sum + i.price, 0);
-                const grouped = {};
-                items.forEach(i => {
-                    if(!grouped[i.name]) grouped[i.name] = {qty:0};
-                    grouped[i.name].qty++;
-                });
-
-                todayRecords.unshift({ id: oid, time: time, items: grouped, total: total });
-                localStorage.setItem('myday_records_'+date, JSON.stringify(todayRecords));
-                
-                currentOrder = [];
-                renderCart();
-                document.getElementById('cartSheet').classList.remove('expanded');
-            });
-        }
-
         function confirmClear() {
             if(currentOrder.length === 0) return;
             openModal('Clear Cart', 'Remove all items?', () => {
@@ -560,69 +453,223 @@
             });
         }
 
-        function toggleCart() {
-            if (window.innerWidth <= 768) {
-                document.getElementById('cartSheet').classList.toggle('expanded');
+        function switchTab(tab) {
+            const menuArea = document.getElementById('menuArea');
+            const cartPanel = document.getElementById('cartPanel');
+            const btnMenu = document.getElementById('btnMenu');
+            const btnCart = document.getElementById('btnCart');
+
+            if(tab === 'menu') {
+                menuArea.style.display = 'grid'; 
+                cartPanel.classList.remove('active'); 
+                btnMenu.classList.add('active');
+                btnCart.classList.remove('active');
+            } else {
+                cartPanel.classList.add('active'); 
+                btnMenu.classList.remove('active');
+                btnCart.classList.add('active');
             }
         }
 
-        function openModal(title, text, action) {
-            document.getElementById('mTitle').innerText = title;
-            document.getElementById('mText').innerText = text;
-            const btn = document.getElementById('mBtn');
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            newBtn.onclick = () => { action(); closeModal(); };
-            
-            const overlay = document.getElementById('modal');
-            overlay.style.display = 'flex';
-            setTimeout(() => overlay.classList.add('open'), 10);
-        }
-        function closeModal() { 
-            const overlay = document.getElementById('modal');
-            overlay.classList.remove('open');
-            setTimeout(() => overlay.style.display = 'none', 300);
-        }
-
-        function openHistory() {
-            const list = document.getElementById('historyList');
-            let html = '';
-            let total = 0;
-            if(todayRecords.length === 0) html = '<div style="text-align:center; opacity:0.5; margin-top:40px;">No sales today</div>';
-            else {
-                todayRecords.forEach(r => {
-                    total += r.total;
-                    let desc = Object.keys(r.items).map(k => `${r.items[k].qty}x ${k}`).join(', ');
-                    html += `
-                    <div style="background:var(--surface); padding:16px; margin-bottom:12px; border-radius:var(--radius-md); box-shadow:var(--shadow-float);">
-                        <div style="display:flex; justify-content:space-between; font-size:12px; opacity:0.6; margin-bottom:8px;">
-                            <span>${r.time}</span><span>#${r.id.toString().slice(-4)}</span>
-                        </div>
-                        <div style="font-size:15px; margin-bottom:8px; line-height:1.4;">${desc}</div>
-                        <div style="font-weight:800; color:var(--primary); text-align:right; font-size:16px;">${r.total.toLocaleString()}</div>
-                    </div>`;
+        function fetchHistory() {
+            fetch(GOOGLE_SCRIPT_URL)
+            .then(response => response.json())
+            .then(data => {
+                let ordersMap = {};
+                data.forEach(item => {
+                    if(!ordersMap[item.id]) {
+                        ordersMap[item.id] = { id: item.id, time: item.time, date: item.date, items: {}, total: 0 };
+                    }
+                    if(!ordersMap[item.id].items[item.name]) {
+                        ordersMap[item.id].items[item.name] = { qty: 0, price: parseInt(item.price) };
+                    }
+                    ordersMap[item.id].items[item.name].qty++;
+                    ordersMap[item.id].total += parseInt(item.price);
                 });
-                html = `<h2 style="text-align:center; margin-bottom:30px; font-size:24px;">Total: ${total.toLocaleString()}</h2>` + html;
-            }
-            list.innerHTML = html;
-            const page = document.getElementById('historyPage');
-            page.style.display = 'flex';
-            setTimeout(() => page.classList.add('open'), 10);
+                todayRecords = Object.values(ordersMap);
+                todayRecords.reverse();
+            })
+            .catch(error => console.error('Error loading history:', error));
         }
-        function resetHistory() {
-            openModal('Reset History', 'Are you sure you want to delete local history?', () => {
-                todayRecords = [];
-                localStorage.removeItem('myday_records_' + new Date().toDateString());
+
+        function deleteOrder(id) {
+            openModal('Delete Order?', 'This will remove it from history and Google Sheet permanently.', () => {
+                todayRecords = todayRecords.filter(r => r.id !== id);
                 openHistory(); 
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'delete', id: id })
+                }).then(() => { fetchHistory(); }).catch(err => console.error(err));
             });
         }
 
-        function toggleTheme() {
-            const b = document.body;
-            const mode = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            b.setAttribute('data-theme', mode);
-            localStorage.setItem('myday_theme', mode);
-            document.getElementById('themeBtn').innerText = mode==='dark'?'☀️':'🌙';
+        function reprintOrder(id) {
+            const order = todayRecords.find(r => r.id === id);
+            if(!order) return;
+            const printItems = [];
+            for(let name in order.items) {
+                const info = order.items[name];
+                for(let i=0; i<info.qty; i++) {
+                    printItems.push({ name: name, price: info.price, sweetness: '', milkOption: null });
+                }
+            }
+            askToPrint({ id: order.id, date: order.date, time: order.time, items: printItems });
+        }
+
+        function resetHistory() {
+            const title = '<span style="color:var(--danger); font-weight:800;">Dangerous Action</span>';
+            const content = `
+                <p style="color:var(--text-sec); margin-bottom:15px; white-space:nowrap;">This will clear all from Here and Google Sheet.</p>
+                <p style="margin-bottom:10px; font-size:13px;">Type <b>CLEAR</b> to confirm:</p>
+                <input type="text" id="confirmInput" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; text-align: center; font-weight: bold; text-transform: uppercase; background: var(--bg); color: var(--text);" placeholder="CLEAR">
+            `;
+            openModal(title, content, () => {
+                const input = document.getElementById('confirmInput');
+                if (input.value.toUpperCase() === 'CLEAR') {
+                    todayRecords = []; openHistory();
+                    fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ action: 'clear_all' })
+                    });
+                    closeModal(); 
+                } else {
+                    input.style.borderColor = 'var(--danger)'; input.classList.add('shake');
+                    setTimeout(() => input.classList.remove('shake'), 400); return false; 
+                }
+            }, 'Cancel');
+        }
+
+        function confirmOrder() {
+            if(currentOrder.length === 0) return;
+            let previewHTML = '<div class="preview-scroll-container"><div style="width:100%;">';
+            let total = 0;
+            currentOrder.forEach(item => {
+                let price = item.price;
+                if(item.milkOption === 'Oat') price += item.oatPrice;
+                total += price;
+                let details = item.sweetness;
+                if(item.milkOption) details += `, ${item.milkOption}`;
+                previewHTML += `<div class="os-item"><div><div class="os-name">${item.name}</div><div class="os-detail">${details}</div></div><div class="os-price">${price.toLocaleString()}</div></div>`;
+            });
+            previewHTML += `</div></div><div style="text-align:right; font-weight:bold; font-size:16px; color:var(--primary);">Total: ${total.toLocaleString()} KHR</div>`;
+            openModal('Confirm Order', previewHTML, () => { processOrder(); });
+        }
+
+        function processOrder() {
+            const now = new Date();
+            const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const cambodiaOffsetMs = 7 * 60 * 60 * 1000; 
+            const shiftedDate = new Date(utcTime + cambodiaOffsetMs);
+            const year = shiftedDate.getFullYear();
+            const month = String(shiftedDate.getMonth() + 1).padStart(2, '0');
+            const day = String(shiftedDate.getDate()).padStart(2, '0');
+            const hourRaw = shiftedDate.getHours();
+            const minutes = String(shiftedDate.getMinutes()).padStart(2, '0');
+            const dateStr = `${day}/${month}/${year}`;
+            const ampm = hourRaw >= 12 ? 'PM' : 'AM';
+            let hour12 = hourRaw % 12; hour12 = hour12 ? hour12 : 12; 
+            const timeStr = `${hour12}:${minutes} ${ampm}`;
+
+            dailyOrderCount++;
+            localStorage.setItem('myday_counter_' + now.toDateString(), dailyOrderCount);
+            const countStr = String(dailyOrderCount).padStart(3, '0');
+            const readableID = `${year}${month}${day}-${String(hourRaw).padStart(2,'0')}${minutes}-${countStr}`;
+
+            const orderForPrint = { id: readableID, date: dateStr, time: timeStr, items: JSON.parse(JSON.stringify(currentOrder)) };
+            const items = currentOrder.map(i => ({
+                date: dateStr, time: timeStr, id: readableID,
+                name: `${i.name} (${i.sweetness})${i.milkOption ? ' '+i.milkOption : ''}`,
+                price: (i.milkOption==='Oat' ? i.price+i.oatPrice : i.price),
+                cost: i.cost, qty: 1, profit: (i.milkOption==='Oat' ? i.price+i.oatPrice : i.price) - i.cost
+            }));
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ user: deviceName, items: items })
+            });
+
+            const total = items.reduce((sum, i) => sum + i.price, 0);
+            const grouped = {};
+            items.forEach(i => {
+                if(!grouped[i.name]) grouped[i.name] = {qty:0};
+                grouped[i.name].qty++;
+            });
+
+            todayRecords.unshift({ id: readableID, time: timeStr, items: grouped, total: total });
+            currentOrder = []; renderCart(); switchTab('menu'); 
+            setTimeout(() => { askToPrint(orderForPrint); }, 300);
+        }
+
+        function askToPrint(orderData) {
+            const receiptHTML = generateReceiptHTML(orderData, false);
+            const visualPreview = `<div class="preview-scroll-container" style="text-align:center;"><div class="receipt-paper">${receiptHTML}</div></div>`;
+            openModal('Order Saved, Print Receipt?', visualPreview, () => {
+                document.getElementById('receiptContainer').innerHTML = generateReceiptHTML(orderData, true);
+                window.print();
+            }, 'No');
+        }
+
+        function generateReceiptHTML(data, isPrint) {
+            let total = 0; let itemsHtml = '';
+            data.items.forEach(item => {
+                let price = item.price; let fullName = item.name; let options = [];
+                if(item.sweetness) options.push(item.sweetness);
+                if(item.milkOption) {
+                    let milkStr = item.milkOption;
+                    if(item.milkOption === 'Oat') { milkStr += ' (+' + item.oatPrice + ')'; price += item.oatPrice; }
+                    options.push(milkStr);
+                }
+                let details = options.length > 0 ? `(${options.join(', ')})` : '';
+                total += price;
+                itemsHtml += `<div class="rp-row"><div class="rp-name-col"><span class="rp-name">${fullName}</span> <span class="rp-opts">${details}</span></div><div class="rp-price">${price.toLocaleString()}</div></div>`;
+            });
+            return `<div class="rp-header"><img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="rp-logo"><div class="rp-title">My Day Matcha</div></div><div class="rp-meta">${data.date} • ${data.time}</div><div class="rp-meta">Order #${data.id}</div><div class="rp-items">${itemsHtml}</div><div class="rp-total">TOTAL: ${total.toLocaleString()} KHR</div><div class="rp-footer">Thank you!</div>`;
+        }
+
+        function openModal(title, content, action, closeLabel = 'Cancel') {
+            document.getElementById('mTitle').innerHTML = title;
+            document.getElementById('mText').innerHTML = content;
+            const closeBtn = document.getElementById('mCloseBtn'); closeBtn.innerText = closeLabel; closeBtn.onclick = closeModal;
+            const btn = document.getElementById('mBtn'); const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            newBtn.onclick = () => { if(action() !== false) { closeModal(); } };
+            document.getElementById('modal').classList.add('open');
+        }
+        function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+        function openHistory() {
+            fetchHistory();
+            const list = document.getElementById('historyList');
+            let html = ''; let total = 0;
+            if(todayRecords.length === 0) { html = '<div style="text-align:center; opacity:0.5; margin-top:40px;">No sales found in Sheet</div>'; } 
+            else {
+                todayRecords.forEach(r => {
+                    total += r.total;
+                    let desc = []; for(let name in r.items) { desc.push(`${r.items[name].qty}x ${name}`); }
+                    let shortID = r.id; if(r.id && r.id.length > 10) shortID = '...' + r.id.split('-').pop();
+                    html += `<div style="background:var(--surface); padding:16px; margin-bottom:12px; border-radius:var(--radius-md); box-shadow:var(--shadow-float);">
+                        <div style="display:flex; justify-content:space-between; font-size:12px; opacity:0.6; margin-bottom:8px;"><span>${r.time}</span>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <span>${shortID}</span>
+                                <button onclick="reprintOrder('${r.id}')" style="background:none; border:none; font-size:16px; cursor:pointer;" title="Print Receipt">🖨️</button>
+                                <button onclick="deleteOrder('${r.id}')" style="background:none; border:none; font-size:16px; cursor:pointer;" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+                        <div style="font-size:15px; margin-bottom:8px; line-height:1.4;">${desc.join(', ')}</div>
+                        <div style="font-weight:800; color:var(--primary); text-align:right; font-size:16px;">${r.total.toLocaleString()} KHR</div>
+                    </div>`;
+                });
+                html = `<h2 style="text-align:center; margin-bottom:30px; font-size:24px;">Total: ${total.toLocaleString()} KHR</h2>` + html;
+            }
+            list.innerHTML = html;
+            document.getElementById('historyPage').classList.add('open');
+        }
+
+        function toggleTheme(manual) {
+            const b = document.body; let mode;
+            if (manual) { mode = b.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; } else { return; }
+            b.setAttribute('data-theme', mode); document.getElementById('themeBtn').innerText = mode==='dark'?'☀️':'🌙';
         }
         
         const savedTheme = localStorage.getItem('myday_theme') || 'light';
