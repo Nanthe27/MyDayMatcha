@@ -63,7 +63,6 @@
         .brand { font-family: 'Quicksand', sans-serif; font-size: 18px; font-weight: 700; color: var(--primary); letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
         .app-logo { height: 32px; width: 32px; border-radius: 50%; border: 1px solid var(--primary); }
         
-        /* 3. FIX: NO CIRCLE AROUND HAMBURGER */
         .hamburger-btn { 
             background: transparent; border: none; 
             color: var(--text); font-size: 26px; cursor: pointer; 
@@ -76,13 +75,12 @@
 
         .main-stage { flex: 1; padding: 15px; display: flex; justify-content: center; overflow: hidden; position: relative; }
         
-        /* 2. FIX: SCROLLING MENU (Increased Padding) */
         .menu-area { 
             width: 100%; max-width: 1200px; 
             overflow-y: auto; display: grid; 
             grid-template-columns: 1fr 1fr; grid-auto-rows: 80px; 
             gap: 12px; align-content: start; 
-            padding-bottom: 200px; /* Allows scrolling way up */
+            padding-bottom: 200px; 
         }
         
         .drink-btn { width: 100%; height: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; padding: 10px; gap: 12px; overflow: hidden; cursor: pointer; position: relative; text-align: left; transition: all 0.2s var(--anim-curve); }
@@ -92,12 +90,11 @@
         .drink-info-box { flex: 1; display: flex; align-items: center; overflow: hidden; }
         .drink-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); line-height: 1.2; }
 
-        /* 1. FIX: CART BUTTONS BLOCKED (Fixed Positioning) */
         .cart-area { 
             display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); 
-            position: fixed; /* Locked to viewport */
-            top: calc(70px + env(safe-area-inset-top)); /* Below header */
-            bottom: 80px; /* Explicitly above tab bar */
+            position: fixed; 
+            top: calc(70px + env(safe-area-inset-top)); 
+            bottom: 80px; 
             left: 0; width: 100%; height: auto; 
             z-index: 150; opacity: 0; visibility: hidden; pointer-events: none; 
             transition: all var(--anim-speed) var(--anim-curve); transform: translateY(10px); 
@@ -113,7 +110,6 @@
 
         @media (min-width: 1024px) {
             .main-stage { display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
-            /* Desktop Reset for Cart */
             .cart-area { 
                 position: static; 
                 height: calc(100vh - 120px); 
@@ -135,7 +131,28 @@
         .del-btn { color: var(--text-muted); background: none; border: none; font-size: 18px; cursor: pointer; transition: color 0.2s; }
         .del-btn:hover { color: #FF3B30; }
         
-        .cart-footer { padding: 25px; padding-bottom: max(25px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); }
+        /* FOOTER AT TOP FOR MOBILE */
+        .cart-footer { 
+            order: -1; /* MOVES TO TOP */
+            padding: 20px 25px; 
+            background: var(--surface); 
+            border-bottom: 1px solid var(--border); 
+            border-top: none;
+            border-radius: var(--radius) var(--radius) 0 0; 
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        
+        /* FOOTER AT BOTTOM FOR DESKTOP */
+        @media (min-width: 1024px) {
+            .cart-footer {
+                order: 0; /* RESET TO BOTTOM */
+                border-top: 1px solid var(--border);
+                border-bottom: none;
+                border-radius: 0 0 var(--radius) var(--radius);
+                padding: 25px;
+            }
+        }
         
         .total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
         .total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
@@ -325,7 +342,6 @@
         function showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); cancelLogin(); toggleSettings(false); }
         function selectUser(name) { tempSelectedUser = name; currentPin = ""; updatePinDisplay(); document.getElementById('userListGrid').style.display = 'none'; document.getElementById('pinContainer').style.display = 'flex'; document.getElementById('loginTitle').innerText = name; }
         
-        // 4. FIX: LOGIN MESSAGE IN JS
         function cancelLogin() { 
             tempSelectedUser = null; 
             currentPin = ""; 
