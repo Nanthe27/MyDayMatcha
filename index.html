@@ -62,12 +62,28 @@
         
         .brand { font-family: 'Quicksand', sans-serif; font-size: 18px; font-weight: 700; color: var(--primary); letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
         .app-logo { height: 32px; width: 32px; border-radius: 50%; border: 1px solid var(--primary); }
-        .hamburger-btn { background: transparent; border: 1px solid var(--border); color: var(--text); font-size: 20px; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.2s var(--anim-curve); }
-        .hamburger-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .hamburger-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        
+        /* FIXED HAMBURGER BUTTON (No Circle) */
+        .hamburger-btn { 
+            background: transparent; border: none; 
+            color: var(--text); font-size: 26px; cursor: pointer; 
+            width: 40px; height: 40px; 
+            display: flex; align-items: center; justify-content: center; 
+            transition: transform 0.2s var(--anim-curve), color 0.2s; 
+        }
+        .hamburger-btn:hover { color: var(--primary); transform: scale(1.1); }
+        .hamburger-btn.active { color: var(--primary); transform: rotate(90deg); }
 
         .main-stage { flex: 1; padding: 15px; display: flex; justify-content: center; overflow: hidden; position: relative; }
-        .menu-area { width: 100%; max-width: 1200px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 80px; gap: 12px; align-content: start; padding-bottom: 100px; }
+        
+        /* FIXED MENU SCROLLING */
+        .menu-area { 
+            width: 100%; max-width: 1200px; 
+            overflow-y: auto; display: grid; 
+            grid-template-columns: 1fr 1fr; grid-auto-rows: 80px; 
+            gap: 12px; align-content: start; 
+            padding-bottom: 150px; /* Increased bottom padding for free scrolling */
+        }
         
         .drink-btn { width: 100%; height: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; padding: 10px; gap: 12px; overflow: hidden; cursor: pointer; position: relative; text-align: left; transition: all 0.2s var(--anim-curve); }
         .drink-btn:hover { border-color: var(--primary); background: var(--surface-hover); transform: scale(0.97); }
@@ -76,12 +92,12 @@
         .drink-info-box { flex: 1; display: flex; align-items: center; overflow: hidden; }
         .drink-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); line-height: 1.2; }
 
-        /* FIXED CART AREA FOR MOBILE */
+        /* FIXED CART AREA OBSTRUCTION */
         .cart-area { 
             display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); 
             position: absolute; top: 0; left: 0; width: 100%; 
-            /* Increased space at bottom to 90px to clear the tab bar */
-            height: calc(100% - 90px); 
+            /* Anchored to bottom to clear nav bar safely */
+            bottom: 85px; height: auto; 
             z-index: 150; opacity: 0; visibility: hidden; pointer-events: none; 
             transition: all var(--anim-speed) var(--anim-curve); transform: translateY(10px); 
         }
@@ -96,7 +112,12 @@
 
         @media (min-width: 1024px) {
             .main-stage { display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
-            .cart-area { position: static; opacity: 1; visibility: visible; pointer-events: auto; height: calc(100vh - 120px); transform: none; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+            /* Desktop Reset for Cart */
+            .cart-area { 
+                position: static; opacity: 1; visibility: visible; pointer-events: auto; 
+                height: calc(100vh - 120px); bottom: auto; transform: none; 
+                border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            }
             .settings-area { width: 400px; right: 0; left: auto; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
             .menu-area { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
             .bottom-nav { display: none !important; }
@@ -111,12 +132,7 @@
         .del-btn { color: var(--text-muted); background: none; border: none; font-size: 18px; cursor: pointer; transition: color 0.2s; }
         .del-btn:hover { color: #FF3B30; }
         
-        /* FIXED CART FOOTER PADDING */
-        .cart-footer { 
-            padding: 25px; 
-            padding-bottom: max(25px, env(safe-area-inset-bottom)); 
-            background: var(--surface); border-top: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); 
-        }
+        .cart-footer { padding: 25px; padding-bottom: max(25px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); }
         
         .total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
         .total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
@@ -199,7 +215,7 @@
 
     <div id="loginScreen">
         <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo">
-        <h2 id="loginTitle" class="login-title">SIGN IN</h2>
+        <h2 id="loginTitle" class="login-title">It's loading, wait abit</h2>
         <div id="userListGrid" style="display:flex; flex-direction:column;"></div>
         <div id="pinContainer" style="display:none; flex-direction:column; align-items:center;">
             <div id="pinDisplay" class="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
@@ -305,7 +321,13 @@
 
         function showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); cancelLogin(); toggleSettings(false); }
         function selectUser(name) { tempSelectedUser = name; currentPin = ""; updatePinDisplay(); document.getElementById('userListGrid').style.display = 'none'; document.getElementById('pinContainer').style.display = 'flex'; document.getElementById('loginTitle').innerText = name; }
-        function cancelLogin() { tempSelectedUser = null; currentPin = ""; document.getElementById('userListGrid').style.display = 'flex'; document.getElementById('pinContainer').style.display = 'none'; document.getElementById('loginTitle').innerText = 'SIGN IN'; }
+        function cancelLogin() { 
+            tempSelectedUser = null; 
+            currentPin = ""; 
+            document.getElementById('userListGrid').style.display = 'flex'; 
+            document.getElementById('pinContainer').style.display = 'none'; 
+            document.getElementById('loginTitle').innerText = "It's loading, wait abit"; 
+        }
         
         function handleNumpad(val) {
             if (val === 'del') {
