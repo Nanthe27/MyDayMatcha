@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
+    
     <title>My Day Matcha</title>
     
     <link rel="icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
@@ -44,17 +48,18 @@
             background: var(--bg); color: var(--text); 
             margin: 0; padding: 0; height: 100vh; width: 100vw; 
             display: flex; flex-direction: column; overflow: hidden; 
-            padding-top: env(safe-area-inset-top);
+            padding-top: 0; 
             transition: background var(--anim-speed) var(--anim-curve), color var(--anim-speed) var(--anim-curve);
         }
 
         @keyframes fadeScale { 0% { opacity: 0; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1); } }
-        .main-stage, .modal-box, #loginScreen, .cart-area.active, .settings-area.active { animation: fadeScale var(--anim-speed) var(--anim-curve); }
+        .main-stage, .modal-box, #loginScreen, .cart-area.active, .settings-area.active, #managerPage, #editorModal { animation: fadeScale var(--anim-speed) var(--anim-curve); }
 
         /* --- HEADER --- */
         .app-header { 
-            height: calc(70px + env(safe-area-inset-top)); 
-            padding: env(safe-area-inset-top) 20px 0 20px; 
+            /* Fixed: 59px Safe Area + 70px Header = 129px */
+            height: 129px; 
+            padding: 59px 20px 0 20px; 
             display: flex; justify-content: space-between; align-items: center; 
             background: var(--surface); border-bottom: 1px solid var(--border); 
             z-index: 50; flex-shrink: 0; 
@@ -93,7 +98,7 @@
         .cart-area { 
             display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); 
             position: fixed; 
-            top: calc(70px + env(safe-area-inset-top)); 
+            top: 129px; 
             bottom: 80px; 
             left: 0; width: 100%; height: auto; 
             z-index: 150; opacity: 0; visibility: hidden; pointer-events: none; 
@@ -101,7 +106,10 @@
         }
         .cart-area.active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
 
-        .settings-area { display: flex; flex-direction: column; background: var(--bg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; opacity: 0; visibility: hidden; pointer-events: none; padding: 20px; transition: all var(--anim-speed) var(--anim-curve); backdrop-filter: blur(10px); }
+        .settings-area { 
+            padding-top: 129px !important; 
+            display: flex; flex-direction: column; background: var(--bg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; opacity: 0; visibility: hidden; pointer-events: none; padding: 20px; transition: all var(--anim-speed) var(--anim-curve); backdrop-filter: blur(10px); 
+        }
         .settings-area.active { opacity: 1; visibility: visible; pointer-events: auto; }
         .setting-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s var(--anim-curve); }
         .setting-card:hover { border-color: var(--primary); background: var(--surface-hover); transform: scale(0.98); }
@@ -109,6 +117,8 @@
         .setting-val { color: var(--text-muted); font-size: 13px; font-weight: 500; }
 
         @media (min-width: 1024px) {
+            body { padding-top: 0; }
+            .app-header { height: 70px; padding: 0 20px; } 
             .main-stage { display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
             .cart-area { 
                 position: static; 
@@ -117,9 +127,10 @@
                 opacity: 1; visibility: visible; pointer-events: auto; transform: none; 
                 border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
             }
-            .settings-area { width: 400px; right: 0; left: auto; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
+            .settings-area { width: 400px; right: 0; left: auto; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.05); padding-top: 20px !important; }
             .menu-area { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
             .bottom-nav { display: none !important; }
+            #managerPage .app-header, #historyPage .app-header { height: 70px !important; padding: 0 20px !important; }
         }
 
         .cart-header { padding: 20px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; }
@@ -131,27 +142,13 @@
         .del-btn { color: var(--text-muted); background: none; border: none; font-size: 18px; cursor: pointer; transition: color 0.2s; }
         .del-btn:hover { color: #FF3B30; }
         
-        /* FOOTER AT TOP FOR MOBILE */
         .cart-footer { 
-            order: -1; /* MOVES TO TOP */
-            padding: 20px 25px; 
-            background: var(--surface); 
-            border-bottom: 1px solid var(--border); 
-            border-top: none;
-            border-radius: var(--radius) var(--radius) 0 0; 
-            flex-shrink: 0;
-            z-index: 10;
+            order: -1; padding: 20px 25px; background: var(--surface); 
+            border-bottom: 1px solid var(--border); border-top: none;
+            border-radius: var(--radius) var(--radius) 0 0; flex-shrink: 0; z-index: 10;
         }
-        
-        /* FOOTER AT BOTTOM FOR DESKTOP */
         @media (min-width: 1024px) {
-            .cart-footer {
-                order: 0; /* RESET TO BOTTOM */
-                border-top: 1px solid var(--border);
-                border-bottom: none;
-                border-radius: 0 0 var(--radius) var(--radius);
-                padding: 25px;
-            }
+            .cart-footer { order: 0; border-top: 1px solid var(--border); border-bottom: none; border-radius: 0 0 var(--radius) var(--radius); padding: 25px; }
         }
         
         .total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
@@ -205,25 +202,33 @@
         .rp-total { border-top: 1px dashed #000; padding-top: 10px; font-weight: 700; font-size: 14px; text-align: right; }
         .preview-scroll-container { max-height: 55vh; overflow-y: auto; background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
 
-        /* HISTORY LAYOUT */
-        #historyPage { z-index: 250; background: var(--bg); }
-        #historyList { width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; }
+        /* LAYOUTS FOR HISTORY AND MANAGER */
+        #historyPage, #managerPage { z-index: 250; background: var(--bg); }
+        #historyList, #managerList { width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; }
         
-        .history-card { 
+        .history-card, .manager-card { 
             background: var(--surface); border: 1px solid var(--border); 
             border-radius: 12px; padding: 15px; margin-bottom: 10px; 
             display: flex; flex-direction: column; gap: 8px;
         }
+        
         .hc-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
         .hc-total { text-align: right; font-weight: 700; font-size: 14px; color: var(--primary); padding-top: 5px; }
+
+        /* EDITOR MODAL STYLE */
+        #editorModal { z-index: 260; background: rgba(0,0,0,0.5); }
+        .editor-form { width: 90%; max-width: 400px; background: var(--surface); padding: 25px; border-radius: var(--radius); max-height: 85vh; overflow-y: auto; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-label { font-size: 12px; font-weight: 600; margin-bottom: 5px; display: block; color: var(--text-muted); }
+        .form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 14px; outline: none; }
+        .form-check { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
 
         #testBanner { display: none; background: var(--primary); color: #fff; text-align: center; font-weight: 800; font-size: 10px; padding: 5px; position: fixed; top: 0; width: 100%; z-index: 10000; }
         body.testing .app-header { margin-top: 20px; }
 
-        /* PRINT STYLES */
         #receiptContainer { display: none; }
         @media print {
-            body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage { display: none !important; }
+            body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal { display: none !important; }
             #receiptContainer { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
             .receipt-paper { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; }
         }
@@ -271,6 +276,7 @@
             <div class="setting-card" onclick="showLogin()"><div class="setting-label">Switch User</div><div class="setting-val" id="currentUserDisplay">Unknown</div></div>
             <div class="setting-card" onclick="toggleTheme()"><div class="setting-label">Theme Mode</div><div class="setting-val" id="themeDisplay">Light Mode</div></div>
             <div class="setting-card" onclick="openHistory()"><div class="setting-label">History</div><div class="setting-val">View ></div></div>
+            <div class="setting-card" onclick="openManager()"><div class="setting-label">Manage Menu</div><div class="setting-val">></div></div>
         </div>
     </div>
 
@@ -298,6 +304,37 @@
             <button class="text-btn" style="color:#FF3B30;" onclick="requestDeleteHistory()">DELETE ALL</button>
         </div>
         <div id="historyList"></div>
+    </div>
+
+    <div id="managerPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
+        <div class="app-header" style="width:100%;">
+            <button class="text-btn" style="font-size:28px; line-height:1; padding:0 15px;" onclick="document.getElementById('managerPage').classList.remove('open')">‹</button>
+            <span style="font-weight:700; color:var(--primary); font-size:16px;">MANAGE MENU</span>
+            <button class="text-btn" style="color:var(--primary);" onclick="newItem()">+ ADD</button>
+        </div>
+        <div id="managerList"></div>
+    </div>
+
+    <div id="editorModal" class="modal-overlay">
+        <div class="editor-form">
+            <h3 style="margin-bottom:20px; text-align:center;">Edit Drink</h3>
+            <div class="form-group"><label class="form-label">Category</label><input id="eCat" class="form-input" placeholder="e.g., Coffee"></div>
+            <div class="form-group"><label class="form-label">ID (Unique)</label><input id="eId" class="form-input" placeholder="e.g., C01"></div>
+            <div class="form-group"><label class="form-label">Name</label><input id="eName" class="form-input" placeholder="Drink Name"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group"><label class="form-label">Price (KHR)</label><input id="ePrice" type="number" class="form-input"></div>
+                <div class="form-group"><label class="form-label">Cost (KHR)</label><input id="eCost" type="number" class="form-input"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Has Milk Option?</label><div class="form-check"><input id="eMilk" type="checkbox" style="width:20px;height:20px;"> <span>Yes</span></div></div>
+            <div class="form-group"><label class="form-label">Oat Milk Price (KHR)</label><input id="eOat" type="number" class="form-input" value="0"></div>
+            <div class="form-group"><label class="form-label">Image URL</label><input id="eImg" class="form-input" placeholder="https://raw.github..."></div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
+                <button class="btn btn-clear" onclick="document.getElementById('editorModal').classList.remove('open')">CANCEL</button>
+                <button class="btn btn-confirm" onclick="saveItem()">SAVE</button>
+            </div>
+            <button class="btn btn-clear" style="width:100%; margin-top:15px; border-color:#FF3B30; color:#FF3B30;" onclick="confirmDelete()">DELETE ITEM</button>
+        </div>
     </div>
 
     <div id="receiptContainer"></div>
@@ -330,12 +367,23 @@
         window.onload = () => { fetchUsers(); fetchMenu(); showLogin(); };
 
         function fetchUsers() {
+            // CACHE LOAD
+            const cachedUsers = localStorage.getItem('myday_users');
+            if (cachedUsers) {
+                renderUserGrid(JSON.parse(cachedUsers));
+            }
+
             fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(res => res.json()).then(data => {
-                const grid = document.getElementById('userListGrid'); grid.innerHTML = '';
-                data.forEach(name => {
-                    const btn = document.createElement('button'); btn.className = 'user-btn'; btn.innerText = name;
-                    btn.onclick = () => selectUser(name); grid.appendChild(btn);
-                });
+                localStorage.setItem('myday_users', JSON.stringify(data));
+                renderUserGrid(data);
+            });
+        }
+
+        function renderUserGrid(data) {
+            const grid = document.getElementById('userListGrid'); grid.innerHTML = '';
+            data.forEach(name => {
+                const btn = document.createElement('button'); btn.className = 'user-btn'; btn.innerText = name;
+                btn.onclick = () => selectUser(name); grid.appendChild(btn);
             });
         }
 
@@ -371,13 +419,24 @@
         }
 
         function fetchMenu() {
+            // CACHE LOAD
+            const cachedMenu = localStorage.getItem('myday_menu');
+            if (cachedMenu) {
+                processMenuData(JSON.parse(cachedMenu));
+            }
+
             fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(res => res.json()).then(data => {
-                if(data && data.length > 0) {
-                    let grouped = {}; data.forEach(item => { if(!grouped[item.category]) grouped[item.category] = []; grouped[item.category].push(item); });
-                    MENU_DATA = Object.keys(grouped).map(cat => ({ category: cat, items: grouped[cat] }));
-                }
-                renderMenu();
-            }).catch(() => renderMenu());
+                localStorage.setItem('myday_menu', JSON.stringify(data));
+                processMenuData(data);
+            });
+        }
+
+        function processMenuData(data) {
+            if(data && data.length > 0) {
+                let grouped = {}; data.forEach(item => { if(!grouped[item.category]) grouped[item.category] = []; grouped[item.category].push(item); });
+                MENU_DATA = Object.keys(grouped).map(cat => ({ category: cat, items: grouped[cat] }));
+            }
+            renderMenu();
         }
 
         function renderMenu() {
@@ -524,6 +583,7 @@
                 </div>`;
         }
 
+        /* --- FIXED OPEN MODAL: KEEPS OPEN IF ACTION RETURNS FALSE --- */
         function openModal(t, c, a, cl = 'CANCEL') {
             document.getElementById('mTitle').innerHTML = t; 
             document.getElementById('mText').innerHTML = c;
@@ -535,7 +595,13 @@
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
             newBtn.innerText = cl === 'PRINT' ? 'PRINT' : 'YES';
-            newBtn.onclick = () => { if(a() !== false) closeModal(); };
+            newBtn.onclick = () => { 
+                if(a) {
+                    if (a() !== false) closeModal();
+                } else {
+                    closeModal();
+                }
+            };
             document.getElementById('modal').classList.add('open');
         }
 
@@ -612,6 +678,132 @@
                 document.getElementById('receiptContainer').innerHTML = html; 
                 window.print();
             }, 'PRINT');
+        }
+
+        /* --- MANAGER LOGIC --- */
+        function openManager() {
+            toggleSettings(false);
+            const list = document.getElementById('managerList');
+            list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading Menu...</div>';
+            document.getElementById('managerPage').classList.add('open');
+            
+            fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(res => res.json()).then(data => {
+                if(data && data.length > 0) {
+                    renderManagerList(data);
+                } else {
+                    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Menu is empty</div>';
+                }
+            }).catch(e => {
+                list.innerHTML = '<div style="padding:20px;text-align:center;color:red">Connection Error</div>';
+            });
+        }
+
+        function renderManagerList(items) {
+            const list = document.getElementById('managerList');
+            list.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'manager-card';
+                // Pass item stringified to avoid quote issues
+                const itemStr = encodeURIComponent(JSON.stringify(item));
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-weight:700;">${item.name}</div>
+                            <div style="font-size:11px; color:var(--text-muted);">${item.category} | ${item.price.toLocaleString()} KHR</div>
+                        </div>
+                        <button class="text-btn" style="border:1px solid var(--border);" onclick="editItem('${itemStr}')">EDIT</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function newItem() {
+            openEditor({ category:'', id:'', name:'', price:0, cost:0, hasMilk:false, oatPrice:0, image:'' });
+        }
+
+        function editItem(itemStr) {
+            const item = JSON.parse(decodeURIComponent(itemStr));
+            openEditor(item);
+        }
+
+        function openEditor(item) {
+            document.getElementById('eCat').value = item.category;
+            document.getElementById('eId').value = item.id;
+            document.getElementById('eName').value = item.name;
+            document.getElementById('ePrice').value = item.price;
+            document.getElementById('eCost').value = item.cost;
+            document.getElementById('eMilk').checked = item.hasMilk;
+            document.getElementById('eOat').value = item.oatPrice;
+            document.getElementById('eImg').value = item.image;
+            
+            document.getElementById('editorModal').classList.add('open');
+        }
+
+        function saveItem() {
+            const item = {
+                category: document.getElementById('eCat').value,
+                id: document.getElementById('eId').value,
+                name: document.getElementById('eName').value,
+                price: Number(document.getElementById('ePrice').value),
+                cost: Number(document.getElementById('eCost').value),
+                hasMilk: document.getElementById('eMilk').checked,
+                oatPrice: Number(document.getElementById('eOat').value),
+                image: document.getElementById('eImg').value
+            };
+
+            if(!item.id || !item.name) { 
+                openModal('ERROR', 'ID and Name are required', null, 'CLOSE'); 
+                return; 
+            }
+
+            document.getElementById('editorModal').classList.remove('open');
+            document.getElementById('managerList').innerHTML = '<div style="padding:20px;text-align:center;">Saving...</div>';
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'save_item', ...item })
+            }).then(res => res.json()).then(data => {
+                if(data.status === 'success') {
+                    openManager(); // Reload list
+                    fetchMenu(); // Reload main menu
+                } else {
+                    openModal('ERROR', 'Error saving item: ' + (data.message || "Unknown error"), null, 'CLOSE');
+                    openManager(); 
+                }
+            }).catch(err => {
+                openModal('ERROR', 'Connection Error. Please try again.', null, 'CLOSE');
+                openManager();
+            });
+        }
+
+        function confirmDelete() {
+            openModal('DELETE?', 'Are you sure you want to delete this item permanently?', () => deleteItem());
+        }
+
+        function deleteItem() {
+            const id = document.getElementById('eId').value;
+            if(!id) return;
+
+            document.getElementById('editorModal').classList.remove('open');
+            document.getElementById('managerList').innerHTML = '<div style="padding:20px;text-align:center;">Deleting...</div>';
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'delete_item', id: id })
+            }).then(res => res.json()).then(data => {
+                if(data.status === 'success') {
+                    openManager();
+                    fetchMenu();
+                } else {
+                    openModal('ERROR', 'Error deleting item', null, 'CLOSE');
+                    openManager();
+                }
+            }).catch(err => {
+                openModal('ERROR', 'Connection Error.', null, 'CLOSE');
+                openManager();
+            });
         }
     </script>
 </body>
