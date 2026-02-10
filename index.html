@@ -101,7 +101,6 @@
         .cart-area { 
             display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); 
             position: fixed; 
-            /* DYNAMIC TOP: Starts exactly where header ends */
             top: calc(70px + env(safe-area-inset-top)); 
             bottom: 80px; 
             left: 0; width: 100%; height: auto; 
@@ -111,7 +110,6 @@
         .cart-area.active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
 
         .settings-area { 
-            /* DYNAMIC PADDING */
             padding-top: calc(70px + env(safe-area-inset-top)) !important; 
             display: flex; flex-direction: column; background: var(--bg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; opacity: 0; visibility: hidden; pointer-events: none; padding: 20px; transition: all var(--anim-speed) var(--anim-curve); backdrop-filter: blur(10px); 
         }
@@ -291,6 +289,10 @@
             <div class="setting-card" onclick="toggleTheme()"><div class="setting-label">Theme Mode</div><div class="setting-val" id="themeDisplay">Light Mode</div></div>
             <div class="setting-card" onclick="openHistory()"><div class="setting-label">History</div><div class="setting-val">View ></div></div>
             <div class="setting-card" onclick="openManager()"><div class="setting-label">Manage Menu</div><div class="setting-val">></div></div>
+            
+            <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card" style="text-decoration: none; background: var(--primary); color: white; margin-top: 40px; border: none; justify-content: center;">
+                <div class="setting-label" style="font-size: 14px;">CUSTOMER LOYALTY (TESTING)</div>
+            </a>
         </div>
     </div>
 
