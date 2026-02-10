@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Matcha Ops</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { 
+            --bg: #ffffff; --text: #000; --sub: #666; --matcha: #017a3f; 
+            --red: #d32f2f; --border: #f0f0f0; --surf: #fafafa; 
+            --radius-btn: 18px; --radius-card: 24px; --ease: cubic-bezier(0.2, 0.8, 0.2, 1); 
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; display: flex; justify-content: center; overflow: hidden; user-select: none; }
+        
+        .app { width: 100%; height: 100%; max-width: 480px; display: flex; flex-direction: column; position: relative; padding-top: 58px; }
+        
+        header { height: 70px; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); z-index: 20; }
+        
+        .view-container { position: relative; flex: 1; overflow: hidden; }
+        .view { position: absolute; top: 0; width: 100%; height: 100%; padding: 24px; opacity: 0; transform: translateY(15px); pointer-events: none; transition: 0.3s var(--ease); display: flex; flex-direction: column; background: #fff; }
+        .view.active { opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 10; }
+
+        input { width: 100%; padding: 18px; border: 1px solid var(--border); border-radius: 18px; font-size: 16px; background: var(--surf); outline: none; margin-bottom: 16px; transition: 0.3s var(--ease); }
+        input:focus { border-color: var(--matcha); background: #fff; }
+
+        .btn { width: 100%; padding: 18px; border-radius: 18px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; transition: 0.1s var(--ease); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
+        .btn:active { transform: scale(0.96); }
+        .btn-green { background: var(--matcha); color: #fff; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-black { background: #000; color: #fff; }
+        .btn-ghost { background: transparent; color: var(--sub); width: auto; padding: 8px 16px; margin: 0; }
+
+        .card { background: var(--surf); padding: 32px; border-radius: 24px; text-align: center; border: 1px solid var(--border); margin-bottom: 24px; }
+        
+        .qty-box { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 24px; }
+        .btn-circ { width: 52px; height: 52px; border-radius: 50%; font-size: 24px; border: none; color: #fff; display: flex; align-items: center; justify-content: center; }
+
+        .live-results { position: absolute; bottom: 70px; width: 100%; background: #fff; border-radius: 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); list-style: none; padding: 0; z-index: 50; display: none; overflow: hidden; }
+        .live-results.show { display: block; animation: slideUp 0.2s var(--ease); }
+        .live-item { padding: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+
+        .dots { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #ddd; transition: 0.3s; }
+        .dot.fill { background: var(--matcha); transform: scale(1.2); }
+
+        #reader { border-radius: 20px; overflow: hidden; margin-bottom: 20px; display: none; background: #000; }
+
+        #card-modal { position: fixed; inset:0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 300; display: none; justify-content: center; align-items: center; padding: 24px; opacity: 0; transition: 0.3s var(--ease); }
+        #card-modal.show { opacity: 1; display: flex; }
+        .modal-content { background: white; padding: 24px; border-radius: 28px; width: 100%; max-width: 360px; text-align: center; transform: translateY(20px); transition: 0.4s var(--ease); }
+        #card-modal.show .modal-content { transform: translateY(0); }
+
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; }
+        .spinner { width: 35px; height: 35px; border: 4px solid #f0f0f0; border-top-color: var(--matcha); border-radius: 50%; animation: s 0.8s infinite linear; }
+        @keyframes s { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <header>
+        <button class="btn btn-ghost" onclick="switchView('v-manage')">Manage</button>
+        <button class="btn btn-ghost" onclick="goHome()">Scan</button>
+    </header>
+
+    <div class="view-container">
+        <div id="v-scan" class="view active">
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <div id="reader"></div>
+                <button id="b-scan" class="btn btn-black" onclick="startScan()">Scan QR Code</button>
+                <div style="position:relative; margin-top:30px;">
+                    <ul id="live" class="live-results"></ul>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="searchIn" placeholder="ID or Name" style="margin:0" onkeyup="doLive(this.value)">
+                        <button class="btn btn-black" style="width:70px; margin:0" onclick="doManual()">Go</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="v-cust" class="view">
+            <div style="text-align:left; width:100%; margin-bottom:10px;">
+                <button class="btn btn-ghost" style="padding:0; font-size:14px;" onclick="goHome()">← Back</button>
+            </div>
+
+            <div class="card">
+                <h2 id="d-name" style="font-family:'Quicksand'; font-size: 28px; margin-bottom: 5px;">...</h2>
+                <div id="d-id" style="color:var(--sub); font-family:monospace; margin-bottom:15px; font-size: 16px;">...</div>
+                <button class="btn btn-green" style="margin-bottom: 24px; font-size: 14px; padding: 12px;" onclick="generateCard()">Generate QR Loyalty Card</button>
+                <div class="dots" id="d-dots"></div>
+            </div>
+            
+            <div id="r-msg" style="background:var(--matcha); color:#fff; padding:15px; border-radius:15px; text-align:center; font-weight:700; display:none; margin-bottom:24px;">🎉 REWARD READY</div>
+            
+            <div style="margin-top:auto">
+                <button id="b-red" class="btn btn-red" style="display:none;" onclick="doAction('redeemReward')">Redeem Reward</button>
+                <div id="q-ctrl" class="qty-box">
+                    <button class="btn-circ btn-red" onclick="adj(-1)">-</button>
+                    <span id="q-val" style="font-size:26px; font-weight:700">1</span>
+                    <button class="btn-circ btn-green" onclick="adj(1)">+</button>
+                </div>
+                <button id="b-add" class="btn btn-black" onclick="doAction('addPurchase')">Confirm Purchase</button>
+            </div>
+        </div>
+
+        <div id="v-manage" class="view">
+            <div style="text-align:left; width:100%; margin-bottom:10px;">
+                <button class="btn btn-ghost" style="padding:0; font-size:14px;" onclick="goHome()">← Back</button>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <input type="text" id="m-search" placeholder="Search..." style="margin:0" onkeyup="renderList(this.value)">
+                <button class="btn btn-green" style="width:60px; margin:0" onclick="showForm()">+</button>
+            </div>
+            <ul id="m-list" style="list-style:none; padding:0; margin:0; overflow-y:auto;"></ul>
+        </div>
+
+        <div id="v-form" class="view">
+            <div style="text-align:left; width:100%; margin-bottom:10px;">
+                <button class="btn btn-ghost" style="padding:0; font-size:14px;" onclick="switchView('v-manage')">← Back</button>
+            </div>
+            <h2 id="f-title" style="font-family:'Quicksand';">New Customer</h2>
+            
+            <label style="font-size:13px; color:var(--sub); margin-left:5px;">Customer ID or Phone Number</label>
+            <input type="text" id="f-phone" placeholder="ID or Phone">
+            
+            <label style="font-size:13px; color:var(--sub); margin-left:5px;">Full Name</label>
+            <input type="text" id="f-name" placeholder="Name">
+            
+            <button class="btn btn-black" style="margin-bottom: 24px;" onclick="generateFromForm()">Generate QR Card</button>
+            <div style="margin-top:auto">
+                <button class="btn btn-green" onclick="save()">Save Customer</button>
+                <button id="f-del" class="btn btn-red" onclick="del()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="card-modal" onclick="closeCard()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div id="card-canvas-container"></div>
+        <p style="font-size:12px; color:#666; margin: 15px 0;">Long press to Save or Share</p>
+        <button class="btn btn-black" onclick="closeCard()">Close Card</button>
+    </div>
+    <div id="qr-hidden" style="display:none;"></div>
+</div>
+
+<div id="loader"><div class="spinner"></div></div>
+
+<script>
+    const API = "https://script.google.com/macros/s/AKfycbwG-iVOOnP5869o5jOZBrxnaMYJv3jIx-iVdhF0NlVlRTAFeyO9S01uSDbeIZDwhSD-Ug/exec";
+    const KEY = "ch#@ngch@mn@n2712@mydaymatcha";
+    const LOGO_URL = "https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/fac565acc942ff0260de380d21014a133789b493/Logo.png";
+    let db = [], cur = null, sc = null, qty = 1;
+
+    const get = (id) => document.getElementById(id);
+    const load = (s) => get('loader').style.display = s ? 'flex' : 'none';
+
+    window.onload = async () => {
+        load(1);
+        try {
+            const r = await fetch(API, {method:"POST", body:JSON.stringify({action:"sync", api_key:KEY})});
+            const j = await r.json();
+            if(j.success) db = j.local_db;
+        } catch(e) {}
+        load(0);
+    };
+
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        get(id).classList.add('active');
+        if(id === 'v-scan') stopScan();
+    }
+
+    function goHome() { get('searchIn').value = ""; switchView('v-scan'); }
+
+    function doLive(q) {
+        const l = get('live');
+        q = q.trim().toLowerCase();
+        if(q.length < 2) { l.classList.remove('show'); return; }
+        const m = db.filter(c => String(c.customer_id).includes(q) || c.name.toLowerCase().includes(q)).slice(0, 5);
+        if(m.length) {
+            l.innerHTML = m.map(c => `<li class="live-item" onclick="sel('${c.customer_id}')"><div><b>${c.name}</b><br><small>${c.customer_id}</small></div><b>${c.purchase_count} pts</b></li>`).join('');
+            l.classList.add('show');
+        } else l.classList.remove('show');
+    }
+
+    function sel(id) { get('live').classList.remove('show'); get('searchIn').value = ""; loadCust(db.find(c => c.customer_id == id)); }
+
+    function doManual() {
+        const v = get('searchIn').value.trim();
+        const f = db.find(c => c.customer_id == v || c.name.toLowerCase() == v.toLowerCase());
+        if(f) loadCust(f); else if(confirm("Not found. Create?")) showForm(v);
+    }
+
+    function loadCust(c) {
+        cur = c; qty = 1; get('q-val').innerText = 1;
+        get('d-name').innerText = c.name; get('d-id').innerText = c.customer_id;
+        const pts = c.purchase_count % 5;
+        get('d-dots').innerHTML = [0,1,2,3,4].map(i => `<div class="dot ${i<pts?'fill':''}"></div>`).join('');
+        const rdy = c.purchase_count >= 5;
+        get('r-msg').style.display = rdy ? 'block' : 'none';
+        get('b-red').style.display = rdy ? 'block' : 'none';
+        get('b-add').style.display = rdy ? 'none' : 'block';
+        get('q-ctrl').style.display = rdy ? 'none' : 'flex';
+        switchView('v-cust');
+    }
+
+    // --- AUTO ID GENERATOR ---
+    function generateAutoId() {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        // Format: DDMMYY-HHMMSS
+        return `${pad(now.getDate())}${pad(now.getMonth()+1)}${String(now.getFullYear()).slice(-2)}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    }
+
+    function showForm(p="") { 
+        get('f-title').innerText="New Customer"; 
+        
+        // AUTO GENERATE ID if p is empty, otherwise use p
+        const autoID = p ? p : generateAutoId();
+        
+        get('f-phone').value = autoID; 
+        get('f-phone').disabled=false; 
+        get('f-name').value=""; 
+        get('f-del').style.display="none"; 
+        switchView('v-form'); 
+    }
+    
+    function edit(id) { 
+        const c = db.find(x => x.customer_id == id);
+        get('f-title').innerText="Edit Customer"; 
+        get('f-phone').value=c.customer_id; 
+        get('f-phone').disabled=true; 
+        get('f-name').value=c.name; 
+        get('f-del').style.display="block"; 
+        switchView('v-form'); 
+    }
+
+    // --- CARD & OTHER FUNCTIONS ---
+    function generateFromForm() {
+        const n = get('f-name').value;
+        const p = get('f-phone').value;
+        if(!n || !p) return alert("Please enter Name and Phone first.");
+        generateCard(n, p);
+    }
+
+    function generateCard(name, id) {
+        if(!name && cur) { name = cur.name; id = cur.customer_id; }
+        load(1);
+        const qrData = JSON.stringify({ app: "matcha", id: id });
+        get('qr-hidden').innerHTML = "";
+        new QRCode(get('qr-hidden'), { text: qrData, width: 256, height: 256, correctLevel: QRCode.CorrectLevel.H });
+        const logoImg = new Image();
+        logoImg.crossOrigin = "Anonymous";
+        logoImg.src = LOGO_URL;
+        logoImg.onload = () => drawCanvas(name, id, logoImg);
+        logoImg.onerror = () => drawCanvas(name, id, null);
+    }
+
+    function drawCanvas(name, id, logoImg) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 600; canvas.height = 850;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = "#017a3f";
+        ctx.fillRect(0,0,600,850);
+        ctx.fillStyle = "#ffffff";
+        drawRoundedRect(ctx, 40, 40, 520, 770, 40);
+        ctx.fill();
+
+        if(logoImg) {
+            const size = 150; const cx = 300; const cy = 145; const r = size / 2;
+            ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+            const aspect = logoImg.width / logoImg.height;
+            let drawW, drawH;
+            if (aspect > 1) { drawH = size; drawW = size * aspect; } else { drawW = size; drawH = size / aspect; }
+            ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
+            ctx.restore();
+            ctx.strokeStyle = "#017a3f"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+        } else {
+            ctx.textAlign = "center"; ctx.fillStyle = "#017a3f"; ctx.font = "bold 40px Quicksand"; ctx.fillText("MY DAY MATCHA", 300, 150);
+        }
+
+        const qrImg = get('qr-hidden').querySelector('img');
+        if(qrImg) ctx.drawImage(qrImg, 150, 250, 300, 300);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#000000"; ctx.font = "bold 48px Quicksand"; ctx.fillText(name, 300, 620);
+        ctx.fillStyle = "#777777"; ctx.font = "32px monospace"; ctx.fillText("ID: " + id, 300, 680);
+        ctx.fillStyle = "#017a3f"; ctx.font = "bold 28px Quicksand"; ctx.fillText("SCAN TO EARN POINTS", 300, 760);
+
+        const finalImg = document.createElement('img');
+        finalImg.src = canvas.toDataURL();
+        finalImg.style.width = "100%"; finalImg.style.borderRadius = "12px";
+        get('card-canvas-container').innerHTML = "";
+        get('card-canvas-container').appendChild(finalImg);
+        load(0);
+        get('card-modal').classList.add('show');
+        get('card-modal').style.display = "flex";
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+        ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+    }
+
+    function closeCard() { get('card-modal').classList.remove('show'); setTimeout(() => get('card-modal').style.display = "none", 300); }
+    function adj(n) { qty = Math.max(1, qty + n); get('q-val').innerText = qty; }
+
+    async function doAction(a) {
+        load(1);
+        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:a, customer_id:cur.customer_id, qty:qty, api_key:KEY})});
+        const j = await r.json();
+        if(j.success) {
+            cur.purchase_count = j.purchase_count;
+            const i = db.findIndex(x => x.customer_id == cur.customer_id);
+            if(i>-1) db[i].purchase_count = j.purchase_count;
+            loadCust(cur);
+        }
+        load(0);
+    }
+
+    function renderList(q = "") {
+        q = q.toLowerCase();
+        get('m-list').innerHTML = db.filter(c => String(c.customer_id).includes(q) || c.name.toLowerCase().includes(q))
+            .map(c => `<li class="live-item" onclick="edit('${c.customer_id}')"><div><b>${c.name}</b><br><small>${c.customer_id}</small></div><b>${c.purchase_count} pts</b></li>`).join('');
+    }
+
+    async function save() {
+        const p = get('f-phone').value, n = get('f-name').value;
+        if(!p || !n) return;
+        load(1);
+        const a = get('f-title').innerText == "New Customer" ? "createCustomer" : "editCustomer";
+        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:a, customer_id:p, name:n, phone:p, api_key:KEY})});
+        const j = await r.json();
+        if(j.success) {
+            if(a=="createCustomer") db.push({customer_id:p, name:n, purchase_count:0});
+            else db.find(x => x.customer_id == p).name = n;
+            switchView('v-manage');
+        } else alert(j.message);
+        load(0);
+    }
+
+    async function del() {
+        const confirmation = prompt("To permanently delete this customer, type 'DELETEUSER' below:");
+        if (confirmation !== "DELETEUSER") { alert("Deletion cancelled."); return; }
+        const p = get('f-phone').value;
+        load(1);
+        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:"deleteCustomer", customer_id:p, api_key:KEY})});
+        const j = await r.json();
+        if(j.success) { db = db.filter(x => x.customer_id != p); switchView('v-manage'); }
+        load(0);
+    }
+
+    function startScan() {
+        get('b-scan').style.display='none'; get('reader').style.display='block';
+        sc = new Html5Qrcode("reader");
+        sc.start({facingMode:"environment"}, {fps:10, qrbox:250}, (t) => { 
+            stopScan();
+            try {
+                const data = JSON.parse(t);
+                if (data.app === "matcha") {
+                    const f = db.find(c => c.customer_id == data.id);
+                    if(f) loadCust(f); else if(confirm("New Card. Create?")) showForm(data.id);
+                } else alert("Invalid Card");
+            } catch(e) {
+                if(!isNaN(t)) { get('searchIn').value = t; doManual(); } else alert("Invalid Format");
+            }
+        });
+    }
+    function stopScan() { if(sc) sc.stop(); get('reader').style.display='none'; get('b-scan').style.display='block'; }
+</script>
+</body>
+</html>
