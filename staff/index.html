@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <title>MyDayMatcha-Loyalty</title>
     
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/fac565acc942ff0260de380d21014a133789b493/Logo.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/fac565acc942ff0260de380d21014a133789b493/Logo.png">
+    
+    <link rel="apple-touch-icon" href="https://github.com/Nanthe27/MyDayMatcha/blob/main/logo%20black%20and%20gole.jpg?raw=true">
 
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -15,101 +15,113 @@
     <style>
         :root { 
             --bg: #ffffff; --text: #000; --sub: #666; --matcha: #017a3f; 
-            --red: #d32f2f; --border: #f0f0f0; --surf: #fafafa; 
-            --radius-btn: 18px; --radius-card: 24px; --ease: cubic-bezier(0.2, 0.8, 0.2, 1); 
+            --red: #d32f2f; --blue: #007aff; --border: #f2f2f2; --surf: #fafafa; 
+            --radius-btn: 22px; --radius-card: 32px; 
+            --ease: cubic-bezier(0.4, 0, 0.2, 1); 
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; display: flex; justify-content: center; overflow: hidden; user-select: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; display: flex; justify-content: center; overflow: hidden; user-select: none; }
         
         .app { width: 100%; height: 100%; max-width: 480px; display: flex; flex-direction: column; position: relative; padding-top: 58px; }
         
-        header { height: 70px; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); z-index: 20; }
+        header { height: 70px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); z-index: 20; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); }
         
+        .pill-toggle { background: #eeeeee; padding: 4px; border-radius: 24px; display: flex; gap: 2px; }
+        .pill-btn { padding: 8px 16px; border-radius: 20px; border: none; font-size: 13px; font-weight: 700; color: #666; background: transparent; transition: all 0.3s var(--ease); cursor: pointer; }
+        .pill-btn.active { background: #fff; color: var(--matcha); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .pill-btn:active { transform: scale(0.95); }
+
+        .btn-red-back { background: var(--red); color: #fff; padding: 10px 16px; border-radius: 18px; font-size: 13px; font-weight: 700; border: none; transition: all 0.2s; }
+        .btn-red-back:active { transform: scale(0.95); opacity: 0.9; }
+
+        .search-container { padding: 12px 24px 0; background: #fff; z-index: 15; }
+
         .view-container { position: relative; flex: 1; overflow: hidden; }
-        .view { position: absolute; top: 0; width: 100%; height: 100%; padding: 24px; opacity: 0; transform: translateY(15px); pointer-events: none; transition: 0.3s var(--ease); display: flex; flex-direction: column; background: #fff; }
+        .view { position: absolute; top: 0; width: 100%; height: 100%; padding: 24px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: all 0.4s var(--ease); display: flex; flex-direction: column; background: #fff; }
         .view.active { opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 10; }
 
-        input { width: 100%; padding: 18px; border: 1px solid var(--border); border-radius: 18px; font-size: 16px; background: var(--surf); outline: none; margin-bottom: 16px; transition: 0.3s var(--ease); }
-        input:focus { border-color: var(--matcha); background: #fff; }
+        input { width: 100%; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius-btn); font-size: 16px; background: var(--surf); outline: none; transition: all 0.3s var(--ease); font-family: inherit; }
+        input:focus { border-color: var(--matcha); background: #fff; box-shadow: 0 0 0 4px rgba(1, 122, 63, 0.05); }
 
-        .btn { width: 100%; padding: 18px; border-radius: 18px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; transition: 0.1s var(--ease); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
-        .btn:active { transform: scale(0.96); }
+        .btn { width: 100%; padding: 18px; border-radius: var(--radius-btn); font-size: 16px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s var(--ease); display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; letter-spacing: -0.02em; }
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
         .btn-green { background: var(--matcha); color: #fff; }
+        .btn-blue { background: var(--blue); color: #fff; }
         .btn-red { background: var(--red); color: #fff; }
-        .btn-black { background: var(--matcha); color: #fff; } /* Matcha Green */
-        .btn-ghost { background: transparent; color: var(--sub); width: auto; padding: 8px 16px; margin: 0; }
+        .btn-ghost { background: transparent; color: var(--sub); width: auto; padding: 10px 16px; margin: 0; font-size: 14px; }
 
-        .card { background: var(--surf); padding: 32px; border-radius: 24px; text-align: center; border: 1px solid var(--border); margin-bottom: 24px; }
+        .card { background: var(--surf); padding: 36px 24px; border-radius: var(--radius-card); text-align: center; border: 1px solid var(--border); margin-bottom: 24px; }
         
-        .qty-box { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 24px; }
-        .btn-circ { width: 52px; height: 52px; border-radius: 50%; font-size: 24px; border: none; color: #fff; display: flex; align-items: center; justify-content: center; }
+        .qty-box { display: flex; align-items: center; justify-content: center; gap: 32px; margin-bottom: 32px; }
+        .btn-circ { width: 56px; height: 56px; border-radius: 50%; font-size: 24px; border: none; color: #fff; display: flex; align-items: center; justify-content: center; }
 
-        .live-results { position: absolute; bottom: 70px; width: 100%; background: #fff; border-radius: 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); list-style: none; padding: 0; z-index: 50; display: none; overflow: hidden; }
-        .live-results.show { display: block; animation: slideUp 0.2s var(--ease); }
-        .live-item { padding: 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .live-results { position: absolute; top: 75px; left: 24px; right: 24px; background: #fff; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.12); border: 1px solid var(--border); list-style: none; padding: 8px; z-index: 100; display: none; overflow: hidden; }
+        .live-results.show { display: block; animation: slideUp 0.3s var(--ease); }
+        .live-item { padding: 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .live-item:active { background: var(--surf); transform: scale(0.98); }
 
-        .dots { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; background: #ddd; transition: 0.3s; }
-        .dot.fill { background: var(--matcha); transform: scale(1.2); }
+        .dots { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; background: #e0e0e0; transition: all 0.4s var(--ease); }
+        .dot.fill { background: var(--matcha); transform: scale(1.25); }
 
-        #reader { border-radius: 20px; overflow: hidden; margin-bottom: 20px; display: none; background: #000; }
+        #reader { border-radius: 48px; overflow: hidden; margin-bottom: 24px; display: none; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; aspect-ratio: 1/1; position: relative; }
+        #reader video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 48px; }
 
-        #card-modal { position: fixed; inset:0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 300; display: none; justify-content: center; align-items: center; padding: 24px; opacity: 0; transition: 0.3s var(--ease); }
+        #card-modal { position: fixed; inset:0; background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); z-index: 300; display: none; justify-content: center; align-items: center; padding: 24px; opacity: 0; transition: all 0.4s var(--ease); }
         #card-modal.show { opacity: 1; display: flex; }
-        .modal-content { background: white; padding: 24px; border-radius: 28px; width: 100%; max-width: 360px; text-align: center; transform: translateY(20px); transition: 0.4s var(--ease); }
-        #card-modal.show .modal-content { transform: translateY(0); }
+        .modal-content { background: white; padding: 28px; border-radius: 40px; width: 100%; max-width: 380px; text-align: center; transform: scale(0.9) translateY(20px); transition: all 0.5s var(--ease); }
+        #card-modal.show .modal-content { transform: scale(1) translateY(0); }
 
-        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 200; display: flex; justify-content: center; align-items: center; }
-        .spinner { width: 35px; height: 35px; border: 4px solid #f0f0f0; border-top-color: var(--matcha); border-radius: 50%; animation: s 0.8s infinite linear; }
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 500; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .spinner { width: 40px; height: 40px; border: 3px solid #f0f0f0; border-top-color: var(--matcha); border-radius: 50%; animation: s 0.9s infinite cubic-bezier(0.5, 0.1, 0.4, 0.9); }
+        
         @keyframes s { to { transform: rotate(360deg); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="app">
     <header>
-        <button class="btn btn-ghost" style="padding:0;" onclick="window.location.href='https://nanthe27.github.io/MyDayMatcha/'">Back To Menu</button>
-        <div style="display:flex; gap:12px;">
-            <button class="btn btn-ghost" style="padding:0;" onclick="switchView('v-manage')">Manage</button>
-            <button class="btn btn-ghost" style="padding:0;" onclick="goHome()">Scan</button>
+        <button class="btn-red-back" onclick="window.location.href='https://nanthe27.github.io/MyDayMatcha/'">Back To Menu</button>
+        <div class="pill-toggle">
+            <button id="pill-scan" class="pill-btn active" onclick="goHome()">Scan</button>
+            <button id="pill-manage" class="pill-btn" onclick="switchView('v-manage')">Manage</button>
         </div>
     </header>
+
+    <div id="top-search" class="search-container">
+        <div style="position:relative; display:flex; gap:12px;">
+            <input type="text" id="searchIn" placeholder="Search ID or Name" onkeyup="doLive(this.value)">
+            <button class="btn btn-green" style="width:70px; padding:0; margin:0;" onclick="doManual()">Go</button>
+            <ul id="live" class="live-results"></ul>
+        </div>
+    </div>
 
     <div class="view-container">
         <div id="v-scan" class="view active">
             <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
                 <div id="reader"></div>
                 <button id="b-scan" class="btn btn-green" onclick="startScan()">Scan QR Code</button>
-                <div style="position:relative; margin-top:30px;">
-                    <ul id="live" class="live-results"></ul>
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" id="searchIn" placeholder="ID or Name" style="margin:0" onkeyup="doLive(this.value)">
-                        <button class="btn btn-green" style="width:70px; margin:0" onclick="doManual()">Go</button>
-                    </div>
-                </div>
             </div>
         </div>
 
         <div id="v-cust" class="view">
-            <div style="text-align:left; width:100%; margin-bottom:10px;">
-                <button class="btn btn-ghost" style="padding:0; font-size:14px;" onclick="goHome()">← Back</button>
+            <div style="text-align:left; width:100%; margin-bottom:16px;">
+                <button class="btn btn-ghost" style="padding:0;" onclick="goHome()">← Back</button>
             </div>
-
             <div class="card">
-                <h2 id="d-name" style="font-family:'Quicksand'; font-size: 28px; margin-bottom: 5px;">...</h2>
-                <div id="d-id" style="color:var(--sub); font-family:monospace; margin-bottom:15px; font-size: 16px;">...</div>
-                <button class="btn btn-green" style="margin-bottom: 24px; font-size: 14px; padding: 12px;" onclick="generateCard()">Generate QR Loyalty Card</button>
+                <h2 id="d-name" style="font-family:'Quicksand'; font-size: 32px; margin-bottom: 8px;">...</h2>
+                <div id="d-id" style="color:var(--sub); font-family:monospace; margin-bottom:24px; font-size: 16px;">...</div>
+                <button class="btn btn-green" style="margin: 0 auto; padding: 14px 24px; width: auto;" onclick="generateCard()">Generate QR Card</button>
                 <div class="dots" id="d-dots"></div>
             </div>
-            
-            <div id="r-msg" style="background:var(--matcha); color:#fff; padding:15px; border-radius:15px; text-align:center; font-weight:700; display:none; margin-bottom:24px;">🎉 REWARD READY</div>
-            
+            <div id="r-msg" style="background:var(--matcha); color:#fff; padding:20px; border-radius:24px; text-align:center; font-weight:700; display:none; margin-bottom:24px;">🎉 REWARD READY</div>
             <div style="margin-top:auto">
-                <button id="b-red" class="btn btn-red" style="display:none;" onclick="doAction('redeemReward')">Redeem Reward</button>
+                <button id="b-red" class="btn btn-blue" style="display:none;" onclick="doAction('redeemReward')">Redeem Reward</button>
                 <div id="q-ctrl" class="qty-box">
-                    <button class="btn-circ btn-red" onclick="adj(-1)">-</button>
-                    <span id="q-val" style="font-size:26px; font-weight:700">1</span>
+                    <button class="btn-circ btn-red" onclick="adj(-1)">−</button>
+                    <span id="q-val" style="font-size:32px; font-weight:700;">1</span>
                     <button class="btn-circ btn-green" onclick="adj(1)">+</button>
                 </div>
                 <button id="b-add" class="btn btn-green" onclick="doAction('addPurchase')">Confirm Purchase</button>
@@ -117,32 +129,25 @@
         </div>
 
         <div id="v-manage" class="view">
-            <div style="text-align:left; width:100%; margin-bottom:10px;">
-                <button class="btn btn-ghost" style="padding:0; font-size:14px;" onclick="goHome()">← Back</button>
+            <div style="text-align:left; width:100%; margin-bottom:16px;">
+                <button class="btn btn-ghost" style="padding:0;" onclick="goHome()">← Back</button>
             </div>
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <input type="text" id="m-search" placeholder="Search..." style="margin:0" onkeyup="renderList(this.value)">
-                <button class="btn btn-green" style="width:60px; margin:0" onclick="showForm()">+</button>
-            </div>
-            <ul id="m-list" style="list-style:none; padding:0; margin:0; overflow-y:auto;"></ul>
+            <button class="btn btn-green" style="margin-bottom: 20px;" onclick="showForm()">+ Create New Customer</button>
+            <ul id="m-list" style="list-style:none; padding:0; margin:0; overflow-y:auto; flex: 1;"></ul>
         </div>
 
         <div id="v-form" class="view">
-            <div style="text-align:left; width:100%; margin-bottom:10px;">
-                <button class="btn btn-ghost" style="padding:0; font-size:14px;" onclick="switchView('v-manage')">← Back</button>
+            <div style="text-align:left; width:100%; margin-bottom:16px;">
+                <button class="btn btn-ghost" style="padding:0;" onclick="switchView('v-manage')">← Back</button>
             </div>
-            <h2 id="f-title" style="font-family:'Quicksand';">New Customer</h2>
-            
-            <label style="font-size:13px; color:var(--sub); margin-left:5px;">Customer ID or Phone Number</label>
-            <input type="text" id="f-phone" placeholder="ID or Phone">
-            
-            <label style="font-size:13px; color:var(--sub); margin-left:5px;">Full Name</label>
-            <input type="text" id="f-name" placeholder="Name">
-            
-            <button class="btn btn-green" style="margin-bottom: 24px;" onclick="generateFromForm()">Generate QR Card</button>
+            <h2 id="f-title" style="font-family:'Quicksand'; font-size: 28px; margin-bottom: 24px;">New Customer</h2>
+            <label style="font-size:12px; font-weight: 700; text-transform: uppercase; color:var(--sub); margin: 0 0 8px 8px;">Customer ID / Phone</label>
+            <input type="text" id="f-phone" style="margin-bottom:16px;">
+            <label style="font-size:12px; font-weight: 700; text-transform: uppercase; color:var(--sub); margin: 0 0 8px 8px;">Full Name</label>
+            <input type="text" id="f-name">
             <div style="margin-top:auto">
                 <button class="btn btn-green" onclick="save()">Save Customer</button>
-                <button id="f-del" class="btn btn-red" onclick="del()">Delete</button>
+                <button id="f-del" class="btn btn-red" style="background:transparent; color:var(--red); border:1px solid var(--red);" onclick="del()">Delete Customer</button>
             </div>
         </div>
     </div>
@@ -151,8 +156,8 @@
 <div id="card-modal" onclick="closeCard()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div id="card-canvas-container"></div>
-        <p style="font-size:12px; color:#666; margin: 15px 0;">Long press to Save or Share</p>
-        <button class="btn btn-green" onclick="closeCard()">Close Card</button>
+        <p style="font-size:13px; color:var(--sub); margin: 20px 0 10px; font-weight: 600;">Long press image to Save</p>
+        <button class="btn btn-green" onclick="closeCard()">Done</button>
     </div>
     <div id="qr-hidden" style="display:none;"></div>
 </div>
@@ -173,7 +178,10 @@
         try {
             const r = await fetch(API, {method:"POST", body:JSON.stringify({action:"sync", api_key:KEY})});
             const j = await r.json();
-            if(j.success) db = j.local_db;
+            if(j.success) {
+                db = j.local_db;
+                renderList();
+            }
         } catch(e) {}
         load(0);
     };
@@ -181,10 +189,20 @@
     function switchView(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         get(id).classList.add('active');
+        
+        document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        if(id === 'v-manage') get('pill-manage').classList.add('active');
+        else if(id === 'v-scan') get('pill-scan').classList.add('active');
+        
         if(id === 'v-scan') stopScan();
+        get('top-search').style.display = (id === 'v-scan' || id === 'v-manage') ? 'block' : 'none';
     }
 
-    function goHome() { get('searchIn').value = ""; switchView('v-scan'); }
+    function goHome() { 
+        get('searchIn').value = ""; 
+        get('live').classList.remove('show');
+        switchView('v-scan'); 
+    }
 
     function doLive(q) {
         const l = get('live');
@@ -192,7 +210,7 @@
         if(q.length < 2) { l.classList.remove('show'); return; }
         const m = db.filter(c => String(c.customer_id).includes(q) || c.name.toLowerCase().includes(q)).slice(0, 5);
         if(m.length) {
-            l.innerHTML = m.map(c => `<li class="live-item" onclick="sel('${c.customer_id}')"><div><b>${c.name}</b><br><small>${c.customer_id}</small></div><b>${c.purchase_count} pts</b></li>`).join('');
+            l.innerHTML = m.map(c => `<li class="live-item" onclick="sel('${c.customer_id}')"><div><b>${c.name}</b><br><small style="opacity:0.6">${c.customer_id}</small></div><b style="color:var(--matcha)">${c.purchase_count} pts</b></li>`).join('');
             l.classList.add('show');
         } else l.classList.remove('show');
     }
@@ -202,11 +220,12 @@
     function doManual() {
         const v = get('searchIn').value.trim();
         const f = db.find(c => c.customer_id == v || c.name.toLowerCase() == v.toLowerCase());
-        if(f) loadCust(f); else if(confirm("Not found. Create?")) showForm(v);
+        if(f) loadCust(f); else if(confirm("Customer not found. Create profile?")) showForm(v);
     }
 
     function loadCust(c) {
         cur = c; qty = 1; get('q-val').innerText = 1;
+        get('top-search').style.display = 'none';
         get('d-name').innerText = c.name; get('d-id').innerText = c.customer_id;
         const pts = c.purchase_count % 5;
         get('d-dots').innerHTML = [0,1,2,3,4].map(i => `<div class="dot ${i<pts?'fill':''}"></div>`).join('');
@@ -244,13 +263,6 @@
         switchView('v-form'); 
     }
 
-    function generateFromForm() {
-        const n = get('f-name').value;
-        const p = get('f-phone').value;
-        if(!n || !p) return alert("Please enter Name and Phone first.");
-        generateCard(n, p);
-    }
-
     function generateCard(name, id) {
         if(!name && cur) { name = cur.name; id = cur.customer_id; }
         load(1);
@@ -268,42 +280,38 @@
         const canvas = document.createElement('canvas');
         canvas.width = 600; canvas.height = 850;
         const ctx = canvas.getContext('2d');
-        
         ctx.fillStyle = "#017a3f";
         ctx.fillRect(0,0,600,850);
         ctx.fillStyle = "#ffffff";
-        drawRoundedRect(ctx, 40, 40, 520, 770, 40);
+        drawRoundedRect(ctx, 40, 40, 520, 770, 50);
         ctx.fill();
 
         if(logoImg) {
-            const size = 150; const cx = 300; const cy = 145; const r = size / 2;
+            const size = 160; const cx = 300; const cy = 150; const r = size / 2;
             ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
             const aspect = logoImg.width / logoImg.height;
             let drawW, drawH;
             if (aspect > 1) { drawH = size; drawW = size * aspect; } else { drawW = size; drawH = size / aspect; }
             ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
             ctx.restore();
-            ctx.strokeStyle = "#017a3f"; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
-        } else {
-            ctx.textAlign = "center"; ctx.fillStyle = "#017a3f"; ctx.font = "bold 40px Quicksand"; ctx.fillText("MY DAY MATCHA", 300, 150);
+            ctx.strokeStyle = "#017a3f"; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
         }
 
         const qrImg = get('qr-hidden').querySelector('img');
-        if(qrImg) ctx.drawImage(qrImg, 150, 250, 300, 300);
+        if(qrImg) ctx.drawImage(qrImg, 150, 260, 300, 300);
 
         ctx.textAlign = "center";
-        ctx.fillStyle = "#000000"; ctx.font = "bold 48px Quicksand"; ctx.fillText(name, 300, 620);
-        ctx.fillStyle = "#777777"; ctx.font = "32px monospace"; ctx.fillText("ID: " + id, 300, 680);
-        ctx.fillStyle = "#017a3f"; ctx.font = "bold 28px Quicksand"; ctx.fillText("SCAN TO EARN POINTS", 300, 760);
+        ctx.fillStyle = "#000000"; ctx.font = "bold 52px Quicksand"; ctx.fillText(name, 300, 630);
+        ctx.fillStyle = "#888888"; ctx.font = "34px monospace"; ctx.fillText("ID: " + id, 300, 690);
+        ctx.fillStyle = "#017a3f"; ctx.font = "bold 30px Quicksand"; ctx.fillText("SCAN TO EARN POINTS", 300, 770);
 
         const finalImg = document.createElement('img');
         finalImg.src = canvas.toDataURL();
-        finalImg.style.width = "100%"; finalImg.style.borderRadius = "12px";
+        finalImg.style.width = "100%"; finalImg.style.borderRadius = "24px";
         get('card-canvas-container').innerHTML = "";
         get('card-canvas-container').appendChild(finalImg);
         load(0);
         get('card-modal').classList.add('show');
-        get('card-modal').style.display = "flex";
     }
 
     function drawRoundedRect(ctx, x, y, w, h, r) {
@@ -314,7 +322,7 @@
         ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
     }
 
-    function closeCard() { get('card-modal').classList.remove('show'); setTimeout(() => get('card-modal').style.display = "none", 300); }
+    function closeCard() { get('card-modal').classList.remove('show'); }
     function adj(n) { qty = Math.max(1, qty + n); get('q-val').innerText = qty; }
 
     async function doAction(a) {
@@ -326,6 +334,7 @@
             const i = db.findIndex(x => x.customer_id == cur.customer_id);
             if(i>-1) db[i].purchase_count = j.purchase_count;
             loadCust(cur);
+            renderList();
         }
         load(0);
     }
@@ -333,7 +342,7 @@
     function renderList(q = "") {
         q = q.toLowerCase();
         get('m-list').innerHTML = db.filter(c => String(c.customer_id).includes(q) || c.name.toLowerCase().includes(q))
-            .map(c => `<li class="live-item" onclick="edit('${c.customer_id}')"><div><b>${c.name}</b><br><small>${c.customer_id}</small></div><b>${c.purchase_count} pts</b></li>`).join('');
+            .map(c => `<li class="live-item" onclick="edit('${c.customer_id}')"><div><b style="font-size:17px">${c.name}</b><br><small style="opacity:0.6">${c.customer_id}</small></div><b style="color:var(--matcha)">${c.purchase_count} pts</b></li>`).join('');
     }
 
     async function save() {
@@ -341,11 +350,12 @@
         if(!p || !n) return;
         load(1);
         const a = get('f-title').innerText == "New Customer" ? "createCustomer" : "editCustomer";
-        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:a, customer_id:p, name:n, phone:p, api_key:KEY})});
+        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:a, customer_id:p, name:n, api_key:KEY})});
         const j = await r.json();
         if(j.success) {
             if(a=="createCustomer") db.push({customer_id:p, name:n, purchase_count:0});
             else db.find(x => x.customer_id == p).name = n;
+            renderList();
             switchView('v-manage');
         } else alert(j.message);
         load(0);
@@ -358,7 +368,11 @@
         load(1);
         const r = await fetch(API, {method:"POST", body:JSON.stringify({action:"deleteCustomer", customer_id:p, api_key:KEY})});
         const j = await r.json();
-        if(j.success) { db = db.filter(x => x.customer_id != p); switchView('v-manage'); }
+        if(j.success) { 
+            db = db.filter(x => x.customer_id != p); 
+            renderList();
+            switchView('v-manage'); 
+        }
         load(0);
     }
 
@@ -371,10 +385,10 @@
                 const data = JSON.parse(t);
                 if (data.app === "matcha") {
                     const f = db.find(c => c.customer_id == data.id);
-                    if(f) loadCust(f); else if(confirm("New Card. Create?")) showForm(data.id);
-                } else alert("Invalid Card");
+                    if(f) loadCust(f); else if(confirm("New Card. Create profile?")) showForm(data.id);
+                } else alert("Invalid Card Format");
             } catch(e) {
-                if(!isNaN(t)) { get('searchIn').value = t; doManual(); } else alert("Invalid Format");
+                if(!isNaN(t)) { get('searchIn').value = t; doManual(); } else alert("QR Code not recognized.");
             }
         });
     }
