@@ -3,826 +3,470 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MyDayMatcha-Loyalty</title>
     
-    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
-    
-    <title>My Day Matcha</title>
-    
-    <link rel="icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Quicksand:wght@700&family=Courier+Prime&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/fac565acc942ff0260de380d21014a133789b493/Logo.png">
+    <link rel="apple-touch-icon" href="https://github.com/Nanthe27/MyDayMatcha/blob/main/logo%20black%20and%20gole.jpg?raw=true">
 
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { 
-            --primary: #4CAF50; 
-            --primary-dim: #2E7D32;
-            --primary-light: #A5D6A7;
-            --bg: #F2F2F7; 
-            --surface: #FFFFFF; 
-            --surface-hover: #F5F5F5;
-            --text: #000000; 
-            --text-muted: #8E8E93; 
-            --border: #E5E5EA; 
-            --radius: 16px; 
-            --anim-speed: 0.25s;
-            --anim-curve: cubic-bezier(0.2, 0, 0, 1);
+            --bg: #ffffff; --text: #000; --sub: #666; --matcha: #017a3f; 
+            --red: #d32f2f; --blue: #007aff; --border: #f2f2f2; --surf: #fafafa; 
+            --soft-blue: #e3f2fd; --soft-gray: #f5f5f5;
+            --radius-btn: 22px; --radius-card: 32px; 
+            --ease: cubic-bezier(0.4, 0, 0.2, 1); 
         }
-
-        [data-theme="dark"] { 
-            --bg: #050505; 
-            --surface: #111111; 
-            --surface-hover: #1A1A1A;
-            --text: #FFFFFF; 
-            --text-muted: #888888; 
-            --border: #333333; 
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased; }
         
         body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg); color: var(--text); 
-            margin: 0; padding: 0; height: 100vh; width: 100vw; 
-            display: flex; flex-direction: column; overflow: hidden; 
-            padding-top: 0; 
-            transition: background var(--anim-speed) var(--anim-curve), color var(--anim-speed) var(--anim-curve);
+            /* UPDATED FONT TO QUICKSAND */
+            font-family: 'Quicksand', sans-serif; 
+            background: var(--bg); color: var(--text); margin: 0; 
+            height: 100vh; height: 100dvh; 
+            display: flex; justify-content: center; overflow: hidden; user-select: none; 
         }
 
-        @keyframes fadeScale { 0% { opacity: 0; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1); } }
-        .main-stage, .modal-box, #loginScreen, .cart-area.active, .settings-area.active, #managerPage, #editorModal { animation: fadeScale var(--anim-speed) var(--anim-curve); }
-
-        /* --- HEADER --- */
-        .app-header { 
-            /* DYNAMIC HEIGHT: 70px + whatever the phone needs for notch/island */
-            height: calc(70px + env(safe-area-inset-top)); 
-            
-            /* DYNAMIC PADDING: Push content down by the safe area amount */
-            padding: env(safe-area-inset-top) 20px 0 20px; 
-            
-            display: flex; justify-content: space-between; align-items: center; 
-            background: var(--surface); border-bottom: 1px solid var(--border); 
-            z-index: 50; flex-shrink: 0; 
-        }
-        
-        .brand { font-family: 'Quicksand', sans-serif; font-size: 18px; font-weight: 700; color: var(--primary); letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
-        .app-logo { height: 32px; width: 32px; border-radius: 50%; border: 1px solid var(--primary); }
-        
-        .hamburger-btn { 
-            background: transparent; border: none; 
-            color: var(--text); font-size: 26px; cursor: pointer; 
-            width: 40px; height: 40px; 
-            display: flex; align-items: center; justify-content: center; 
-            transition: transform 0.2s var(--anim-curve), color 0.2s; 
-        }
-        .hamburger-btn:hover { color: var(--primary); transform: scale(1.1); }
-        .hamburger-btn.active { color: var(--primary); transform: rotate(90deg); }
-
-        .main-stage { flex: 1; padding: 15px; display: flex; justify-content: center; overflow: hidden; position: relative; }
-        
-        .menu-area { 
-            width: 100%; max-width: 1200px; 
-            overflow-y: auto; display: grid; 
-            grid-template-columns: 1fr 1fr; grid-auto-rows: 80px; 
-            gap: 12px; align-content: start; 
-            padding-bottom: 200px; 
-        }
-        
-        .drink-btn { width: 100%; height: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; padding: 10px; gap: 12px; overflow: hidden; cursor: pointer; position: relative; text-align: left; transition: all 0.2s var(--anim-curve); }
-        .drink-btn:hover { border-color: var(--primary); background: var(--surface-hover); transform: scale(0.97); }
-        .drink-btn:active { transform: scale(0.94); opacity: 0.9; }
-        .drink-icon-box { width: 45px; height: 45px; min-width: 45px; background-color: var(--surface-hover); background-size: cover; background-position: center; border-radius: var(--radius); transition: background-image 0.3s ease-in; }
-        .drink-info-box { flex: 1; display: flex; align-items: center; overflow: hidden; }
-        .drink-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); line-height: 1.2; }
-
-        .cart-area { 
-            display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); 
-            position: fixed; 
-            top: calc(70px + env(safe-area-inset-top)); 
-            bottom: 80px; 
-            left: 0; width: 100%; height: auto; 
-            z-index: 150; opacity: 0; visibility: hidden; pointer-events: none; 
-            transition: all var(--anim-speed) var(--anim-curve); transform: translateY(10px); 
-        }
-        .cart-area.active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
-
-        .settings-area { 
-            padding-top: calc(70px + env(safe-area-inset-top)) !important; 
-            display: flex; flex-direction: column; background: var(--bg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; opacity: 0; visibility: hidden; pointer-events: none; padding: 20px; transition: all var(--anim-speed) var(--anim-curve); backdrop-filter: blur(10px); 
-        }
-        .settings-area.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        
-        .setting-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s var(--anim-curve); }
-        .setting-card:hover { border-color: var(--primary); background: var(--surface-hover); transform: scale(0.98); }
-        .setting-label { font-weight: 600; font-size: 14px; }
-        .setting-val { color: var(--text-muted); font-size: 13px; font-weight: 500; }
-
-        @media (min-width: 1024px) {
-            body { padding-top: 0; }
-            .app-header { height: 70px; padding: 0 20px; } 
-            .main-stage { display: grid; grid-template-columns: 1fr 380px; gap: 30px; }
-            .cart-area { 
-                position: static; 
-                height: calc(100vh - 120px); 
-                top: auto; bottom: auto; 
-                opacity: 1; visibility: visible; pointer-events: auto; transform: none; 
-                border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        /* --- DESKTOP / LAPTOP REDESIGN (Professional Look) --- */
+        @media screen and (min-width: 481px) {
+            body {
+                background-color: #f0f2f5; /* Clean Professional Grey */
+                align-items: center;
             }
-            .settings-area { width: 400px; right: 0; left: auto; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.05); padding-top: 20px !important; }
-            .menu-area { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-            .bottom-nav { display: none !important; }
-            
-            #managerPage .app-header, #historyPage .app-header { height: 70px !important; padding: 0 20px !important; }
-        }
-
-        .cart-header { padding: 20px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; }
-        .cart-list { flex: 1; overflow-y: auto; padding: 0 20px; }
-        .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); animation: fadeScale 0.2s; }
-        .item-name { font-size: 13px; font-weight: 600; color: var(--text); }
-        .mini-select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 10px; font-weight: 500; padding: 4px; color: var(--text); outline: none; margin-top: 4px; }
-        .item-price { font-weight: 700; font-size: 13px; color: var(--primary); }
-        .del-btn { color: var(--text-muted); background: none; border: none; font-size: 18px; cursor: pointer; transition: color 0.2s; }
-        .del-btn:hover { color: #FF3B30; }
-        
-        .cart-footer { 
-            order: -1; padding: 20px 25px; background: var(--surface); 
-            border-bottom: 1px solid var(--border); border-top: none;
-            border-radius: var(--radius) var(--radius) 0 0; flex-shrink: 0; z-index: 10;
-        }
-        @media (min-width: 1024px) {
-            .cart-footer { order: 0; border-top: 1px solid var(--border); border-bottom: none; border-radius: 0 0 var(--radius) var(--radius); padding: 25px; }
+            .app {
+                height: 90vh;
+                max-height: 850px;
+                border-radius: 24px; /* Tighter, more modern radius */
+                /* Professional shadow and border */
+                box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+                border: 1px solid #d1d5db; 
+                background: #fff;
+                overflow: hidden;
+            }
         }
         
-        .total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
-        .total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
-        .total-display { font-size: 26px; font-weight: 700; color: var(--primary); transition: color 0.3s; }
-        .controls { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; }
-        .btn { padding: 16px; border-radius: var(--radius); font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; border: 1px solid var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-        .btn-confirm { background: var(--primary); color: #fff; }
-        .btn-confirm:active { transform: scale(0.95); }
-        .btn-clear { background: transparent; color: #FF3B30; border: 1px solid #FF3B30; }
-        .btn-clear:active { transform: scale(0.95); background: rgba(255, 59, 48, 0.1); }
-
-        .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--surface); border-top: 1px solid var(--border); justify-content: center; align-items: center; gap: 0; z-index: 200; }
-        .nav-item { flex: 1; height: 100%; font-weight: 700; font-size: 11px; color: var(--text-muted); background: none; border: none; letter-spacing: 1px; transition: 0.3s; border-top: 2px solid transparent; position: relative; }
-        .nav-item.active { color: var(--primary); border-top-color: var(--primary); background: rgba(76, 175, 80, 0.05); }
-        .nav-badge { position: absolute; top: 12px; right: 25%; background: #FF3B30; color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; opacity: 0; transition: 0.2s; transform: scale(0); }
-        .nav-badge.show { opacity: 1; transform: scale(1); }
-
-        .toast-msg { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--primary); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 13px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 250; opacity: 0; visibility: hidden; transition: 0.3s cubic-bezier(0.2, 0, 0, 1); white-space: nowrap; max-width: 85vw; overflow: hidden; text-overflow: ellipsis; }
-        .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible; }
-
-        .text-btn { background: transparent; border: none; font-size: 14px; font-weight: 700; color: var(--text); padding: 10px 15px; border-radius: 8px; cursor: pointer; letter-spacing: 0.5px; }
-        .text-btn:active { background: var(--surface-hover); }
-
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.4s; }
-        #loginScreen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
-        .login-logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary); margin-bottom: 20px; }
-        .login-title { font-family: 'Quicksand', sans-serif; font-size: 24px; color: var(--primary); margin-bottom: 40px; }
-        .user-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 260px; height: 60px; margin-bottom: 12px; border-radius: var(--radius); font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 1px; transition: 0.2s; }
-        .pin-display { display: flex; gap: 15px; margin-bottom: 30px; width: 200px; justify-content: center; height: 20px; }
-        .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--border); transition: 0.2s; }
-        .pin-dot.active { background: var(--primary); transform: scale(1.2); }
-        .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 280px; }
-        .num-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 22px; font-weight: 600; height: 65px; border-radius: var(--radius); cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
-        .num-btn:active { background: var(--border); transform: scale(0.95); }
-        .num-btn.clear { color: #FF3B30; font-size: 16px; font-weight: 700; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        .shake { animation: shake 0.3s ease-in-out; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.1); backdrop-filter: blur(5px); z-index: 300; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
-        .modal-overlay.open { opacity: 1; visibility: visible; }
-        .modal-box { background: var(--surface); width: 90%; max-width: 380px; padding: 30px; text-align: center; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .modal-title { color: var(--primary); font-family: 'Quicksand', sans-serif; font-size: 20px; margin-bottom: 15px; }
-
-        .receipt-paper { background: white; color: #000; padding: 20px; width: 100%; margin: 0 auto; font-family: 'Courier Prime', monospace; text-align: center; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .rp-header { margin-bottom: 15px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
-        .rp-logo { width: 40px; height: 40px; border-radius: 50%; filter: grayscale(100%); margin-bottom: 5px; }
-        .rp-title { font-weight: 700; font-size: 16px; margin-top: 5px; }
-        .rp-items { text-align: left; font-size: 12px; margin-bottom: 15px; }
-        .rp-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .rp-total { border-top: 1px dashed #000; padding-top: 10px; font-weight: 700; font-size: 14px; text-align: right; }
-        .preview-scroll-container { max-height: 55vh; overflow-y: auto; background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-
-        /* LAYOUTS FOR HISTORY AND MANAGER */
-        /* FIXED: Use env() for safe area top padding */
-        #historyPage, #managerPage { z-index: 250; background: var(--bg); }
-        #historyList, #managerList { width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; }
+        .app { width: 100%; height: 100%; max-width: 480px; display: flex; flex-direction: column; position: relative; padding: 0; }
         
-        .history-card, .manager-card { 
-            background: var(--surface); border: 1px solid var(--border); 
-            border-radius: 12px; padding: 15px; margin-bottom: 10px; 
-            display: flex; flex-direction: column; gap: 8px;
+        @media screen and (max-width: 480px) {
+            .app { 
+                padding-top: 0px;    /* Space from mobile top screen edge */
+                padding-bottom: 20px; /* Space from mobile bottom screen edge */
+            }
         }
+
+        header { height: 90px; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); z-index: 20; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); flex-shrink: 0; }
         
-        /* DYNAMIC HEADER HEIGHT FOR MOBILE */
-        #historyPage .app-header, #managerPage .app-header {
-            height: calc(70px + env(safe-area-inset-top));
-            padding: env(safe-area-inset-top) 20px 0 20px;
+        .header-btn { 
+            background: transparent; border: none; padding: 12px; 
+            font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 18px; 
+            color: var(--text); cursor: pointer; transition: opacity 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .header-btn:active { opacity: 0.6; }
+
+        /* Scan Button Styling */
+        #btn-scan-header {
+            background: var(--soft-gray);
+            color: #888;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s var(--ease);
+        }
+        #btn-scan-header.active {
+            background: var(--soft-blue);
+            color: var(--blue);
         }
 
-        .hc-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
-        .hc-total { text-align: right; font-weight: 700; font-size: 14px; color: var(--primary); padding-top: 5px; }
+        .hamburger-icon { width: 24px; height: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+        .bar { width: 100%; height: 3px; background: #000; border-radius: 2px; }
 
-        /* EDITOR MODAL STYLE */
-        #editorModal { z-index: 260; background: rgba(0,0,0,0.5); }
-        .editor-form { width: 90%; max-width: 400px; background: var(--surface); padding: 25px; border-radius: var(--radius); max-height: 85vh; overflow-y: auto; }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        .form-label { font-size: 12px; font-weight: 600; margin-bottom: 5px; display: block; color: var(--text-muted); }
-        .form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 14px; outline: none; }
-        .form-check { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
-
-        #testBanner { display: none; background: var(--primary); color: #fff; text-align: center; font-weight: 800; font-size: 10px; padding: 5px; position: fixed; top: 0; width: 100%; z-index: 10000; }
-        body.testing .app-header { margin-top: 20px; }
-
-        #receiptContainer { display: none; }
-        @media print {
-            body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal { display: none !important; }
-            #receiptContainer { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
-            .receipt-paper { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; }
+        #side-menu {
+            position: absolute; top: 0; right: 0; bottom: 0; width: 280px;
+            background: #fff; z-index: 100; padding: 100px 24px 40px;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+            transform: translateX(100%); transition: transform 0.4s var(--ease);
+            display: flex; flex-direction: column; gap: 16px;
         }
+        #side-menu.open { transform: translateX(0); }
+        
+        #menu-backdrop {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.3); 
+            backdrop-filter: blur(4px); z-index: 90; opacity: 0; 
+            pointer-events: none; transition: opacity 0.4s var(--ease);
+        }
+        #menu-backdrop.open { opacity: 1; pointer-events: auto; }
+
+        .search-row { display: flex; gap: 20px; margin-bottom: 24px; position: relative; flex-shrink: 0; }
+
+        .view-container { position: relative; flex: 1; overflow: hidden; }
+        .view { position: absolute; top: 0; width: 100%; height: 100%; padding: 24px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: all 0.4s var(--ease); display: flex; flex-direction: column; background: #fff; }
+        .view.active { opacity: 1; transform: translateY(0); pointer-events: auto; z-index: 10; }
+
+        input { width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-btn); font-size: 16px; background: var(--surf); outline: none; transition: all 0.3s var(--ease); font-family: inherit; margin-bottom: 20px; }
+        input:focus { border-color: var(--matcha); background: #fff; box-shadow: 0 0 0 4px rgba(1, 122, 63, 0.05); }
+
+        .btn { width: 100%; padding: 18px; border-radius: var(--radius-btn); font-size: 16px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s var(--ease); display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 32px; letter-spacing: -0.02em; }
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
+        .btn-green { background: var(--matcha); color: #fff; }
+        .btn-blue { background: var(--blue); color: #fff; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-ghost { background: transparent; color: var(--sub); width: auto; padding: 10px 18px; margin-bottom: 16px; font-size: 14px; }
+
+        .card { background: var(--surf); padding: 32px 20px; border-radius: var(--radius-card); text-align: center; border: 1px solid var(--border); margin-bottom: 24px; }
+        
+        .qty-box { display: flex; align-items: center; justify-content: center; gap: 32px; margin-bottom: 24px; }
+        .btn-circ { width: 60px; height: 60px; border-radius: 50%; font-size: 28px; border: none; color: #fff; display: flex; align-items: center; justify-content: center; }
+
+        .live-results { position: absolute; top: 65px; left: 0; right: 0; background: #fff; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.12); border: 1px solid var(--border); list-style: none; padding: 8px; z-index: 100; display: none; overflow: hidden; }
+        .live-results.show { display: block; animation: slideUp 0.3s var(--ease); }
+        .live-item { padding: 18px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .live-item:active { background: var(--surf); transform: scale(0.98); }
+
+        .dots { display: flex; justify-content: center; gap: 14px; margin-top: 24px; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; background: #e0e0e0; transition: all 0.4s var(--ease); }
+        .dot.fill { background: var(--matcha); transform: scale(1.25); }
+
+        #reader { border-radius: 48px; overflow: hidden; margin-bottom: 24px; display: none; background: #000; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; aspect-ratio: 1/1; position: relative; }
+        #reader video { object-fit: cover !important; width: 100% !important; height: 100% !important; border-radius: 48px; }
+
+        #card-modal { position: fixed; inset:0; background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); z-index: 300; display: none; justify-content: center; align-items: center; padding: 24px; opacity: 0; transition: all 0.4s var(--ease); }
+        #card-modal.show { opacity: 1; display: flex; }
+        .modal-content { background: white; padding: 32px; border-radius: 40px; width: 100%; max-width: 420px; text-align: center; transform: scale(0.9) translateY(20px); transition: all 0.5s var(--ease); }
+        #card-modal.show .modal-content { transform: scale(1) translateY(0); }
+
+        #loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 500; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .spinner { width: 44px; height: 44px; border: 4px solid #f0f0f0; border-top-color: var(--matcha); border-radius: 50%; animation: s 0.9s infinite cubic-bezier(0.5, 0.1, 0.4, 0.9); }
+        
+        @keyframes s { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="testing" data-theme="light">
+<body>
 
-    <div id="toast" class="toast-msg">Item Added</div>
-
-    <div id="loginScreen">
-        <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo">
-        <h2 id="loginTitle" class="login-title">It's loading, wait abit</h2>
-        <div id="userListGrid" style="display:flex; flex-direction:column;"></div>
-        <div id="pinContainer" style="display:none; flex-direction:column; align-items:center;">
-            <div id="pinDisplay" class="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
-            <div class="numpad-grid">
-                <button class="num-btn" onclick="handleNumpad(1)">1</button><button class="num-btn" onclick="handleNumpad(2)">2</button><button class="num-btn" onclick="handleNumpad(3)">3</button>
-                <button class="num-btn" onclick="handleNumpad(4)">4</button><button class="num-btn" onclick="handleNumpad(5)">5</button><button class="num-btn" onclick="handleNumpad(6)">6</button>
-                <button class="num-btn" onclick="handleNumpad(7)">7</button><button class="num-btn" onclick="handleNumpad(8)">8</button><button class="num-btn" onclick="handleNumpad(9)">9</button>
-                <button class="num-btn clear" onclick="cancelLogin()">BACK</button><button class="num-btn" onclick="handleNumpad(0)">0</button><button class="num-btn clear" onclick="handleNumpad('del')">⌫</button>
-            </div>
-        </div>
-    </div>
-
-    <header class="app-header">
-        <div class="brand">
-            <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="app-logo">
-            MY DAY MATCHA
-        </div>
-        <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleSettings()">☰</button>
+<div class="app">
+    <header>
+        <button id="btn-scan-header" class="header-btn active" onclick="goHome()">Scan</button>
+        <button class="header-btn" onclick="switchView('v-menu')">
+            <div class="hamburger-icon"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        </button>
     </header>
 
-    <div class="main-stage">
-        <div class="menu-area" id="menuArea"></div>
-        <div class="cart-area" id="cartPanel">
-            <div class="cart-header">Current Order</div>
-            <div class="cart-list" id="cartList"></div>
-            <div class="cart-footer">
-                <div class="total-row"><span class="total-label">TOTAL</span><span class="total-display" id="totalDisplay">0 KHR</span></div>
-                <div class="controls"><button class="btn btn-clear" onclick="confirmClear()">Clear</button><button class="btn btn-confirm" onclick="confirmOrder()">Confirm</button></div>
+    <div class="view-container">
+        <div id="v-scan" class="view active">
+            <div class="search-row">
+                <input type="text" id="scanSearchInput" placeholder="Points: Search ID/Name" onkeyup="doLiveScan(this.value)" style="margin:0">
+                <button class="btn btn-green" style="width:80px; padding:0; margin:0;" onclick="doManualScan()">Go</button>
+                <ul id="scanLiveResults" class="live-results"></ul>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                <div id="reader"></div>
+                <button id="b-scan" class="btn btn-green" onclick="startScan()">Scan QR Code</button>
             </div>
         </div>
-        <div class="settings-area" id="settingsPanel">
-            <h3 style="margin-bottom:20px; color:var(--text-muted); font-size:12px; letter-spacing:1px;">SETTINGS</h3>
-            <div class="setting-card" onclick="showLogin()"><div class="setting-label">Switch User</div><div class="setting-val" id="currentUserDisplay">Unknown</div></div>
-            <div class="setting-card" onclick="toggleTheme()"><div class="setting-label">Theme Mode</div><div class="setting-val" id="themeDisplay">Light Mode</div></div>
-            <div class="setting-card" onclick="openHistory()"><div class="setting-label">History</div><div class="setting-val">View ></div></div>
-            <div class="setting-card" onclick="openManager()"><div class="setting-label">Manage Menu</div><div class="setting-val">></div></div>
-            
-            <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card" style="text-decoration: none; background: var(--primary); color: white; margin-top: 40px; border: none; justify-content: center;">
-                <div class="setting-label" style="font-size: 20px;">Loyalty Customer</div>
-            </a>
+
+        <div id="v-menu" class="view">
+            <h2 style="font-family:'Quicksand'; margin: 0 0 32px; font-size: 32px;">Settings & Menu</h2>
+            <button class="btn btn-green" onclick="switchView('v-manage')">Manage Customers</button>
+            <button class="btn btn-red" onclick="window.location.href='https://nanthe27.github.io/MyDayMatcha/'">Back To Website</button>
+            <div style="margin-top:auto; text-align:center; color:#ccc; font-family:monospace;">My Day Matcha Loyalty<br>v1.1.0</div>
         </div>
-    </div>
 
-    <div class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('menu')" id="btnMenu">MENU</button>
-        <button class="nav-item" onclick="switchTab('cart')" id="btnCart">ORDER <span id="navBadge" class="nav-badge">0</span></button>
-    </div>
+        <div id="v-cust" class="view">
+            <button class="btn btn-ghost" onclick="goHome()">← Back to Scan</button>
+            <div class="card">
+                <h2 id="d-name" style="font-family:'Quicksand'; font-size: 32px; margin-bottom: 12px;">...</h2>
+                <div id="d-id" style="color:var(--sub); font-family:monospace; margin-bottom:32px; font-size: 16px;">...</div>
+                <button class="btn btn-green" style="margin: 0 auto 12px; padding: 14px 24px; width: auto;" onclick="generateCard()">Generate QR Card</button>
+                <div class="dots" id="d-dots"></div>
+            </div>
+            <div id="r-msg" style="background:var(--matcha); color:#fff; padding:18px; border-radius:24px; text-align:center; font-weight:700; display:none; margin-bottom:24px;">REWARD READY</div>
+            <div style="margin-top:auto">
+                <button id="b-red" class="btn btn-blue" style="display:none;" onclick="doAction('redeemReward')">Redeem Reward</button>
+                <div id="q-ctrl" class="qty-box">
+                    <button class="btn-circ btn-red" onclick="adj(-1)">−</button>
+                    <span id="q-val" style="font-size:32px; font-weight:700;">1</span>
+                    <button class="btn-circ btn-green" onclick="adj(1)">+</button>
+                </div>
+                <button id="b-add" class="btn btn-green" onclick="doAction('addPurchase')">Confirm Purchase</button>
+            </div>
+        </div>
 
-    <div id="modal" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="mTitle" class="modal-title">Title</h3>
-            <div id="mText" style="color:var(--text-muted); font-size:14px; margin-bottom:30px;">Text</div>
-            <input id="mInput" type="text" placeholder="Type code here" style="display:none; width:100%; margin-bottom:15px; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:16px;">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <button id="mCloseBtn" class="btn btn-clear" onclick="closeModal()">CANCEL</button>
-                <button class="btn btn-confirm" id="mBtn">YES</button>
+        <div id="v-manage" class="view">
+            <button class="btn btn-ghost" onclick="switchView('v-menu')">← Back to Menu</button>
+            <div class="search-row">
+                <input type="text" id="manageSearchInput" placeholder="Filter customer list..." onkeyup="renderList(this.value)" style="margin:0">
+                <button class="btn btn-green" style="width:60px; padding:0; margin:0; font-size: 24px;" onclick="showForm()">+</button>
+            </div>
+            <ul id="m-list" style="list-style:none; padding:0; margin:0; overflow-y:auto; flex: 1;"></ul>
+        </div>
+
+        <div id="v-form" class="view">
+            <button class="btn btn-ghost" onclick="switchView('v-manage')">← Back to Manage</button>
+            <h2 id="f-title" style="font-family:'Quicksand'; font-size: 28px; margin-bottom: 24px;">New Customer</h2>
+            <label style="font-size:12px; font-weight: 700; text-transform: uppercase; color:var(--sub); margin: 0 0 12px 8px; display: block;">Customer ID / Phone</label>
+            <input type="text" id="f-phone">
+            <label style="font-size:12px; font-weight: 700; text-transform: uppercase; color:var(--sub); margin: 0 0 12px 8px; display: block;">Full Name</label>
+            <input type="text" id="f-name">
+            <button class="btn btn-green" style="margin-bottom: 24px; background:var(--surf); color:var(--text); border:1px solid var(--border);" onclick="generateFromForm()">Preview QR Card</button>
+            <div style="margin-top:auto">
+                <button class="btn btn-green" onclick="save()">Save Customer</button>
+                <button id="f-del" class="btn btn-red" style="background:transparent; color:var(--red); border:1px solid var(--red);" onclick="del()">Delete Customer</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div id="historyPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
-        <div class="app-header" style="width:100%;">
-            <button class="text-btn" style="font-size:28px; line-height:1; padding:0 15px;" onclick="document.getElementById('historyPage').classList.remove('open')">‹</button>
-            <span id="historyTotalTitle" style="font-weight:700; color:var(--primary); font-size:18px;">0 KHR</span>
-            <button class="text-btn" style="color:#FF3B30;" onclick="requestDeleteHistory()">DELETE ALL</button>
-        </div>
-        <div id="historyList"></div>
+<div id="card-modal" onclick="closeCard()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div id="card-canvas-container"></div>
+        <p style="font-size:13px; color:var(--sub); margin: 24px 0 16px; font-weight: 600;">Tap button below to Save High-Res</p>
+        <button id="downloadBtn" class="btn btn-green" style="margin-bottom: 12px;">Download Card</button>
+        <button class="btn btn-ghost" onclick="closeCard()" style="margin:0">Close</button>
     </div>
+    <div id="qr-hidden" style="display:none;"></div>
+</div>
 
-    <div id="managerPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
-        <div class="app-header" style="width:100%;">
-            <button class="text-btn" style="font-size:28px; line-height:1; padding:0 15px;" onclick="document.getElementById('managerPage').classList.remove('open')">‹</button>
-            <span style="font-weight:700; color:var(--primary); font-size:16px;">MANAGE MENU</span>
-            <button class="text-btn" style="color:var(--primary);" onclick="newItem()">+ ADD</button>
-        </div>
-        <div id="managerList"></div>
-    </div>
+<div id="loader"><div class="spinner"></div></div>
 
-    <div id="editorModal" class="modal-overlay">
-        <div class="editor-form">
-            <h3 style="margin-bottom:20px; text-align:center;">Edit Drink</h3>
-            <div class="form-group"><label class="form-label">Category</label><input id="eCat" class="form-input" placeholder="e.g., Coffee"></div>
-            <div class="form-group"><label class="form-label">ID (Unique)</label><input id="eId" class="form-input" placeholder="e.g., C01"></div>
-            <div class="form-group"><label class="form-label">Name</label><input id="eName" class="form-input" placeholder="Drink Name"></div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="form-group"><label class="form-label">Price (KHR)</label><input id="ePrice" type="number" class="form-input"></div>
-                <div class="form-group"><label class="form-label">Cost (KHR)</label><input id="eCost" type="number" class="form-input"></div>
-            </div>
-            <div class="form-group"><label class="form-label">Has Milk Option?</label><div class="form-check"><input id="eMilk" type="checkbox" style="width:20px;height:20px;"> <span>Yes</span></div></div>
-            <div class="form-group"><label class="form-label">Oat Milk Price (KHR)</label><input id="eOat" type="number" class="form-input" value="0"></div>
-            <div class="form-group"><label class="form-label">Image URL</label><input id="eImg" class="form-input" placeholder="https://raw.github..."></div>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
-                <button class="btn btn-clear" onclick="document.getElementById('editorModal').classList.remove('open')">CANCEL</button>
-                <button class="btn btn-confirm" onclick="saveItem()">SAVE</button>
-            </div>
-            <button class="btn btn-clear" style="width:100%; margin-top:15px; border-color:#FF3B30; color:#FF3B30;" onclick="confirmDelete()">DELETE ITEM</button>
-        </div>
-    </div>
+<script>
+    const API = "https://script.google.com/macros/s/AKfycbwG-iVOOnP5869o5jOZBrxnaMYJv3jIx-iVdhF0NlVlRTAFeyO9S01uSDbeIZDwhSD-Ug/exec";
+    const KEY = "ch#@ngch@mn@n2712@mydaymatcha";
+    const LOGO_URL = "https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/fac565acc942ff0260de380d21014a133789b493/Logo.png";
+    let db = [], cur = null, sc = null, qty = 1;
 
-    <div id="receiptContainer"></div>
+    const get = (id) => document.getElementById(id);
+    const load = (s) => get('loader').style.display = s ? 'flex' : 'none';
 
-    <script>
-        const IS_TEST_MODE = false; 
-        const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
-        const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
-        const GOOGLE_SCRIPT_URL = IS_TEST_MODE ? TEST_URL : LIVE_URL;
+    window.onload = async () => {
+        load(1);
+        try {
+            const r = await fetch(API, {method:"POST", body:JSON.stringify({action:"sync", api_key:KEY})});
+            const j = await r.json();
+            if(j.success) { db = j.local_db; renderList(); }
+        } catch(e) {}
+        load(0);
+    };
 
-        if (IS_TEST_MODE) {
-            const banner = document.createElement('div');
-            banner.id = 'testBanner'; banner.innerText = 'TEST MODE'; banner.style.display = 'block'; document.body.prepend(banner);
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        get(id).classList.add('active');
+        if(id === 'v-scan') stopScan();
+        
+        // UPDATE SCAN BUTTON STATE
+        const scanBtn = get('btn-scan-header');
+        if (id === 'v-scan' || id === 'v-cust') {
+            scanBtn.classList.add('active'); // Soft Blue
+        } else {
+            scanBtn.classList.remove('active'); // Gray
+        }
+    }
+
+    function goHome() { 
+        get('scanSearchInput').value = ""; 
+        get('scanLiveResults').classList.remove('show'); 
+        switchView('v-scan'); 
+    }
+
+    function doLiveScan(q) {
+        const l = get('scanLiveResults');
+        q = q.trim().toLowerCase();
+        if(q.length < 2) { l.classList.remove('show'); return; }
+        const m = db.filter(c => String(c.customer_id).includes(q) || c.name.toLowerCase().includes(q)).slice(0, 5);
+        if(m.length) {
+            l.innerHTML = m.map(c => `<li class="live-item" onclick="selScan('${c.customer_id}')"><div><b>${c.name}</b><br><small style="opacity:0.6">${c.customer_id}</small></div><b style="color:var(--matcha)">${c.purchase_count} pts</b></li>`).join('');
+            l.classList.add('show');
+        } else l.classList.remove('show');
+    }
+
+    function selScan(id) { 
+        get('scanLiveResults').classList.remove('show'); 
+        get('scanSearchInput').value = ""; 
+        loadCust(db.find(c => c.customer_id == id)); 
+    }
+
+    function doManualScan() {
+        const v = get('scanSearchInput').value.trim();
+        const f = db.find(c => c.customer_id == v || c.name.toLowerCase() == v.toLowerCase());
+        if(f) loadCust(f); else if(confirm("Not found. Create new?")) showForm(v);
+    }
+
+    function loadCust(c) {
+        cur = c; qty = 1; get('q-val').innerText = 1;
+        get('d-name').innerText = c.name; get('d-id').innerText = c.customer_id;
+        const pts = c.purchase_count % 5;
+        get('d-dots').innerHTML = [0,1,2,3,4].map(i => `<div class="dot ${i<pts?'fill':''}"></div>`).join('');
+        const rdy = c.purchase_count >= 5;
+        get('r-msg').style.display = rdy ? 'block' : 'none';
+        get('b-red').style.display = rdy ? 'block' : 'none';
+        get('b-add').style.display = rdy ? 'none' : 'block';
+        get('q-ctrl').style.display = rdy ? 'none' : 'flex';
+        switchView('v-cust');
+    }
+
+    function generateAutoId() {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const datePart = `${pad(now.getDate())}${pad(now.getMonth()+1)}${String(now.getFullYear()).slice(-2)}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+        return `${datePart}-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+
+    function showForm(p="") { 
+        get('f-title').innerText="New Customer"; 
+        get('f-phone').value = p || generateAutoId();
+        get('f-phone').disabled=false; 
+        get('f-name').value=""; 
+        get('f-del').style.display="none"; 
+        switchView('v-form'); 
+    }
+    
+    function edit(id) { 
+        const c = db.find(x => x.customer_id == id);
+        get('f-title').innerText="Edit Customer"; 
+        get('f-phone').value=c.customer_id; 
+        get('f-phone').disabled=true; 
+        get('f-name').value=c.name; 
+        get('f-del').style.display="block"; 
+        switchView('v-form'); 
+    }
+
+    function generateFromForm() {
+        const n = get('f-name').value, p = get('f-phone').value;
+        if(!n || !p) return alert("Please enter Name and ID first.");
+        generateCard(n, p);
+    }
+
+    function generateCard(name, id) {
+        if(!name && cur) { name = cur.name; id = cur.customer_id; }
+        load(1);
+        const qrData = JSON.stringify({ app: "matcha", id: id });
+        get('qr-hidden').innerHTML = "";
+        new QRCode(get('qr-hidden'), { text: qrData, width: 1024, height: 1024, correctLevel: QRCode.CorrectLevel.H });
+        const logoImg = new Image();
+        logoImg.crossOrigin = "Anonymous";
+        logoImg.src = LOGO_URL;
+        logoImg.onload = () => drawCanvas(name, id, logoImg);
+        logoImg.onerror = () => drawCanvas(name, id, null);
+    }
+
+    function drawCanvas(name, id, logoImg) {
+        const S = 4;
+        const canvas = document.createElement('canvas');
+        canvas.width = 600 * S; canvas.height = 850 * S;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+        ctx.fillStyle = "#017a3f"; ctx.fillRect(0,0,600*S, 850*S);
+        ctx.fillStyle = "#ffffff"; drawRoundedRect(ctx, 40*S, 40*S, 520*S, 770*S, 50*S); ctx.fill();
+
+        if(logoImg) {
+            const size = 160 * S; const cx = 300 * S; const cy = 150 * S; const r = size / 2;
+            ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+            const aspect = logoImg.width / logoImg.height;
+            let drawW, drawH;
+            if (aspect > 1) { drawH = size; drawW = size * aspect; } else { drawW = size; drawH = size / aspect; }
+            ctx.drawImage(logoImg, cx - drawW/2, cy - drawH/2, drawW, drawH);
+            ctx.restore();
+            ctx.strokeStyle = "#017a3f"; ctx.lineWidth = 5 * S; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
         }
 
-        let MENU_DATA = [];
-        let currentOrder = [], todayRecords = [], deviceName = "Unknown", tempSelectedUser = null;
-        let currentPin = ""; 
-        let dailyOrderCount = parseInt(localStorage.getItem('myday_counter_' + new Date().toDateString())) || 0;
-        let historyData = {}; 
+        const qrImg = get('qr-hidden').querySelector('img');
+        if(qrImg) ctx.drawImage(qrImg, 150 * S, 260 * S, 300 * S, 300 * S);
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#000000"; ctx.font = `bold ${52*S}px Quicksand`; ctx.fillText(name, 300 * S, 630 * S);
+        ctx.fillStyle = "#888888"; ctx.font = `${34*S}px monospace`; ctx.fillText("ID: " + id, 300 * S, 690 * S);
+        ctx.fillStyle = "#017a3f"; ctx.font = `bold ${30*S}px Quicksand`; ctx.fillText("SCAN TO EARN POINTS", 300 * S, 770 * S);
 
-        document.addEventListener('keydown', (e) => {
-            if(document.getElementById('loginScreen').classList.contains('hidden')) return;
-            if(!tempSelectedUser) return;
-            if(e.key >= '0' && e.key <= '9') handleNumpad(parseInt(e.key));
-            if(e.key === 'Backspace') handleNumpad('del');
-            if(e.key === 'Enter') checkPin();
+        const imgData = canvas.toDataURL("image/png", 1.0);
+        const finalImg = document.createElement('img');
+        finalImg.src = imgData; finalImg.style.width = "100%"; finalImg.style.borderRadius = "24px";
+        get('card-canvas-container').innerHTML = "";
+        get('card-canvas-container').appendChild(finalImg);
+        
+        const safeName = name.replace(/\s+/g, '_');
+        const filename = `${safeName}_${id}_MyDayMatcha.png`;
+        get('downloadBtn').onclick = () => {
+            const link = document.createElement('a');
+            link.download = filename; link.href = imgData; link.click();
+        };
+        load(0); get('card-modal').classList.add('show');
+    }
+
+    function drawRoundedRect(ctx, x, y, w, h, r) {
+        ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+    }
+
+    function closeCard() { get('card-modal').classList.remove('show'); }
+    function adj(n) { qty = Math.max(1, qty + n); get('q-val').innerText = qty; }
+
+    async function doAction(a) {
+        load(1);
+        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:a, customer_id:cur.customer_id, qty:qty, api_key:KEY})});
+        const j = await r.json();
+        if(j.success) {
+            cur.purchase_count = j.purchase_count;
+            const i = db.findIndex(x => x.customer_id == cur.customer_id);
+            if(i>-1) db[i].purchase_count = j.purchase_count;
+            loadCust(cur); renderList();
+        }
+        load(0);
+    }
+
+    function renderList(q = "") {
+        q = q.toLowerCase();
+        get('m-list').innerHTML = db.filter(c => String(c.customer_id).includes(q) || c.name.toLowerCase().includes(q))
+            .map(c => `<li class="live-item" onclick="edit('${c.customer_id}')"><div><b style="font-size:17px">${c.name}</b><br><small style="opacity:0.6">${c.customer_id}</small></div><b style="color:var(--matcha)">${c.purchase_count} pts</b></li>`).join('');
+    }
+
+    async function save() {
+        const p = get('f-phone').value, n = get('f-name').value;
+        if(!p || !n) return;
+        load(1);
+        const a = get('f-title').innerText == "New Customer" ? "createCustomer" : "editCustomer";
+        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:a, customer_id:p, name:n, api_key:KEY})});
+        const j = await r.json();
+        if(j.success) {
+            if(a=="createCustomer") db.push({customer_id:p, name:n, purchase_count:0});
+            else db.find(x => x.customer_id == p).name = n;
+            renderList(); switchView('v-manage');
+        } else alert(j.message);
+        load(0);
+    }
+
+    async function del() {
+        const confirmation = prompt("To permanently delete this customer, type 'DELETEUSER' below:");
+        if (confirmation !== "DELETEUSER") { alert("Deletion cancelled."); return; }
+        const p = get('f-phone').value;
+        load(1);
+        const r = await fetch(API, {method:"POST", body:JSON.stringify({action:"deleteCustomer", customer_id:p, api_key:KEY})});
+        const j = await r.json();
+        if(j.success) { db = db.filter(x => x.customer_id != p); renderList(); switchView('v-manage'); }
+        load(0);
+    }
+
+    function startScan() {
+        get('b-scan').style.display='none'; get('reader').style.display='block';
+        sc = new Html5Qrcode("reader");
+        sc.start({facingMode:"environment"}, {fps:10, qrbox:250}, (t) => { 
+            stopScan();
+            try {
+                const data = JSON.parse(t);
+                if (data.app === "matcha") {
+                    const f = db.find(c => c.customer_id == data.id);
+                    if(f) loadCust(f); else if(confirm("Not found. Create new?")) showForm(data.id);
+                } else alert("Invalid Card Format");
+            } catch(e) {
+                if(!isNaN(t)) { get('scanSearchInput').value = t; doManualScan(); } else alert("QR Code not recognized.");
+            }
         });
-
-        window.onload = () => { fetchUsers(); fetchMenu(); showLogin(); };
-
-        function fetchUsers() {
-            // CACHE LOAD
-            const cachedUsers = localStorage.getItem('myday_users');
-            if (cachedUsers) {
-                renderUserGrid(JSON.parse(cachedUsers));
-            }
-
-            fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(res => res.json()).then(data => {
-                localStorage.setItem('myday_users', JSON.stringify(data));
-                renderUserGrid(data);
-            });
-        }
-
-        function renderUserGrid(data) {
-            const grid = document.getElementById('userListGrid'); grid.innerHTML = '';
-            data.forEach(name => {
-                const btn = document.createElement('button'); btn.className = 'user-btn'; btn.innerText = name;
-                btn.onclick = () => selectUser(name); grid.appendChild(btn);
-            });
-        }
-
-        function showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); cancelLogin(); toggleSettings(false); }
-        function selectUser(name) { tempSelectedUser = name; currentPin = ""; updatePinDisplay(); document.getElementById('userListGrid').style.display = 'none'; document.getElementById('pinContainer').style.display = 'flex'; document.getElementById('loginTitle').innerText = name; }
-        
-        function cancelLogin() { 
-            tempSelectedUser = null; 
-            currentPin = ""; 
-            document.getElementById('userListGrid').style.display = 'flex'; 
-            document.getElementById('pinContainer').style.display = 'none'; 
-            document.getElementById('loginTitle').innerText = "It's loading, wait abit"; 
-        }
-        
-        function handleNumpad(val) {
-            if (val === 'del') {
-                currentPin = String(currentPin).slice(0, -1);
-            } else {
-                if (String(currentPin).length < 4) currentPin += val;
-            }
-            updatePinDisplay();
-            if (String(currentPin).length === 4) setTimeout(checkPin, 200);
-        }
-
-        function updatePinDisplay() { const dots = document.querySelectorAll('.pin-dot'); dots.forEach((dot, idx) => { if(idx < currentPin.length) dot.classList.add('active'); else dot.classList.remove('active'); }); }
-        function checkPin() {
-            if(currentPin.length !== 4) return;
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', user: tempSelectedUser, pin: currentPin }) })
-            .then(res => res.json()).then(data => {
-                if(data.status === 'success') { deviceName = tempSelectedUser; document.getElementById('currentUserDisplay').innerText = deviceName; document.getElementById('loginScreen').classList.add('hidden'); }
-                else { const display = document.getElementById('pinDisplay'); display.classList.add('shake'); setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400); }
-            });
-        }
-
-        function fetchMenu() {
-            // CACHE LOAD
-            const cachedMenu = localStorage.getItem('myday_menu');
-            if (cachedMenu) {
-                processMenuData(JSON.parse(cachedMenu));
-            }
-
-            fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(res => res.json()).then(data => {
-                localStorage.setItem('myday_menu', JSON.stringify(data));
-                processMenuData(data);
-            });
-        }
-
-        function processMenuData(data) {
-            if(data && data.length > 0) {
-                let grouped = {}; data.forEach(item => { if(!grouped[item.category]) grouped[item.category] = []; grouped[item.category].push(item); });
-                MENU_DATA = Object.keys(grouped).map(cat => ({ category: cat, items: grouped[cat] }));
-            }
-            renderMenu();
-        }
-
-        function renderMenu() {
-            const container = document.getElementById('menuArea'); container.innerHTML = '';
-            MENU_DATA.forEach(grp => {
-                grp.items.forEach(item => {
-                    const btn = document.createElement('div'); btn.className = 'drink-btn';
-                    let imgUrl = item.image;
-                    if(!imgUrl || imgUrl === "") imgUrl = 'https://img.pikbest.com/origin/10/37/43/56YpIkbEsTKmG.png!bw700';
-                    btn.innerHTML = `<div class="drink-icon-box" style="background-image: url('${imgUrl}');"></div><div class="drink-info-box"><div class="drink-name">${item.name}</div></div>`;
-                    btn.onclick = () => addToCart(item);
-                    container.appendChild(btn);
-                });
-            });
-        }
-
-        function addToCart(item) {
-            currentOrder.push({ uid: Date.now() + Math.random(), ...item, milkOption: item.hasMilk ? 'Milk' : null, sweetness: '100%' });
-            renderCart();
-            const toast = document.getElementById('toast');
-            toast.innerText = item.name + " Added!";
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 1500);
-        }
-
-        function renderCart() {
-            const list = document.getElementById('cartList'); list.innerHTML = ''; let total = 0;
-            currentOrder.forEach(item => {
-                let p = item.price + (item.milkOption === 'Oat' ? item.oatPrice : 0); total += p;
-                const div = document.createElement('div'); div.className = 'cart-item';
-                div.innerHTML = `<div><div class="item-name">${item.name}</div>
-                    ${item.hasMilk ? `
-                        <select class="mini-select" onchange="updateItem('${item.uid}','milk',this.value)">
-                            <option value="Milk" ${item.milkOption === 'Milk' ? 'selected' : ''}>Milk</option>
-                            <option value="Oat" ${item.milkOption === 'Oat' ? 'selected' : ''}>Oat (+${item.oatPrice} KHR)</option>
-                        </select>
-                    ` : ''}
-                    <select class="mini-select" onchange="updateItem('${item.uid}','sweet',this.value)">
-                        <option ${item.sweetness === '100%' ? 'selected' : ''}>100%</option>
-                        <option ${item.sweetness === '75%' ? 'selected' : ''}>75%</option>
-                        <option ${item.sweetness === '50%' ? 'selected' : ''}>50%</option>
-                        <option ${item.sweetness === '0%' ? 'selected' : ''}>0%</option>
-                    </select></div>
-                    <div style="text-align:right"><div class="item-price">${p.toLocaleString()} KHR</div><button class="del-btn" onclick="removeItem('${item.uid}')">×</button></div>`;
-                list.appendChild(div);
-            });
-            document.getElementById('totalDisplay').innerText = total.toLocaleString() + ' KHR';
-            const badge = document.getElementById('navBadge'); badge.innerText = currentOrder.length;
-            if(currentOrder.length > 0) badge.classList.add('show'); else badge.classList.remove('show');
-        }
-
-        function updateItem(uid, k, v) { const i = currentOrder.find(x => x.uid == uid); i[k === 'milk' ? 'milkOption' : 'sweetness'] = v; renderCart(); }
-        function removeItem(uid) { currentOrder = currentOrder.filter(x => x.uid != uid); renderCart(); }
-        function confirmClear() { if(currentOrder.length > 0) openModal('CLEAR', 'Reset cart?', () => { currentOrder = []; renderCart(); }); }
-        
-        function switchTab(t) {
-            document.getElementById('menuArea').style.display = t === 'menu' ? 'grid' : 'none';
-            const panel = document.getElementById('cartPanel');
-            if (t === 'cart') panel.classList.add('active'); else panel.classList.remove('active');
-            document.getElementById('btnMenu').classList.toggle('active', t === 'menu');
-            document.getElementById('btnCart').classList.toggle('active', t === 'cart');
-            toggleSettings(false);
-        }
-
-        function toggleSettings(forceState) {
-            const panel = document.getElementById('settingsPanel');
-            const btn = document.getElementById('hamburgerBtn');
-            if (forceState !== undefined) {
-                if(forceState) { panel.classList.add('active'); btn.classList.add('active'); }
-                else { panel.classList.remove('active'); btn.classList.remove('active'); }
-            } else {
-                panel.classList.toggle('active');
-                btn.classList.toggle('active');
-            }
-        }
-
-        function getGroupedItems(items) {
-            let groups = [];
-            items.forEach(item => {
-                let sig = item.name + '|' + item.sweetness + '|' + (item.milkOption || 'No');
-                let existing = groups.find(g => g.sig === sig);
-                if (existing) { existing.qty++; } 
-                else { groups.push({ ...item, qty: 1, sig: sig }); }
-            });
-            return groups;
-        }
-
-        function confirmOrder() {
-            if(currentOrder.length === 0) return;
-            let total = 0; let html = '<div style="background:var(--bg); padding:10px; border-radius:8px;">';
-            const grouped = getGroupedItems(currentOrder);
-            grouped.forEach(i => {
-                let unitP = i.price + (i.milkOption==='Oat'?i.oatPrice:0); 
-                let rowP = unitP * i.qty;
-                total += rowP;
-                let countStr = i.qty > 1 ? `<b style="color:var(--primary)">x${i.qty}</b> ` : '';
-                html += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; border-bottom:1px solid var(--border); padding-bottom:5px;">
-                    <span>${countStr}${i.name} <span style="color:var(--text-muted);font-size:10px;">(${i.sweetness})</span></span>
-                    <span>${rowP.toLocaleString()} KHR</span></div>`;
-            });
-            html += `</div><div style="text-align:right; font-weight:700; color:var(--primary); margin-top:10px; font-size:18px;">${total.toLocaleString()} KHR</div>`;
-            openModal('CONFIRM', html, () => processOrder());
-        }
-
-        function processOrder() {
-            const now = new Date(); dailyOrderCount++;
-            localStorage.setItem('myday_counter_' + now.toDateString(), dailyOrderCount);
-            const id = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(dailyOrderCount).padStart(3,'0')}`;
-            const dateStr = now.toLocaleDateString('en-GB');
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const payload = currentOrder.map(i => ({ id, name: `${i.name} (${i.sweetness})`, price: i.price+(i.milkOption==='Oat'?i.oatPrice:0), cost: i.cost, qty: 1, profit: 0 }));
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ user: deviceName, items: payload }) });
-            
-            const orderForPrint = { id, date: dateStr, time: timeStr, items: getGroupedItems(currentOrder) };
-            currentOrder = []; renderCart(); switchTab('menu');
-            
-            const html = generateReceiptHTML(orderForPrint);
-            openModal('ORDER SAVED', `<div class="preview-scroll-container"><div class="receipt-paper">${html}</div></div>`, () => {
-                document.getElementById('receiptContainer').innerHTML = html; 
-                window.print();
-            }, 'PRINT');
-            return false;
-        }
-
-        function generateReceiptHTML(d) {
-            let total = 0; let rows = '';
-            d.items.forEach(i => {
-                let unitP = i.price + (i.milkOption==='Oat'?i.oatPrice:0); 
-                let rowP = unitP * i.qty;
-                total += rowP;
-                let qtyStr = i.qty > 1 ? `x${i.qty} ` : '';
-                rows += `<div class="rp-row">
-                    <div>${qtyStr}${i.name.toUpperCase()}<br><small>${i.sweetness}${i.milkOption?', '+i.milkOption:''}</small></div>
-                    <div class="rp-price">${rowP.toLocaleString()} KHR</div>
-                </div>`;
-            });
-            return `<div class="rp-header"><img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="rp-logo"><div class="rp-title">My Day Matcha</div></div>
-                <div style="font-size:9px;margin-bottom:15px;">${d.date} ${d.time} | #${d.id}</div><div class="rp-items">${rows}</div>
-                <div class="rp-total">TOTAL: ${total.toLocaleString()} KHR</div>
-                <div style="margin-top:20px; font-size:10px; font-weight:600; line-height:1.6;">
-                    Order online via Telegram @mydaymatcha<br>
-                    Truly appreciate your support
-                </div>`;
-        }
-
-        /* --- FIXED OPEN MODAL: KEEPS OPEN IF ACTION RETURNS FALSE --- */
-        function openModal(t, c, a, cl = 'CANCEL') {
-            document.getElementById('mTitle').innerHTML = t; 
-            document.getElementById('mText').innerHTML = c;
-            const input = document.getElementById('mInput');
-            input.style.display = 'none';
-            input.value = '';
-            document.getElementById('mCloseBtn').innerText = cl === 'PRINT' ? 'CLOSE' : 'CANCEL';
-            const btn = document.getElementById('mBtn'); 
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            newBtn.innerText = cl === 'PRINT' ? 'PRINT' : 'YES';
-            newBtn.onclick = () => { 
-                if(a) {
-                    if (a() !== false) closeModal();
-                } else {
-                    closeModal();
-                }
-            };
-            document.getElementById('modal').classList.add('open');
-        }
-
-        function requestDeleteHistory() {
-            document.getElementById('mTitle').innerText = "DELETE ALL?";
-            document.getElementById('mText').innerText = "Type YESDELETEALL to confirm:";
-            const input = document.getElementById('mInput');
-            input.style.display = 'block';
-            input.focus();
-            const btn = document.getElementById('mBtn');
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
-            newBtn.innerText = "CONFIRM";
-            newBtn.onclick = () => {
-                if (input.value === "YESDELETEALL") {
-                    closeModal();
-                    fetch(GOOGLE_SCRIPT_URL, {method:'POST', body:JSON.stringify({action:'clear_all'})}).then(()=>openHistory());
-                } else {
-                    input.style.borderColor = "red";
-                    input.classList.add('shake');
-                    setTimeout(()=>input.classList.remove('shake'), 400);
-                }
-            };
-            document.getElementById('modal').classList.add('open');
-        }
-
-        function closeModal() { document.getElementById('modal').classList.remove('open'); }
-        function toggleTheme() { const b = document.body; const isDark = b.getAttribute('data-theme') === 'dark'; b.setAttribute('data-theme', isDark ? 'light' : 'dark'); document.getElementById('themeDisplay').innerText = isDark ? 'Light Mode' : 'Dark Mode'; }
-        
-        function openHistory() { 
-            toggleSettings(false); 
-            const list = document.getElementById('historyList');
-            list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading...</div>';
-            document.getElementById('historyPage').classList.add('open'); 
-            document.getElementById('historyTotalTitle').innerText = '0 KHR';
-            fetch(GOOGLE_SCRIPT_URL + '?action=get_history').then(r=>r.json()).then(data => {
-                list.innerHTML = '';
-                if(data.length === 0) { list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">No sales this month</div>'; return; }
-                historyData = {}; 
-                let grandTotal = 0;
-                data.forEach(item => {
-                    grandTotal += item.price;
-                    if(!historyData[item.id]) {
-                        historyData[item.id] = { id: item.id, time: item.time, date: item.date, total: 0, items: [] };
-                    }
-                    historyData[item.id].total += item.price;
-                    let existingItem = historyData[item.id].items.find(i => i.name === item.name);
-                    if(existingItem) { existingItem.qty++; } else { historyData[item.id].items.push({ name: item.name, price: item.price, qty: 1, sweetness: '', milkOption: '' }); }
-                });
-                document.getElementById('historyTotalTitle').innerText = grandTotal.toLocaleString() + ' KHR';
-                Object.keys(historyData).reverse().forEach(id => {
-                    const order = historyData[id];
-                    const div = document.createElement('div');
-                    div.className = 'history-card';
-                    let itemsDisplay = order.items.map(i => (i.qty > 1 ? `x${i.qty} ` : '') + i.name).join(', ');
-                    div.innerHTML = `
-                        <div class="hc-header">
-                            <span>#${id} | ${order.date} ${order.time}</span>
-                            <button class="text-btn" style="padding:4px 8px; font-size:10px; border:1px solid var(--border);" onclick="printHistory('${id}')">PRINT</button>
-                        </div>
-                        <div style="font-size:13px;">${itemsDisplay}</div>
-                        <div class="hc-total">${order.total.toLocaleString()} KHR</div>
-                    `;
-                    list.appendChild(div);
-                });
-            }).catch(e => { list.innerHTML = '<div style="padding:20px;text-align:center;color:red">Error loading history</div>'; });
-        }
-
-        function printHistory(id) {
-            const order = historyData[id];
-            if(!order) return;
-            const html = generateReceiptHTML(order);
-            openModal('PRINT RECORD', `<div class="preview-scroll-container"><div class="receipt-paper">${html}</div></div>`, () => {
-                document.getElementById('receiptContainer').innerHTML = html; 
-                window.print();
-            }, 'PRINT');
-        }
-
-        /* --- MANAGER LOGIC --- */
-        function openManager() {
-            toggleSettings(false);
-            const list = document.getElementById('managerList');
-            list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading Menu...</div>';
-            document.getElementById('managerPage').classList.add('open');
-            
-            fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(res => res.json()).then(data => {
-                if(data && data.length > 0) {
-                    renderManagerList(data);
-                } else {
-                    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Menu is empty</div>';
-                }
-            }).catch(e => {
-                list.innerHTML = '<div style="padding:20px;text-align:center;color:red">Connection Error</div>';
-            });
-        }
-
-        function renderManagerList(items) {
-            const list = document.getElementById('managerList');
-            list.innerHTML = '';
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'manager-card';
-                // Pass item stringified to avoid quote issues
-                const itemStr = encodeURIComponent(JSON.stringify(item));
-                div.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <div style="font-weight:700;">${item.name}</div>
-                            <div style="font-size:11px; color:var(--text-muted);">${item.category} | ${item.price.toLocaleString()} KHR</div>
-                        </div>
-                        <button class="text-btn" style="border:1px solid var(--border);" onclick="editItem('${itemStr}')">EDIT</button>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function newItem() {
-            openEditor({ category:'', id:'', name:'', price:0, cost:0, hasMilk:false, oatPrice:0, image:'' });
-        }
-
-        function editItem(itemStr) {
-            const item = JSON.parse(decodeURIComponent(itemStr));
-            openEditor(item);
-        }
-
-        function openEditor(item) {
-            document.getElementById('eCat').value = item.category;
-            document.getElementById('eId').value = item.id;
-            document.getElementById('eName').value = item.name;
-            document.getElementById('ePrice').value = item.price;
-            document.getElementById('eCost').value = item.cost;
-            document.getElementById('eMilk').checked = item.hasMilk;
-            document.getElementById('eOat').value = item.oatPrice;
-            document.getElementById('eImg').value = item.image;
-            
-            document.getElementById('editorModal').classList.add('open');
-        }
-
-        function saveItem() {
-            const item = {
-                category: document.getElementById('eCat').value,
-                id: document.getElementById('eId').value,
-                name: document.getElementById('eName').value,
-                price: Number(document.getElementById('ePrice').value),
-                cost: Number(document.getElementById('eCost').value),
-                hasMilk: document.getElementById('eMilk').checked,
-                oatPrice: Number(document.getElementById('eOat').value),
-                image: document.getElementById('eImg').value
-            };
-
-            if(!item.id || !item.name) { 
-                openModal('ERROR', 'ID and Name are required', null, 'CLOSE'); 
-                return; 
-            }
-
-            document.getElementById('editorModal').classList.remove('open');
-            document.getElementById('managerList').innerHTML = '<div style="padding:20px;text-align:center;">Saving...</div>';
-            
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'save_item', ...item })
-            }).then(res => res.json()).then(data => {
-                if(data.status === 'success') {
-                    openManager(); // Reload list
-                    fetchMenu(); // Reload main menu
-                } else {
-                    openModal('ERROR', 'Error saving item: ' + (data.message || "Unknown error"), null, 'CLOSE');
-                    openManager(); 
-                }
-            }).catch(err => {
-                openModal('ERROR', 'Connection Error. Please try again.', null, 'CLOSE');
-                openManager();
-            });
-        }
-
-        function confirmDelete() {
-            openModal('DELETE?', 'Are you sure you want to delete this item permanently?', () => deleteItem());
-        }
-
-        function deleteItem() {
-            const id = document.getElementById('eId').value;
-            if(!id) return;
-
-            document.getElementById('editorModal').classList.remove('open');
-            document.getElementById('managerList').innerHTML = '<div style="padding:20px;text-align:center;">Deleting...</div>';
-
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'delete_item', id: id })
-            }).then(res => res.json()).then(data => {
-                if(data.status === 'success') {
-                    openManager();
-                    fetchMenu();
-                } else {
-                    openModal('ERROR', 'Error deleting item', null, 'CLOSE');
-                    openManager();
-                }
-            }).catch(err => {
-                openModal('ERROR', 'Connection Error.', null, 'CLOSE');
-                openManager();
-            });
-        }
-    </script>
+    }
+    function stopScan() { if(sc) sc.stop(); get('reader').style.display='none'; get('b-scan').style.display='block'; }
+</script>
 </body>
 </html>
-
-
