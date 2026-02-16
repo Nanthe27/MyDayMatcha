@@ -30,6 +30,10 @@
             --radius: 16px; 
             --anim-speed: 0.25s;
             --anim-curve: cubic-bezier(0.2, 0, 0, 1);
+            
+            /* UPDATED FROM YOUR SNIPPET (LIGHT MODE) */
+            --glass-bg: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
         }
 
         [data-theme="dark"] { 
@@ -39,6 +43,10 @@
             --text: #FFFFFF; 
             --text-muted: #888888; 
             --border: #333333; 
+            
+            /* UPDATED FROM YOUR SNIPPET (DARK MODE ADAPTATION) */
+            --glass-bg: rgba(25, 25, 25, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -53,16 +61,12 @@
         }
 
         @keyframes fadeScale { 0% { opacity: 0; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1); } }
-        .main-stage, .modal-box, #loginScreen, .cart-area.active, .settings-area.active, #managerPage, #editorModal { animation: fadeScale var(--anim-speed) var(--anim-curve); }
+        .main-stage, .modal-box, #loginScreen, .cart-area.active, .settings-area.active, #managerPage, #editorModal, #inventoryPage, #invEditorModal { animation: fadeScale var(--anim-speed) var(--anim-curve); }
 
         /* --- HEADER --- */
         .app-header { 
-            /* DYNAMIC HEIGHT: 70px + whatever the phone needs for notch/island */
             height: calc(70px + env(safe-area-inset-top)); 
-            
-            /* DYNAMIC PADDING: Push content down by the safe area amount */
             padding: env(safe-area-inset-top) 20px 0 20px; 
-            
             display: flex; justify-content: space-between; align-items: center; 
             background: var(--surface); border-bottom: 1px solid var(--border); 
             z-index: 50; flex-shrink: 0; 
@@ -120,6 +124,45 @@
         .setting-label { font-weight: 600; font-size: 14px; }
         .setting-val { color: var(--text-muted); font-size: 13px; font-weight: 500; }
 
+        /* UPDATED: FLOATING PILL BOTTOM NAV (USING YOUR SNIPPET) */
+        .bottom-nav { 
+            display: flex; position: fixed; 
+            bottom: 30px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 450px; height: 65px; 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            justify-content: center; align-items: center; gap: 5px; 
+            z-index: 280; border-radius: 35px; padding: 5px; 
+        }
+        .nav-item { 
+            flex: 1; height: 100%; font-weight: 700; font-size: 10px; color: var(--text-muted); 
+            background: transparent; border: none; letter-spacing: 0.5px; transition: background-color 0.3s, transform 0.3s; 
+            border-radius: 30px; position: relative; cursor: pointer;
+        }
+        /* ADDED: HOVER EFFECT FROM YOUR SNIPPET */
+        .nav-item:hover {
+            background-color: var(--glass-bg);
+        }
+        .nav-item.active { background: var(--primary); color: white; }
+        .nav-item:active { transform: scale(0.95); }
+        
+        .nav-badge { 
+            position: absolute; top: 2px; right: 5px; background: #FF3B30; color: white; 
+            font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 10px; opacity: 0; transition: 0.2s; transform: scale(0); 
+        }
+        .nav-badge.show { opacity: 1; transform: scale(1); }
+
+        .desktop-nav-group { display: none; flex-direction: column; }
+
+        /* INVENTORY DESKTOP GRID CLASSES */
+        .inv-container { display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 15px; padding-bottom:120px; }
+        .dashboard-wrapper { width: 100%; display: flex; flex-direction: column; }
+        .inv-left-col, .inv-right-col { display: flex; flex-direction: column; }
+
+        /* DESKTOP STYLES */
         @media (min-width: 1024px) {
             body { padding-top: 0; }
             .app-header { height: 70px; padding: 0 20px; } 
@@ -133,9 +176,29 @@
             }
             .settings-area { width: 400px; right: 0; left: auto; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.05); padding-top: 20px !important; }
             .menu-area { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-            .bottom-nav { display: none !important; }
             
-            #managerPage .app-header, #historyPage .app-header { height: 70px !important; padding: 0 20px !important; }
+            .bottom-nav { display: none !important; }
+            .desktop-nav-group { display: flex !important; }
+            
+            #managerPage .app-header, #historyPage .app-header, #inventoryPage .app-header { height: 70px !important; padding: 0 20px !important; }
+
+            .inv-container { 
+                max-width: 1200px !important; 
+                display: grid !important; 
+                grid-template-columns: 1fr 1fr; 
+                grid-template-rows: auto 1fr;
+                gap: 0 40px; 
+                padding-bottom: 30px !important; 
+                align-items: start;
+            }
+            .dashboard-wrapper { grid-column: 2; grid-row: 1; }
+            .inv-right-col { grid-column: 2; grid-row: 2; }
+            .inv-left-col { 
+                grid-column: 1; grid-row: 1 / 3; 
+                position: sticky; top: 0; 
+                max-height: calc(100vh - 100px); 
+                overflow-y: auto; padding-right: 10px; 
+            }
         }
 
         .cart-header { padding: 20px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; }
@@ -166,13 +229,7 @@
         .btn-clear { background: transparent; color: #FF3B30; border: 1px solid #FF3B30; }
         .btn-clear:active { transform: scale(0.95); background: rgba(255, 59, 48, 0.1); }
 
-        .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--surface); border-top: 1px solid var(--border); justify-content: center; align-items: center; gap: 0; z-index: 200; }
-        .nav-item { flex: 1; height: 100%; font-weight: 700; font-size: 11px; color: var(--text-muted); background: none; border: none; letter-spacing: 1px; transition: 0.3s; border-top: 2px solid transparent; position: relative; }
-        .nav-item.active { color: var(--primary); border-top-color: var(--primary); background: rgba(76, 175, 80, 0.05); }
-        .nav-badge { position: absolute; top: 12px; right: 25%; background: #FF3B30; color: white; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 10px; opacity: 0; transition: 0.2s; transform: scale(0); }
-        .nav-badge.show { opacity: 1; transform: scale(1); }
-
-        .toast-msg { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--primary); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 13px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 250; opacity: 0; visibility: hidden; transition: 0.3s cubic-bezier(0.2, 0, 0, 1); white-space: nowrap; max-width: 85vw; overflow: hidden; text-overflow: ellipsis; }
+        .toast-msg { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--primary); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; font-size: 13px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 250; opacity: 0; visibility: hidden; transition: 0.3s cubic-bezier(0.2, 0, 0, 1); white-space: nowrap; max-width: 85vw; overflow: hidden; text-overflow: ellipsis; }
         .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; visibility: visible; }
 
         .text-btn { background: transparent; border: none; font-size: 14px; font-weight: 700; color: var(--text); padding: 10px 15px; border-radius: 8px; cursor: pointer; letter-spacing: 0.5px; }
@@ -207,10 +264,8 @@
         .rp-total { border-top: 1px dashed #000; padding-top: 10px; font-weight: 700; font-size: 14px; text-align: right; }
         .preview-scroll-container { max-height: 55vh; overflow-y: auto; background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
 
-        /* LAYOUTS FOR HISTORY AND MANAGER */
-        /* FIXED: Use env() for safe area top padding */
-        #historyPage, #managerPage { z-index: 250; background: var(--bg); }
-        #historyList, #managerList { width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; }
+        /* ALL FULL SCREEN PAGES */
+        #historyPage, #managerPage, #inventoryPage { z-index: 250; background: var(--bg); }
         
         .history-card, .manager-card { 
             background: var(--surface); border: 1px solid var(--border); 
@@ -218,8 +273,7 @@
             display: flex; flex-direction: column; gap: 8px;
         }
         
-        /* DYNAMIC HEADER HEIGHT FOR MOBILE */
-        #historyPage .app-header, #managerPage .app-header {
+        #historyPage .app-header, #managerPage .app-header, #inventoryPage .app-header {
             height: calc(70px + env(safe-area-inset-top));
             padding: env(safe-area-inset-top) 20px 0 20px;
         }
@@ -227,20 +281,55 @@
         .hc-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
         .hc-total { text-align: right; font-weight: 700; font-size: 14px; color: var(--primary); padding-top: 5px; }
 
-        /* EDITOR MODAL STYLE */
-        #editorModal { z-index: 260; background: rgba(0,0,0,0.5); }
-        .editor-form { width: 90%; max-width: 400px; background: var(--surface); padding: 25px; border-radius: var(--radius); max-height: 85vh; overflow-y: auto; }
+        .dashboard-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 25px 20px; margin-bottom: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); transition: opacity 0.3s ease; }
+        .dash-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+        .dash-val { font-weight: 700; }
+        .profit-val { font-size: 18px; text-align: right; margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px; font-weight: 800; }
+        
+        .chart-container { display: flex; gap: 30px; align-items: center; margin-top: 25px; padding: 20px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); }
+        
+        .pie-chart { 
+            width: 120px; height: 120px; 
+            border-radius: 50%; flex-shrink: 0; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12); 
+            position: relative; 
+        }
+        .pie-chart::after { 
+            content: ''; position: absolute; 
+            top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 70px; height: 70px; 
+            background: var(--bg); 
+            border-radius: 50%; 
+            box-shadow: inset 0 3px 8px rgba(0,0,0,0.08); 
+            z-index: 1; 
+        }
+        .pie-center-text { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            z-index: 2; font-size: 18px; font-weight: 800; color: var(--text); 
+        }
+        
+        .chart-legend { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+        .legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--text); }
+        .dot { width: 14px; height: 14px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .dot.sales { background: var(--primary); }
+        .dot.expenses { background: #FF3B30; }
+
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-label { font-size: 12px; font-weight: 600; margin-bottom: 5px; display: block; color: var(--text-muted); }
         .form-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 14px; outline: none; }
         .form-check { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+
+        .pending-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px dashed var(--border); border-radius: 8px; font-size: 12px; }
+
+        #editorModal, #invEditorModal { z-index: 260; background: rgba(0,0,0,0.5); }
+        .editor-form { width: 90%; max-width: 400px; background: var(--surface); padding: 25px; border-radius: var(--radius); max-height: 85vh; overflow-y: auto; }
 
         #testBanner { display: none; background: var(--primary); color: #fff; text-align: center; font-weight: 800; font-size: 10px; padding: 5px; position: fixed; top: 0; width: 100%; z-index: 10000; }
         body.testing .app-header { margin-top: 20px; }
 
         #receiptContainer { display: none; }
         @media print {
-            body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal { display: none !important; }
+            body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal, #inventoryPage, #invEditorModal { display: none !important; }
             #receiptContainer { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
             .receipt-paper { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; }
         }
@@ -275,30 +364,51 @@
 
     <div class="main-stage">
         <div class="menu-area" id="menuArea"></div>
+
         <div class="cart-area" id="cartPanel">
             <div class="cart-header">Current Order</div>
             <div class="cart-list" id="cartList"></div>
             <div class="cart-footer">
-                <div class="total-row"><span class="total-label">TOTAL</span><span class="total-display" id="totalDisplay">0 KHR</span></div>
+                <div class="total-row">
+                    <span class="total-label" style="display:flex; align-items:center;">
+                        TOTAL
+                        <select id="globalDiscountSelect" class="mini-select" onchange="updateGlobalDiscount(this.value)" style="margin-left:10px; margin-top:0;">
+                            <option value="0">No Disc</option>
+                            <option value="10">10% Off</option>
+                            <option value="15">15% Off</option>
+                            <option value="20">20% Off</option>
+                            <option value="30">30% Off</option>
+                            <option value="50">50% Off</option>
+                            <option value="100">Free</option>
+                        </select>
+                    </span>
+                    <span class="total-display" id="totalDisplay">0 KHR</span>
+                </div>
                 <div class="controls"><button class="btn btn-clear" onclick="confirmClear()">Clear</button><button class="btn btn-confirm" onclick="confirmOrder()">Confirm</button></div>
             </div>
         </div>
+
         <div class="settings-area" id="settingsPanel">
             <h3 style="margin-bottom:20px; color:var(--text-muted); font-size:12px; letter-spacing:1px;">SETTINGS</h3>
-            <div class="setting-card" onclick="showLogin()"><div class="setting-label">Switch User</div><div class="setting-val" id="currentUserDisplay">Unknown</div></div>
             <div class="setting-card" onclick="toggleTheme()"><div class="setting-label">Theme Mode</div><div class="setting-val" id="themeDisplay">Light Mode</div></div>
             <div class="setting-card" onclick="openHistory()"><div class="setting-label">History</div><div class="setting-val">View ></div></div>
             <div class="setting-card" onclick="openManager()"><div class="setting-label">Manage Menu</div><div class="setting-val">></div></div>
             
-            <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card" style="text-decoration: none; background: var(--primary); color: white; margin-top: 40px; border: none; justify-content: center;">
-                <div class="setting-label" style="font-size: 20px;">| Loyalty Customer |</div>
+            <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card" style="text-decoration: none; border: none; justify-content: center; margin-top: 15px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0284c7;">
+                <div class="setting-label" style="font-size: 14px; font-weight: 800;">Customer Loyalty</div>
             </a>
+            
+            <div class="desktop-nav-group">
+                <h3 style="margin-top:20px; margin-bottom:20px; color:var(--text-muted); font-size:12px; letter-spacing:1px;">APP NAVIGATION</h3>
+                <div class="setting-card" onclick="switchTab('inventory')"><div class="setting-label">Stock Tracker</div><div class="setting-val">></div></div>
+            </div>
         </div>
     </div>
 
     <div class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('menu')" id="btnMenu">MENU</button>
         <button class="nav-item" onclick="switchTab('cart')" id="btnCart">ORDER <span id="navBadge" class="nav-badge">0</span></button>
+        <button class="nav-item" onclick="switchTab('inventory')" id="btnInventory">STOCK</button>
     </div>
 
     <div id="modal" class="modal-overlay">
@@ -319,7 +429,7 @@
             <span id="historyTotalTitle" style="font-weight:700; color:var(--primary); font-size:18px;">0 KHR</span>
             <button class="text-btn" style="color:#FF3B30;" onclick="requestDeleteHistory()">DELETE ALL</button>
         </div>
-        <div id="historyList"></div>
+        <div id="historyList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom:100px;"></div>
     </div>
 
     <div id="managerPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
@@ -328,7 +438,75 @@
             <span style="font-weight:700; color:var(--primary); font-size:16px;">MANAGE MENU</span>
             <button class="text-btn" style="color:var(--primary);" onclick="newItem()">+ ADD</button>
         </div>
-        <div id="managerList"></div>
+        <div id="managerList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom:100px;"></div>
+    </div>
+
+    <div id="inventoryPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
+        <div class="app-header" style="width:100%;">
+            <button class="text-btn" style="font-size:28px; line-height:1; padding:0 15px;" onclick="switchTab('menu')">‹</button>
+            <span style="font-weight:700; color:var(--primary); font-size:16px;">STOCK TRACKER</span>
+            <div style="width:40px;"></div>
+        </div>
+        
+        <div class="inv-container">
+            
+            <div class="dashboard-wrapper">
+                <div class="dashboard-card">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase;">This Month</div>
+                    
+                    <div id="invDashboard" style="transition: opacity 0.3s ease;">
+                        <div class="dash-row"><span style="color:var(--text-muted)">Total Sales Income</span><span class="dash-val" id="dashSales" style="color:var(--primary); transition: color 0.3s ease;">+0 KHR</span></div>
+                        <div class="dash-row"><span style="color:var(--text-muted)">Total Inventory Cost</span><span class="dash-val" id="dashCost" style="color:#FF3B30; transition: color 0.3s ease;">-0 KHR</span></div>
+                        
+                        <div class="profit-val" id="dashProfit" style="color:var(--primary); transition: color 0.3s ease;">Actual Profit: 0 KHR</div>
+                        
+                        <div class="chart-container">
+                            <div class="pie-chart" id="dashPie" style="background: conic-gradient(var(--primary) 0% 50%, #FF3B30 50% 100%); transition: background 0.5s ease;">
+                                <div class="pie-center-text" id="dashPieText">50%</div>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item"><div class="dot sales"></div> Income (<span id="dashSalesPct">50</span>%)</div>
+                                <div class="legend-item"><div class="dot expenses"></div> Expense (<span id="dashExpPct">50</span>%)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="text-btn" style="width:100%; margin-top:20px; font-size:12px; font-weight:800; color:var(--text-muted); text-align:center; border-top:1px solid var(--border); border-radius:0; padding-top:15px; padding-bottom:5px;" onclick="toggleAllTimeStats()">VIEW ALL TIME PROFIT ▾</button>
+                    
+                    <div id="allTimeStats" style="display:none; flex-direction:column; margin-top:10px; padding-top:15px; border-top:1px dashed var(--border);">
+                        <div style="text-align:center; color:var(--text-muted); font-size:12px;" id="allTimeLoading">Loading All-Time Data...</div>
+                        <div id="allTimeContent" style="display:none;">
+                            <div class="dash-row"><span style="color:var(--text-muted)">All Time Income</span><span class="dash-val" id="atSales" style="color:var(--primary)">+0 KHR</span></div>
+                            <div class="dash-row"><span style="color:var(--text-muted)">All Time Cost</span><span class="dash-val" id="atCost" style="color:#FF3B30">-0 KHR</span></div>
+                            <div class="profit-val" id="atProfit" style="font-size:16px; border-top:none; margin-top:5px; padding-top:5px;">All Time Profit: 0 KHR</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inv-left-col">
+                <div class="cart-header" style="border-radius:var(--radius); margin-bottom: 10px; padding:15px; background:none;">ADD EXPENSE</div>
+                <div style="background:var(--surface); padding:20px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom: 25px;">
+                    <div class="form-group"><label class="form-label">Ingredient Name</label><input id="invItem" class="form-input" placeholder="e.g., Matcha Powder"></div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div class="form-group"><label class="form-label">Unit Size (e.g., 1L)</label><input id="invUnit" class="form-input" placeholder="e.g., 1 kg"></div>
+                        <div class="form-group"><label class="form-label">Amount Bought</label><input id="invAmount" type="number" class="form-input" placeholder="e.g., 2"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Total Cost (KHR)</label><input id="invCost" type="number" class="form-input" placeholder="0"></div>
+                    
+                    <button class="btn btn-clear" style="width:100%; margin-top:10px; border-color:var(--primary); color:var(--primary);" onclick="addPendingInventory()">+ ADD TO LIST</button>
+                    
+                    <div id="pendingInvList" style="margin-top:15px; display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto; padding-right:5px;"></div>
+                    
+                    <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:15px; display:none;" onclick="saveInventory()">SAVE ALL RECORDS</button>
+                </div>
+            </div>
+
+            <div class="inv-right-col">
+                <div class="cart-header" style="border-radius:var(--radius); margin-bottom: 10px; padding:15px; background:none;">RECENT PURCHASES</div>
+                <div id="inventoryList"></div>
+            </div>
+        </div>
     </div>
 
     <div id="editorModal" class="modal-overlay">
@@ -353,11 +531,29 @@
         </div>
     </div>
 
+    <div id="invEditorModal" class="modal-overlay">
+        <div class="editor-form">
+            <h3 style="margin-bottom:20px; text-align:center;">Edit Record</h3>
+            <input type="hidden" id="eiOldDate">
+            <input type="hidden" id="eiOldTime">
+            <input type="hidden" id="eiOldItem">
+            
+            <div class="form-group"><label class="form-label">Ingredient Name</label><input id="eiItem" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Quantity</label><input id="eiQty" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Cost (KHR)</label><input id="eiCost" type="number" class="form-input"></div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
+                <button class="btn btn-clear" onclick="document.getElementById('invEditorModal').classList.remove('open')">CANCEL</button>
+                <button class="btn btn-confirm" onclick="saveEditedInventory()">SAVE</button>
+            </div>
+        </div>
+    </div>
+
     <div id="receiptContainer"></div>
 
     <script>
         const IS_TEST_MODE = false; 
-        const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
+        const LIVE_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
         const GOOGLE_SCRIPT_URL = IS_TEST_MODE ? TEST_URL : LIVE_URL;
 
@@ -371,6 +567,8 @@
         let currentPin = ""; 
         let dailyOrderCount = parseInt(localStorage.getItem('myday_counter_' + new Date().toDateString())) || 0;
         let historyData = {}; 
+        let pendingInventory = [];
+        let globalOrderDiscount = 0;
 
         document.addEventListener('keydown', (e) => {
             if(document.getElementById('loginScreen').classList.contains('hidden')) return;
@@ -383,11 +581,8 @@
         window.onload = () => { fetchUsers(); fetchMenu(); showLogin(); };
 
         function fetchUsers() {
-            // CACHE LOAD
             const cachedUsers = localStorage.getItem('myday_users');
-            if (cachedUsers) {
-                renderUserGrid(JSON.parse(cachedUsers));
-            }
+            if (cachedUsers) renderUserGrid(JSON.parse(cachedUsers));
 
             fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(res => res.json()).then(data => {
                 localStorage.setItem('myday_users', JSON.stringify(data));
@@ -407,39 +602,56 @@
         function selectUser(name) { tempSelectedUser = name; currentPin = ""; updatePinDisplay(); document.getElementById('userListGrid').style.display = 'none'; document.getElementById('pinContainer').style.display = 'flex'; document.getElementById('loginTitle').innerText = name; }
         
         function cancelLogin() { 
-            tempSelectedUser = null; 
-            currentPin = ""; 
+            tempSelectedUser = null; currentPin = ""; 
             document.getElementById('userListGrid').style.display = 'flex'; 
             document.getElementById('pinContainer').style.display = 'none'; 
             document.getElementById('loginTitle').innerText = "It's loading, wait abit"; 
         }
         
         function handleNumpad(val) {
-            if (val === 'del') {
-                currentPin = String(currentPin).slice(0, -1);
-            } else {
-                if (String(currentPin).length < 4) currentPin += val;
-            }
+            if (val === 'del') currentPin = String(currentPin).slice(0, -1);
+            else if (String(currentPin).length < 4) currentPin += val;
             updatePinDisplay();
             if (String(currentPin).length === 4) setTimeout(checkPin, 200);
         }
 
         function updatePinDisplay() { const dots = document.querySelectorAll('.pin-dot'); dots.forEach((dot, idx) => { if(idx < currentPin.length) dot.classList.add('active'); else dot.classList.remove('active'); }); }
+        
         function checkPin() {
             if(currentPin.length !== 4) return;
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', user: tempSelectedUser, pin: currentPin }) })
+            
+            document.getElementById('pinDisplay').style.opacity = '0.5';
+
+            fetch(GOOGLE_SCRIPT_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'login', user: tempSelectedUser, pin: currentPin }) 
+            })
             .then(res => res.json()).then(data => {
-                if(data.status === 'success') { deviceName = tempSelectedUser; document.getElementById('currentUserDisplay').innerText = deviceName; document.getElementById('loginScreen').classList.add('hidden'); }
-                else { const display = document.getElementById('pinDisplay'); display.classList.add('shake'); setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400); }
+                document.getElementById('pinDisplay').style.opacity = '1';
+                if(data.status === 'success') { 
+                    deviceName = tempSelectedUser; 
+                    
+                    const userDisplayElement = document.getElementById('currentUserDisplay');
+                    if (userDisplayElement) { userDisplayElement.innerText = deviceName; }
+                    
+                    document.getElementById('loginScreen').classList.add('hidden'); 
+                } else { 
+                    alert("Login Failed: " + (data.message || "Incorrect PIN. Check your Google Sheet."));
+                    const display = document.getElementById('pinDisplay'); display.classList.add('shake'); 
+                    setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400); 
+                }
+            }).catch(err => {
+                document.getElementById('pinDisplay').style.opacity = '1';
+                alert("Connection Blocked! Please ensure your Google Script URL is correct and deployed as 'Anyone'. Error: " + err.message);
+                const display = document.getElementById('pinDisplay'); display.classList.add('shake'); 
+                setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400);
             });
         }
 
         function fetchMenu() {
-            // CACHE LOAD
             const cachedMenu = localStorage.getItem('myday_menu');
-            if (cachedMenu) {
-                processMenuData(JSON.parse(cachedMenu));
-            }
+            if (cachedMenu) processMenuData(JSON.parse(cachedMenu));
 
             fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(res => res.json()).then(data => {
                 localStorage.setItem('myday_menu', JSON.stringify(data));
@@ -470,7 +682,7 @@
         }
 
         function addToCart(item) {
-            currentOrder.push({ uid: Date.now() + Math.random(), ...item, milkOption: item.hasMilk ? 'Milk' : null, sweetness: '100%' });
+            currentOrder.push({ uid: Date.now() + Math.random(), ...item, milkOption: item.hasMilk ? 'Milk' : null, sweetness: '100%', discount: 0 });
             renderCart();
             const toast = document.getElementById('toast');
             toast.innerText = item.name + " Added!";
@@ -478,10 +690,18 @@
             setTimeout(() => toast.classList.remove('show'), 1500);
         }
 
+        function updateGlobalDiscount(val) {
+            globalOrderDiscount = Number(val);
+            renderCart();
+        }
+
         function renderCart() {
             const list = document.getElementById('cartList'); list.innerHTML = ''; let total = 0;
             currentOrder.forEach(item => {
-                let p = item.price + (item.milkOption === 'Oat' ? item.oatPrice : 0); total += p;
+                let baseP = item.price + (item.milkOption === 'Oat' ? item.oatPrice : 0); 
+                let p = baseP - (baseP * (item.discount || 0) / 100); 
+                total += p;
+                
                 const div = document.createElement('div'); div.className = 'cart-item';
                 div.innerHTML = `<div><div class="item-name">${item.name}</div>
                     ${item.hasMilk ? `
@@ -495,25 +715,71 @@
                         <option ${item.sweetness === '75%' ? 'selected' : ''}>75%</option>
                         <option ${item.sweetness === '50%' ? 'selected' : ''}>50%</option>
                         <option ${item.sweetness === '0%' ? 'selected' : ''}>0%</option>
-                    </select></div>
+                    </select>
+                    <select class="mini-select" onchange="updateItem('${item.uid}','discount',this.value)">
+                        <option value="0" ${item.discount == 0 ? 'selected' : ''}>No Disc</option>
+                        <option value="10" ${item.discount == 10 ? 'selected' : ''}>10% Off</option>
+                        <option value="20" ${item.discount == 20 ? 'selected' : ''}>20% Off</option>
+                        <option value="30" ${item.discount == 30 ? 'selected' : ''}>30% Off</option>
+                        <option value="50" ${item.discount == 50 ? 'selected' : ''}>50% Off</option>
+                        <option value="100" ${item.discount == 100 ? 'selected' : ''}>Free</option>
+                    </select>
+                    </div>
                     <div style="text-align:right"><div class="item-price">${p.toLocaleString()} KHR</div><button class="del-btn" onclick="removeItem('${item.uid}')">×</button></div>`;
                 list.appendChild(div);
             });
-            document.getElementById('totalDisplay').innerText = total.toLocaleString() + ' KHR';
+            
+            let finalTotal = total - (total * globalOrderDiscount / 100);
+            document.getElementById('totalDisplay').innerText = finalTotal.toLocaleString() + ' KHR';
+            
             const badge = document.getElementById('navBadge'); badge.innerText = currentOrder.length;
             if(currentOrder.length > 0) badge.classList.add('show'); else badge.classList.remove('show');
         }
 
-        function updateItem(uid, k, v) { const i = currentOrder.find(x => x.uid == uid); i[k === 'milk' ? 'milkOption' : 'sweetness'] = v; renderCart(); }
+        function updateItem(uid, k, v) { 
+            const i = currentOrder.find(x => x.uid == uid); 
+            if (k === 'discount') {
+                i.discount = Number(v);
+            } else {
+                i[k === 'milk' ? 'milkOption' : 'sweetness'] = v; 
+            }
+            renderCart(); 
+        }
         function removeItem(uid) { currentOrder = currentOrder.filter(x => x.uid != uid); renderCart(); }
-        function confirmClear() { if(currentOrder.length > 0) openModal('CLEAR', 'Reset cart?', () => { currentOrder = []; renderCart(); }); }
+        
+        function confirmClear() { 
+            if(currentOrder.length > 0) openModal('CLEAR', 'Reset cart?', () => { 
+                currentOrder = []; 
+                globalOrderDiscount = 0;
+                document.getElementById('globalDiscountSelect').value = '0';
+                renderCart(); 
+            }); 
+        }
         
         function switchTab(t) {
-            document.getElementById('menuArea').style.display = t === 'menu' ? 'grid' : 'none';
-            const panel = document.getElementById('cartPanel');
-            if (t === 'cart') panel.classList.add('active'); else panel.classList.remove('active');
+            document.getElementById('historyPage').classList.remove('open');
+            document.getElementById('managerPage').classList.remove('open');
+            document.getElementById('editorModal').classList.remove('open');
+            document.getElementById('invEditorModal').classList.remove('open');
+            document.getElementById('modal').classList.remove('open');
+
+            const invPanel = document.getElementById('inventoryPage');
+            
+            if (t === 'inventory') {
+                invPanel.classList.add('open');
+                fetchInventoryAndStats();
+            } else {
+                invPanel.classList.remove('open');
+                document.getElementById('menuArea').style.display = t === 'menu' ? 'grid' : 'none';
+                
+                const panel = document.getElementById('cartPanel');
+                if (t === 'cart') panel.classList.add('active'); else panel.classList.remove('active');
+            }
+            
             document.getElementById('btnMenu').classList.toggle('active', t === 'menu');
             document.getElementById('btnCart').classList.toggle('active', t === 'cart');
+            document.getElementById('btnInventory').classList.toggle('active', t === 'inventory');
+            
             toggleSettings(false);
         }
 
@@ -532,7 +798,7 @@
         function getGroupedItems(items) {
             let groups = [];
             items.forEach(item => {
-                let sig = item.name + '|' + item.sweetness + '|' + (item.milkOption || 'No');
+                let sig = item.name + '|' + item.sweetness + '|' + (item.milkOption || 'No') + '|' + (item.discount || 0);
                 let existing = groups.find(g => g.sig === sig);
                 if (existing) { existing.qty++; } 
                 else { groups.push({ ...item, qty: 1, sig: sig }); }
@@ -545,15 +811,24 @@
             let total = 0; let html = '<div style="background:var(--bg); padding:10px; border-radius:8px;">';
             const grouped = getGroupedItems(currentOrder);
             grouped.forEach(i => {
-                let unitP = i.price + (i.milkOption==='Oat'?i.oatPrice:0); 
-                let rowP = unitP * i.qty;
+                let baseP = i.price + (i.milkOption==='Oat'?i.oatPrice:0); 
+                let itemP = baseP - (baseP * (i.discount || 0) / 100);
+                let rowP = itemP * i.qty;
                 total += rowP;
                 let countStr = i.qty > 1 ? `<b style="color:var(--primary)">x${i.qty}</b> ` : '';
+                let discStr = i.discount > 0 ? ` <span style="color:#FF3B30;font-size:10px;">(-${i.discount}%)</span>` : '';
+                
                 html += `<div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; border-bottom:1px solid var(--border); padding-bottom:5px;">
-                    <span>${countStr}${i.name} <span style="color:var(--text-muted);font-size:10px;">(${i.sweetness})</span></span>
+                    <span>${countStr}${i.name} <span style="color:var(--text-muted);font-size:10px;">(${i.sweetness})</span>${discStr}</span>
                     <span>${rowP.toLocaleString()} KHR</span></div>`;
             });
-            html += `</div><div style="text-align:right; font-weight:700; color:var(--primary); margin-top:10px; font-size:18px;">${total.toLocaleString()} KHR</div>`;
+            
+            let finalTotal = total - (total * globalOrderDiscount / 100);
+            if(globalOrderDiscount > 0) {
+                html += `<div style="text-align:right; font-size:12px; color:#FF3B30; margin-top:5px;">Order Discount: -${globalOrderDiscount}%</div>`;
+            }
+            html += `</div><div style="text-align:right; font-weight:700; color:var(--primary); margin-top:10px; font-size:18px;">${finalTotal.toLocaleString()} KHR</div>`;
+            
             openModal('CONFIRM', html, () => processOrder());
         }
 
@@ -564,11 +839,25 @@
             const dateStr = now.toLocaleDateString('en-GB');
             const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
-            const payload = currentOrder.map(i => ({ id, name: `${i.name} (${i.sweetness})`, price: i.price+(i.milkOption==='Oat'?i.oatPrice:0), cost: i.cost, qty: 1, profit: 0 }));
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ user: deviceName, items: payload }) });
+            const payload = currentOrder.map(i => {
+                let baseP = i.price + (i.milkOption==='Oat'?i.oatPrice:0);
+                let itemP = baseP - (baseP * (i.discount || 0) / 100);
+                let finalP = itemP - (itemP * globalOrderDiscount / 100); 
+                let discNameStr = i.discount > 0 ? ` -${i.discount}%` : '';
+                let globalDiscStr = globalOrderDiscount > 0 ? ` (Order -${globalOrderDiscount}%)` : '';
+                
+                return { id, name: `${i.name} (${i.sweetness})${discNameStr}${globalDiscStr}`, price: finalP, cost: i.cost, qty: 1, profit: 0 };
+            });
             
-            const orderForPrint = { id, date: dateStr, time: timeStr, items: getGroupedItems(currentOrder) };
-            currentOrder = []; renderCart(); switchTab('menu');
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ user: deviceName, items: payload }) });
+            
+            const orderForPrint = { id, date: dateStr, time: timeStr, items: getGroupedItems(currentOrder), globalDiscount: globalOrderDiscount };
+            
+            currentOrder = []; 
+            globalOrderDiscount = 0; 
+            document.getElementById('globalDiscountSelect').value = '0';
+            renderCart(); 
+            switchTab('menu');
             
             const html = generateReceiptHTML(orderForPrint);
             openModal('ORDER SAVED', `<div class="preview-scroll-container"><div class="receipt-paper">${html}</div></div>`, () => {
@@ -581,25 +870,32 @@
         function generateReceiptHTML(d) {
             let total = 0; let rows = '';
             d.items.forEach(i => {
-                let unitP = i.price + (i.milkOption==='Oat'?i.oatPrice:0); 
-                let rowP = unitP * i.qty;
+                let baseP = i.price + (i.milkOption==='Oat'?i.oatPrice:0); 
+                let itemP = baseP - (baseP * (i.discount || 0) / 100);
+                let rowP = itemP * i.qty;
                 total += rowP;
                 let qtyStr = i.qty > 1 ? `x${i.qty} ` : '';
+                let discStr = i.discount > 0 ? ` (-${i.discount}%)` : '';
+                
                 rows += `<div class="rp-row">
-                    <div>${qtyStr}${i.name.toUpperCase()}<br><small>${i.sweetness}${i.milkOption?', '+i.milkOption:''}</small></div>
+                    <div>${qtyStr}${i.name.toUpperCase()}<br><small>${i.sweetness}${i.milkOption?', '+i.milkOption:''}${discStr}</small></div>
                     <div class="rp-price">${rowP.toLocaleString()} KHR</div>
                 </div>`;
             });
+            
+            let finalTotal = total - (total * (d.globalDiscount || 0) / 100);
+            let discHTML = d.globalDiscount > 0 ? `<div class="rp-row" style="color:#666; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;"><div>ORDER DISCOUNT</div><div>-${d.globalDiscount}%</div></div>` : '';
+            
             return `<div class="rp-header"><img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="rp-logo"><div class="rp-title">My Day Matcha</div></div>
                 <div style="font-size:9px;margin-bottom:15px;">${d.date} ${d.time} | #${d.id}</div><div class="rp-items">${rows}</div>
-                <div class="rp-total">TOTAL: ${total.toLocaleString()} KHR</div>
+                ${discHTML}
+                <div class="rp-total">TOTAL: ${finalTotal.toLocaleString()} KHR</div>
                 <div style="margin-top:20px; font-size:10px; font-weight:600; line-height:1.6;">
                     Order online via Telegram @mydaymatcha<br>
                     Truly appreciate your support
                 </div>`;
         }
 
-        /* --- FIXED OPEN MODAL: KEEPS OPEN IF ACTION RETURNS FALSE --- */
         function openModal(t, c, a, cl = 'CANCEL') {
             document.getElementById('mTitle').innerHTML = t; 
             document.getElementById('mText').innerHTML = c;
@@ -612,11 +908,7 @@
             btn.parentNode.replaceChild(newBtn, btn);
             newBtn.innerText = cl === 'PRINT' ? 'PRINT' : 'YES';
             newBtn.onclick = () => { 
-                if(a) {
-                    if (a() !== false) closeModal();
-                } else {
-                    closeModal();
-                }
+                if(a) { if (a() !== false) closeModal(); } else { closeModal(); }
             };
             document.getElementById('modal').classList.add('open');
         }
@@ -634,7 +926,7 @@
             newBtn.onclick = () => {
                 if (input.value === "YESDELETEALL") {
                     closeModal();
-                    fetch(GOOGLE_SCRIPT_URL, {method:'POST', body:JSON.stringify({action:'clear_all'})}).then(()=>openHistory());
+                    fetch(GOOGLE_SCRIPT_URL, {method:'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body:JSON.stringify({action:'clear_all'})}).then(()=>openHistory());
                 } else {
                     input.style.borderColor = "red";
                     input.classList.add('shake');
@@ -660,15 +952,17 @@
                 let grandTotal = 0;
                 data.forEach(item => {
                     grandTotal += item.price;
-                    if(!historyData[item.id]) {
-                        historyData[item.id] = { id: item.id, time: item.time, date: item.date, total: 0, items: [] };
+                    let rowId = item.id ? item.id : (item.date + '-' + item.time);
+                    if(!historyData[rowId]) {
+                        historyData[rowId] = { id: rowId, time: item.time, date: item.date, total: 0, items: [] };
                     }
-                    historyData[item.id].total += item.price;
-                    let existingItem = historyData[item.id].items.find(i => i.name === item.name);
-                    if(existingItem) { existingItem.qty++; } else { historyData[item.id].items.push({ name: item.name, price: item.price, qty: 1, sweetness: '', milkOption: '' }); }
+                    historyData[rowId].total += item.price;
+                    let existingItem = historyData[rowId].items.find(i => i.name === item.name);
+                    if(existingItem) { existingItem.qty++; } else { historyData[rowId].items.push({ name: item.name, price: item.price, qty: 1, sweetness: '', milkOption: '' }); }
                 });
                 document.getElementById('historyTotalTitle').innerText = grandTotal.toLocaleString() + ' KHR';
-                Object.keys(historyData).reverse().forEach(id => {
+                
+                Object.keys(historyData).sort((a, b) => b.localeCompare(a)).forEach(id => {
                     const order = historyData[id];
                     const div = document.createElement('div');
                     div.className = 'history-card';
@@ -696,7 +990,6 @@
             }, 'PRINT');
         }
 
-        /* --- MANAGER LOGIC --- */
         function openManager() {
             toggleSettings(false);
             const list = document.getElementById('managerList');
@@ -704,14 +997,9 @@
             document.getElementById('managerPage').classList.add('open');
             
             fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(res => res.json()).then(data => {
-                if(data && data.length > 0) {
-                    renderManagerList(data);
-                } else {
-                    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Menu is empty</div>';
-                }
-            }).catch(e => {
-                list.innerHTML = '<div style="padding:20px;text-align:center;color:red">Connection Error</div>';
-            });
+                if(data && data.length > 0) { renderManagerList(data); } 
+                else { list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Menu is empty</div>'; }
+            }).catch(e => { list.innerHTML = '<div style="padding:20px;text-align:center;color:red">Connection Error</div>'; });
         }
 
         function renderManagerList(items) {
@@ -720,7 +1008,6 @@
             items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'manager-card';
-                // Pass item stringified to avoid quote issues
                 const itemStr = encodeURIComponent(JSON.stringify(item));
                 div.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -729,20 +1016,14 @@
                             <div style="font-size:11px; color:var(--text-muted);">${item.category} | ${item.price.toLocaleString()} KHR</div>
                         </div>
                         <button class="text-btn" style="border:1px solid var(--border);" onclick="editItem('${itemStr}')">EDIT</button>
-                    </div>
-                `;
+                    </div>`;
                 list.appendChild(div);
             });
         }
 
-        function newItem() {
-            openEditor({ category:'', id:'', name:'', price:0, cost:0, hasMilk:false, oatPrice:0, image:'' });
-        }
+        function newItem() { openEditor({ category:'', id:'', name:'', price:0, cost:0, hasMilk:false, oatPrice:0, image:'' }); }
 
-        function editItem(itemStr) {
-            const item = JSON.parse(decodeURIComponent(itemStr));
-            openEditor(item);
-        }
+        function editItem(itemStr) { const item = JSON.parse(decodeURIComponent(itemStr)); openEditor(item); }
 
         function openEditor(item) {
             document.getElementById('eCat').value = item.category;
@@ -753,77 +1034,258 @@
             document.getElementById('eMilk').checked = item.hasMilk;
             document.getElementById('eOat').value = item.oatPrice;
             document.getElementById('eImg').value = item.image;
-            
             document.getElementById('editorModal').classList.add('open');
         }
 
         function saveItem() {
             const item = {
-                category: document.getElementById('eCat').value,
-                id: document.getElementById('eId').value,
-                name: document.getElementById('eName').value,
-                price: Number(document.getElementById('ePrice').value),
-                cost: Number(document.getElementById('eCost').value),
-                hasMilk: document.getElementById('eMilk').checked,
-                oatPrice: Number(document.getElementById('eOat').value),
-                image: document.getElementById('eImg').value
+                category: document.getElementById('eCat').value, id: document.getElementById('eId').value, name: document.getElementById('eName').value,
+                price: Number(document.getElementById('ePrice').value), cost: Number(document.getElementById('eCost').value),
+                hasMilk: document.getElementById('eMilk').checked, oatPrice: Number(document.getElementById('eOat').value), image: document.getElementById('eImg').value
             };
-
-            if(!item.id || !item.name) { 
-                openModal('ERROR', 'ID and Name are required', null, 'CLOSE'); 
-                return; 
-            }
-
+            if(!item.id || !item.name) { openModal('ERROR', 'ID and Name are required', null, 'CLOSE'); return; }
             document.getElementById('editorModal').classList.remove('open');
             document.getElementById('managerList').innerHTML = '<div style="padding:20px;text-align:center;">Saving...</div>';
             
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'save_item', ...item })
-            }).then(res => res.json()).then(data => {
-                if(data.status === 'success') {
-                    openManager(); // Reload list
-                    fetchMenu(); // Reload main menu
-                } else {
-                    openModal('ERROR', 'Error saving item: ' + (data.message || "Unknown error"), null, 'CLOSE');
-                    openManager(); 
-                }
-            }).catch(err => {
-                openModal('ERROR', 'Connection Error. Please try again.', null, 'CLOSE');
-                openManager();
-            });
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'save_item', ...item }) })
+            .then(res => res.json()).then(data => {
+                if(data.status === 'success') { openManager(); fetchMenu(); } 
+                else { openModal('ERROR', 'Error saving item: ' + (data.message || "Unknown error"), null, 'CLOSE'); openManager(); }
+            }).catch(err => { openModal('ERROR', 'Connection Error.', null, 'CLOSE'); openManager(); });
         }
 
-        function confirmDelete() {
-            openModal('DELETE?', 'Are you sure you want to delete this item permanently?', () => deleteItem());
-        }
+        function confirmDelete() { openModal('DELETE?', 'Are you sure you want to delete this item permanently?', () => deleteItem()); }
 
         function deleteItem() {
             const id = document.getElementById('eId').value;
             if(!id) return;
-
             document.getElementById('editorModal').classList.remove('open');
             document.getElementById('managerList').innerHTML = '<div style="padding:20px;text-align:center;">Deleting...</div>';
 
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'delete_item', id: id }) })
+            .then(res => res.json()).then(data => {
+                if(data.status === 'success') { openManager(); fetchMenu(); } 
+                else { openModal('ERROR', 'Error deleting item', null, 'CLOSE'); openManager(); }
+            }).catch(err => { openModal('ERROR', 'Connection Error.', null, 'CLOSE'); openManager(); });
+        }
+
+        function addPendingInventory() {
+            const item = document.getElementById('invItem').value;
+            const unit = document.getElementById('invUnit').value;
+            const amt = document.getElementById('invAmount').value;
+            const cost = document.getElementById('invCost').value;
+
+            if(!item || !unit || !amt || !cost) { openModal('ERROR', 'All fields are required', null, 'CLOSE'); return; }
+
+            pendingInventory.push({ item: item, qty: amt + ' x ' + unit, cost: Number(cost) });
+            
+            document.getElementById('invItem').value = '';
+            document.getElementById('invUnit').value = '';
+            document.getElementById('invAmount').value = '';
+            document.getElementById('invCost').value = '';
+            renderPendingInv();
+        }
+
+        function removePendingInv(index) {
+            pendingInventory.splice(index, 1);
+            renderPendingInv();
+        }
+
+        function renderPendingInv() {
+            const list = document.getElementById('pendingInvList');
+            const btn = document.getElementById('btnSaveInv');
+            list.innerHTML = '';
+            if(pendingInventory.length > 0) {
+                pendingInventory.forEach((p, i) => {
+                    list.innerHTML += `<div class="pending-item">
+                        <div><b>${p.item}</b> (${p.qty})</div>
+                        <div><span style="color:#FF3B30; font-weight:bold;">${p.cost.toLocaleString()} KHR</span> <button class="text-btn" style="margin-left:10px; color:var(--text-muted); font-size:16px; padding:0 5px;" onclick="removePendingInv(${i})">×</button></div>
+                    </div>`;
+                });
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function saveInventory() {
+            if(pendingInventory.length === 0) return;
+            document.getElementById('inventoryList').innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">Saving Records...</div>';
+            
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'delete_item', id: id })
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'save_inventory', user: deviceName, items: pendingInventory })
             }).then(res => res.json()).then(data => {
-                if(data.status === 'success') {
-                    openManager();
-                    fetchMenu();
+                pendingInventory = [];
+                renderPendingInv();
+                fetchInventoryAndStats();
+            }).catch(e => {
+                openModal('ERROR', 'Failed to save inventory.', null, 'CLOSE');
+                fetchInventoryAndStats();
+            });
+        }
+
+        function fetchInventoryAndStats() {
+            const list = document.getElementById('inventoryList');
+            const dash = document.getElementById('invDashboard');
+            
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">Loading Records...</div>';
+            dash.style.opacity = '0.5';
+
+            Promise.all([
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory').then(r=>r.json()),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_history').then(r=>r.json())
+            ]).then(([invData, histData]) => {
+                
+                list.innerHTML = '';
+                let totalInvCost = 0;
+                
+                if(invData.length === 0 || !invData.length) { 
+                    list.innerHTML = '<div style="text-align:center; color:var(--text-muted);">No records found this month.</div>'; 
                 } else {
-                    openModal('ERROR', 'Error deleting item', null, 'CLOSE');
-                    openManager();
+                    invData.forEach(log => {
+                        totalInvCost += Number(log.cost);
+                        const div = document.createElement('div');
+                        div.className = 'history-card';
+                        const logStr = encodeURIComponent(JSON.stringify(log));
+                        div.innerHTML = `
+                            <div class="hc-header">
+                                <span>${log.date} ${log.time}</span>
+                                <div>
+                                    <span style="font-weight:500; margin-right: 5px;">${log.user}</span>
+                                    <button class="text-btn" style="padding:2px 6px; font-size:10px; border:1px solid var(--border);" onclick="openInvEditor('${logStr}')">EDIT</button>
+                                    <button class="text-btn" style="padding:2px 6px; font-size:12px; border:1px solid #FF3B30; color:#FF3B30; margin-left: 3px;" onclick="confirmDeleteInv('${logStr}')">×</button>
+                                </div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                                <div style="font-size:13px;"><b>${log.item}</b> <span style="color:var(--text-muted);">(${log.qty})</span></div>
+                                <div style="color:#FF3B30; font-weight:700; font-size:14px;">-${Number(log.cost).toLocaleString()} KHR</div>
+                            </div>
+                        `;
+                        list.appendChild(div);
+                    });
                 }
-            }).catch(err => {
-                openModal('ERROR', 'Connection Error.', null, 'CLOSE');
-                openManager();
+
+                let totalSales = 0;
+                if(histData.length > 0) {
+                    histData.forEach(item => { totalSales += Number(item.price); });
+                }
+
+                let realProfit = totalSales - totalInvCost;
+                let totalCombined = totalSales + totalInvCost;
+                
+                let salesPct = totalCombined > 0 ? Math.round((totalSales / totalCombined) * 100) : 50;
+                let expPct = totalCombined > 0 ? Math.round((totalInvCost / totalCombined) * 100) : 50;
+                
+                let profitColor = realProfit >= 0 ? "var(--primary)" : "#FF3B30";
+
+                document.getElementById('dashSales').innerText = '+' + totalSales.toLocaleString() + ' KHR';
+                document.getElementById('dashCost').innerText = '-' + totalInvCost.toLocaleString() + ' KHR';
+                
+                const dProfit = document.getElementById('dashProfit');
+                dProfit.innerText = 'Actual Profit: ' + realProfit.toLocaleString() + ' KHR';
+                dProfit.style.color = profitColor;
+                
+                document.getElementById('dashPie').style.background = `conic-gradient(var(--primary) 0% ${salesPct}%, #FF3B30 ${salesPct}% 100%)`;
+                document.getElementById('dashPieText').innerText = salesPct + '%';
+                
+                document.getElementById('dashSalesPct').innerText = salesPct;
+                document.getElementById('dashExpPct').innerText = expPct;
+
+                dash.style.opacity = '1';
+
+            }).catch(e => { 
+                list.innerHTML = '<div style="text-align:center; color:red;">Connection Error</div>'; 
+                dash.style.opacity = '1'; 
+            });
+        }
+
+        function toggleAllTimeStats() {
+            const panel = document.getElementById('allTimeStats');
+            const content = document.getElementById('allTimeContent');
+            const loading = document.getElementById('allTimeLoading');
+
+            if(panel.style.display === 'none') {
+                panel.style.display = 'flex';
+                loading.style.display = 'block';
+                content.style.display = 'none';
+
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_all_time_stats')
+                .then(r => r.json())
+                .then(data => {
+                    let sales = data.sales || 0;
+                    let cost = data.cost || 0;
+                    let profit = sales - cost;
+
+                    document.getElementById('atSales').innerText = '+' + sales.toLocaleString() + ' KHR';
+                    document.getElementById('atCost').innerText = '-' + cost.toLocaleString() + ' KHR';
+                    
+                    let pEl = document.getElementById('atProfit');
+                    pEl.innerText = 'All Time Profit: ' + profit.toLocaleString() + ' KHR';
+                    pEl.style.color = profit >= 0 ? "var(--primary)" : "#FF3B30";
+
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+                }).catch(e => {
+                    loading.innerText = 'Error loading connection.';
+                });
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function openInvEditor(logStr) {
+            const log = JSON.parse(decodeURIComponent(logStr));
+            document.getElementById('eiOldDate').value = log.date;
+            document.getElementById('eiOldTime').value = log.time;
+            document.getElementById('eiOldItem').value = log.item;
+            
+            document.getElementById('eiItem').value = log.item;
+            document.getElementById('eiQty').value = log.qty;
+            document.getElementById('eiCost').value = log.cost;
+            
+            document.getElementById('invEditorModal').classList.add('open');
+        }
+
+        function saveEditedInventory() {
+            const oldDate = document.getElementById('eiOldDate').value;
+            const oldTime = document.getElementById('eiOldTime').value;
+            const oldItem = document.getElementById('eiOldItem').value;
+            
+            const newItem = document.getElementById('eiItem').value;
+            const newQty = document.getElementById('eiQty').value;
+            const newCost = document.getElementById('eiCost').value;
+            
+            if(!newItem || !newCost) { openModal('ERROR', 'Item and Cost are required', null, 'CLOSE'); return; }
+            
+            document.getElementById('invEditorModal').classList.remove('open');
+            document.getElementById('inventoryList').innerHTML = '<div style="text-align:center; padding:20px;">Updating...</div>';
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ 
+                    action: 'edit_inventory', 
+                    old_date: oldDate, old_time: oldTime, old_item: oldItem,
+                    new_item: newItem, new_qty: newQty, new_cost: Number(newCost)
+                })
+            }).then(r => r.json()).then(data => { fetchInventoryAndStats();
+            }).catch(e => { openModal('ERROR', 'Failed to update record.', null, 'CLOSE'); fetchInventoryAndStats(); });
+        }
+
+        function confirmDeleteInv(logStr) {
+            openModal('DELETE?', 'Delete this inventory record permanently?', () => {
+                const log = JSON.parse(decodeURIComponent(logStr));
+                document.getElementById('inventoryList').innerHTML = '<div style="text-align:center; padding:20px;">Deleting...</div>';
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'delete_inventory', date: log.date, time: log.time, item: log.item })
+                }).then(r => r.json()).then(data => { fetchInventoryAndStats();
+                }).catch(e => { openModal('ERROR', 'Failed to delete record.', null, 'CLOSE'); fetchInventoryAndStats(); });
             });
         }
     </script>
 </body>
 </html>
-
-
-
