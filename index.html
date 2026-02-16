@@ -31,7 +31,7 @@
             --anim-speed: 0.25s;
             --anim-curve: cubic-bezier(0.2, 0, 0, 1);
             
-            /* UPDATED FROM YOUR SNIPPET (LIGHT MODE) */
+            /* LIQUID GLASS THEME VARIABLES (LIGHT) */
             --glass-bg: rgba(255, 255, 255, 0.2);
             --glass-border: rgba(255, 255, 255, 0.3);
         }
@@ -44,7 +44,7 @@
             --text-muted: #888888; 
             --border: #333333; 
             
-            /* UPDATED FROM YOUR SNIPPET (DARK MODE ADAPTATION) */
+            /* LIQUID GLASS THEME VARIABLES (DARK) */
             --glass-bg: rgba(25, 25, 25, 0.2);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
@@ -124,7 +124,7 @@
         .setting-label { font-weight: 600; font-size: 14px; }
         .setting-val { color: var(--text-muted); font-size: 13px; font-weight: 500; }
 
-        /* UPDATED: FLOATING PILL BOTTOM NAV (USING YOUR SNIPPET) */
+        /* FLOATING PILL BOTTOM NAV (MOBILE) */
         .bottom-nav { 
             display: flex; position: fixed; 
             bottom: 30px; left: 50%; transform: translateX(-50%); 
@@ -142,13 +142,15 @@
             background: transparent; border: none; letter-spacing: 0.5px; transition: background-color 0.3s, transform 0.3s; 
             border-radius: 30px; position: relative; cursor: pointer;
         }
-        /* ADDED: HOVER EFFECT FROM YOUR SNIPPET */
         .nav-item:hover {
             background-color: var(--glass-bg);
         }
         .nav-item.active { background: var(--primary); color: white; }
         .nav-item:active { transform: scale(0.95); }
         
+        /* LOYALTY FADE BLUE STYLING */
+        .loyalty-pill { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0284c7; }
+
         .nav-badge { 
             position: absolute; top: 2px; right: 5px; background: #FF3B30; color: white; 
             font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 10px; opacity: 0; transition: 0.2s; transform: scale(0); 
@@ -182,6 +184,7 @@
             
             #managerPage .app-header, #historyPage .app-header, #inventoryPage .app-header { height: 70px !important; padding: 0 20px !important; }
 
+            /* Desktop Inventory Split Layout */
             .inv-container { 
                 max-width: 1200px !important; 
                 display: grid !important; 
@@ -281,12 +284,14 @@
         .hc-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
         .hc-total { text-align: right; font-weight: 700; font-size: 14px; color: var(--primary); padding-top: 5px; }
 
+        /* UPGRADED DONUT CHART STYLES */
         .dashboard-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 25px 20px; margin-bottom: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); transition: opacity 0.3s ease; }
         .dash-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
         .dash-val { font-weight: 700; }
         .profit-val { font-size: 18px; text-align: right; margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 15px; font-weight: 800; }
         
-        .chart-container { display: flex; gap: 30px; align-items: center; margin-top: 25px; padding: 20px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); }
+        /* FIXED: REDUCED GAP FOR MOBILE SCREENS SO TEXT DOES NOT WRAP */
+        .chart-container { display: flex; gap: 20px; align-items: center; margin-top: 25px; padding: 20px; background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border); }
         
         .pie-chart { 
             width: 120px; height: 120px; 
@@ -309,7 +314,10 @@
         }
         
         .chart-legend { flex: 1; display: flex; flex-direction: column; gap: 14px; }
-        .legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--text); }
+        
+        /* FIXED: FORCED WHITE-SPACE NOWRAP SO "(94%)" NEVER BREAKS TO A NEW LINE */
+        .legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; }
+        
         .dot { width: 14px; height: 14px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .dot.sales { background: var(--primary); }
         .dot.expenses { background: #FF3B30; }
@@ -394,7 +402,7 @@
             <div class="setting-card" onclick="openHistory()"><div class="setting-label">History</div><div class="setting-val">View ></div></div>
             <div class="setting-card" onclick="openManager()"><div class="setting-label">Manage Menu</div><div class="setting-val">></div></div>
             
-            <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card" style="text-decoration: none; border: none; justify-content: center; margin-top: 15px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0284c7;">
+            <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card loyalty-pill" style="text-decoration: none; border: none; justify-content: center; margin-top: 15px;">
                 <div class="setting-label" style="font-size: 14px; font-weight: 800;">Customer Loyalty</div>
             </a>
             
@@ -1289,6 +1297,3 @@
     </script>
 </body>
 </html>
-
-
-
