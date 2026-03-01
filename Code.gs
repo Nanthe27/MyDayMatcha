@@ -32,7 +32,15 @@ function doGet(e) {
     var history = [];
     for (var i = 0; i < data.length; i++) {
       if (data[i][0] === "TOTALS") continue;
-      history.push({ id: data[i][0], date: data[i][1], time: data[i][2], name: data[i][4], price: data[i][5] });
+      var dateVal = data[i][1];
+      var dateStr = (dateVal instanceof Date)
+          ? Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "dd/MM/yyyy")
+          : String(dateVal);
+      var timeVal = data[i][2];
+      var timeStr = (timeVal instanceof Date)
+          ? Utilities.formatDate(timeVal, Session.getScriptTimeZone(), "HH:mm:ss")
+          : String(timeVal);
+      history.push({ id: data[i][0], date: dateStr, time: timeStr, name: data[i][4], price: data[i][5] });
     }
     return ContentService.createTextOutput(JSON.stringify(history.reverse())).setMimeType(ContentService.MimeType.JSON);
   }
