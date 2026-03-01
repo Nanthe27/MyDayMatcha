@@ -366,6 +366,33 @@
         .month-nav-btn:active { transform: scale(0.88); background: var(--border); }
         .month-nav-label { font-size: 15px; font-weight: 700; color: var(--text); min-width: 145px; text-align: center; }
 
+        /* SYNC BUTTON */
+        .sync-btn {
+            background: transparent; border: none;
+            color: var(--text-muted); font-size: 22px; cursor: pointer;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; transition: color 0.2s, background 0.2s;
+        }
+        .sync-btn:hover { color: var(--primary); background: var(--surface-hover); }
+        .sync-btn.syncing { color: var(--primary); }
+        .sync-icon { display: inline-block; font-size: 20px; line-height: 1; transition: transform 0.3s; }
+        .sync-btn.syncing .sync-icon { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* DAILY BREAKDOWN */
+        .day-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+        .day-tab {
+            padding: 6px 12px; border-radius: 20px;
+            border: 1px solid var(--border); background: var(--bg);
+            font-size: 12px; font-weight: 700; color: var(--text-muted);
+            cursor: pointer; transition: 0.15s;
+        }
+        .day-tab.active, .day-tab:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .day-detail { background: var(--bg); border-radius: var(--radius); padding: 15px; border: 1px solid var(--border); }
+        .day-stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; font-weight: 600; }
+        .day-stat-row:last-child { border-bottom: none; }
+
         #receiptContainer { display: none; }
         @media print {
             body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal, #inventoryPage, #invEditorModal { display: none !important; }
@@ -381,6 +408,7 @@
     <div id="loginScreen">
         <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo">
         <h2 id="loginTitle" class="login-title">It's loading, wait abit</h2>
+        <div id="appVersionDisplay" style="font-size:11px; color:var(--text-muted); margin-top:-30px; margin-bottom:20px; font-weight:600; letter-spacing:1.5px;"></div>
         <div id="userListGrid" style="display:flex; flex-direction:column;"></div>
         <div id="pinContainer" style="display:none; flex-direction:column; align-items:center;">
             <div id="pinDisplay" class="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
@@ -398,7 +426,12 @@
             <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="app-logo">
             MY DAY MATCHA
         </div>
-        <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleSettings()">☰</button>
+        <div style="display:flex; align-items:center; gap:4px;">
+            <button id="syncBtn" class="sync-btn" onclick="forceSync()" title="Force Sync Data">
+                <span class="sync-icon">↻</span>
+            </button>
+            <button id="hamburgerBtn" class="hamburger-btn" onclick="toggleSettings()">☰</button>
+        </div>
     </header>
 
     <div class="main-stage">
@@ -436,6 +469,11 @@
             <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card loyalty-pill" style="text-decoration: none; border: none; justify-content: center; margin-top: 15px;">
                 <div class="setting-label" style="font-size: 14px; font-weight: 800;">Customer Loyalty</div>
             </a>
+
+            <div class="setting-card" onclick="logout()" style="margin-top:8px; border-color:rgba(255,59,48,0.3);">
+                <div class="setting-label" style="color:#FF3B30;">Logout</div>
+                <div class="setting-val" style="color:#FF3B30;">→</div>
+            </div>
             
             <div class="desktop-nav-group">
                 <h3 style="margin-top:20px; margin-bottom:20px; color:var(--text-muted); font-size:12px; letter-spacing:1px;">APP NAVIGATION</h3>
@@ -523,7 +561,7 @@
                     </div>
 
                     <button class="text-btn" style="width:100%; margin-top:20px; font-size:12px; font-weight:800; color:var(--text-muted); text-align:center; border-top:1px solid var(--border); border-radius:0; padding-top:15px; padding-bottom:5px;" onclick="toggleAllTimeStats()">VIEW ALL TIME PROFIT ▾</button>
-                    
+
                     <div id="allTimeStats" style="display:none; flex-direction:column; margin-top:10px; padding-top:15px; border-top:1px dashed var(--border);">
                         <div style="text-align:center; color:var(--text-muted); font-size:12px;" id="allTimeLoading">Loading All-Time Data...</div>
                         <div id="allTimeContent" style="display:none;">
@@ -532,6 +570,12 @@
                             <div class="profit-val" id="atProfit" style="font-size:16px; border-top:none; margin-top:5px; padding-top:5px;">All Time Profit: 0 KHR</div>
                         </div>
                     </div>
+                </div>
+
+                <div class="dashboard-card" id="dailyBreakdownCard" style="display:none;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px;">📅 Daily Breakdown</div>
+                    <div id="dayTabsContainer" class="day-tabs"></div>
+                    <div id="dayDetailContainer" class="day-detail"></div>
                 </div>
             </div>
 
@@ -604,7 +648,8 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const IS_TEST_MODE = false; 
+        const APP_VERSION = 'v2.4';
+        const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
         const GOOGLE_SCRIPT_URL = IS_TEST_MODE ? TEST_URL : LIVE_URL;
@@ -645,6 +690,9 @@
         });
 
         window.onload = () => {
+            const verEl = document.getElementById('appVersionDisplay');
+            if (verEl) verEl.innerText = APP_VERSION;
+
             fetchUsers(); fetchMenu();
             const savedSess = localStorage.getItem('myday_session');
             if (savedSess) {
@@ -655,6 +703,7 @@
                         const ude = document.getElementById('currentUserDisplay');
                         if (ude) ude.innerText = deviceName;
                         document.getElementById('loginScreen').classList.add('hidden');
+                        _backgroundSync();
                         return;
                     }
                 } catch(e) {}
@@ -717,8 +766,9 @@
 
                     const userDisplayElement = document.getElementById('currentUserDisplay');
                     if (userDisplayElement) { userDisplayElement.innerText = deviceName; }
-                    
-                    document.getElementById('loginScreen').classList.add('hidden'); 
+
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    _backgroundSync();
                 } else { 
                     alert("Login Failed: " + (data.message || "Incorrect PIN. Check your Google Sheet."));
                     const display = document.getElementById('pinDisplay'); display.classList.add('shake'); 
@@ -1400,6 +1450,8 @@
             document.getElementById('dashSalesPct').innerText = salesPct;
             document.getElementById('dashExpPct').innerText = expPct;
             dash.style.opacity = '1';
+
+            _renderDailyBreakdown(invData, histData);
         }
 
         function toggleAllTimeStats() {
@@ -1487,6 +1539,105 @@
                 }).then(r => r.json()).then(data => { fetchInventoryAndStats();
                 }).catch(e => { openModal('ERROR', 'Failed to delete record.', null, 'CLOSE'); fetchInventoryAndStats(); });
             });
+        }
+
+        function _backgroundSync() {
+            const btn = document.getElementById('syncBtn');
+            if (btn) btn.classList.add('syncing');
+            const mk = fmtMonthKey(new Date());
+            Promise.all([
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(r => r.json()).then(d => { localStorage.setItem('myday_users', JSON.stringify(d)); renderUserGrid(d); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(r => r.json()).then(d => { localStorage.setItem('myday_menu', JSON.stringify(d)); processMenuData(d); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_inv_' + mk, JSON.stringify(d)); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_history_' + mk, JSON.stringify(d)); })
+            ]).then(() => {
+                if (btn) btn.classList.remove('syncing');
+            }).catch(() => {
+                if (btn) btn.classList.remove('syncing');
+            });
+        }
+
+        function forceSync() {
+            const btn = document.getElementById('syncBtn');
+            if (btn && btn.classList.contains('syncing')) return;
+            if (btn) btn.classList.add('syncing');
+
+            const mk = fmtMonthKey(new Date());
+            ['myday_users', 'myday_menu', 'myday_inv_' + mk, 'myday_history_' + mk].forEach(k => localStorage.removeItem(k));
+
+            const toast = document.getElementById('toast');
+            Promise.all([
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(r => r.json()).then(d => { localStorage.setItem('myday_users', JSON.stringify(d)); renderUserGrid(d); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(r => r.json()).then(d => { localStorage.setItem('myday_menu', JSON.stringify(d)); processMenuData(d); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_inv_' + mk, JSON.stringify(d)); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_history_' + mk, JSON.stringify(d)); })
+            ]).then(() => {
+                if (btn) btn.classList.remove('syncing');
+                toast.innerText = '✓ Synced!'; toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 1500);
+            }).catch(() => {
+                if (btn) btn.classList.remove('syncing');
+                toast.innerText = 'Sync Failed'; toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('myday_session');
+            deviceName = "Unknown";
+            toggleSettings(false);
+            showLogin();
+        }
+
+        function _renderDailyBreakdown(invData, histData) {
+            const card = document.getElementById('dailyBreakdownCard');
+            const tabsEl = document.getElementById('dayTabsContainer');
+            const detailEl = document.getElementById('dayDetailContainer');
+            if (!card || !tabsEl || !detailEl) return;
+
+            if (histData.length === 0 && invData.length === 0) { card.style.display = 'none'; return; }
+            card.style.display = 'block';
+
+            let days = {};
+            histData.forEach(item => {
+                const d = typeof item.date === 'string' ? item.date : String(item.date);
+                if (!days[d]) days[d] = { income: 0, drinks: 0, cost: 0 };
+                days[d].income += Number(item.price);
+                days[d].drinks++;
+            });
+            invData.forEach(item => {
+                const d = typeof item.date === 'string' ? item.date : String(item.date);
+                if (!days[d]) days[d] = { income: 0, drinks: 0, cost: 0 };
+                days[d].cost += Number(item.cost);
+            });
+
+            const sortedDays = Object.keys(days).sort((a, b) => b.localeCompare(a));
+            tabsEl.innerHTML = '';
+            sortedDays.forEach((day, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'day-tab' + (idx === 0 ? ' active' : '');
+                btn.innerText = day;
+                btn.onclick = () => {
+                    tabsEl.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    _renderDayDetail(days[day], day, detailEl);
+                };
+                tabsEl.appendChild(btn);
+            });
+
+            if (sortedDays.length > 0) _renderDayDetail(days[sortedDays[0]], sortedDays[0], detailEl);
+        }
+
+        function _renderDayDetail(d, date, el) {
+            const profit = d.income - d.cost;
+            const profitColor = profit >= 0 ? 'var(--primary)' : '#FF3B30';
+            el.innerHTML = `
+                <div class="day-stat-row"><span style="color:var(--text-muted)">Date</span><span style="font-weight:700;">${date}</span></div>
+                <div class="day-stat-row"><span style="color:var(--text-muted)">Drinks Sold</span><span style="color:var(--primary); font-weight:800;">${d.drinks}</span></div>
+                <div class="day-stat-row"><span style="color:var(--text-muted)">Total Income</span><span style="color:var(--primary); font-weight:700;">+${d.income.toLocaleString()} KHR</span></div>
+                <div class="day-stat-row"><span style="color:var(--text-muted)">Expenses</span><span style="color:#FF3B30; font-weight:700;">-${d.cost.toLocaleString()} KHR</span></div>
+                <div class="day-stat-row" style="border-top:1px solid var(--border); padding-top:12px; margin-top:4px;"><span style="font-weight:800;">Net Profit</span><span style="color:${profitColor}; font-weight:800; font-size:16px;">${profit >= 0 ? '+' : ''}${profit.toLocaleString()} KHR</span></div>
+            `;
         }
     </script>
 </body>
