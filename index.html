@@ -588,7 +588,7 @@
             </div>
 
             <div class="dashboard-card" id="dailyBreakdownCard" style="display:none;">
-                <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px;">📅 Daily Breakdown</div>
+                <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px;">Daily Breakdown</div>
                 <div id="dayCalendar" class="day-cal-wrap"></div>
                 <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
                 <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px; font-style:italic; letter-spacing:0.3px;">Today's Date Profit is <b>-NOT-</b> Actual Profit a Month</div>
@@ -1749,7 +1749,7 @@
             el.innerHTML = `
                 <div class="day-stat-row"><span style="color:var(--text-muted)">Date</span><span style="font-weight:700;">${_toDisplayDate(date)}</span></div>
                 <div class="day-stat-row" style="cursor:pointer;" onclick="_showDrinksPopup('${date}')">
-                    <span style="color:var(--text-muted)">Drinks Sold &nbsp;<span style="font-size:10px; opacity:0.6;">👆 tap to view</span></span>
+                    <span style="color:var(--text-muted)">Drinks Sold &nbsp;<span style="font-size:10px; opacity:0.6;">Tap to view</span></span>
                     <span style="color:var(--primary); font-weight:800;">${d.drinks}</span>
                 </div>
                 <div class="day-stat-row"><span style="color:var(--text-muted)">Total Income</span><span style="color:var(--primary); font-weight:700;">+${d.income.toLocaleString()} KHR</span></div>
@@ -1789,6 +1789,7 @@
     </script>
 </body>
 </html>
+
 
 
 
