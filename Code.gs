@@ -30,12 +30,23 @@ function doGet(e) {
     if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
     var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getValues();
     var history = [];
+    var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     for (var i = 0; i < data.length; i++) {
       if (data[i][0] === "TOTALS") continue;
-      var dateVal = data[i][1];
-      var dateStr = (dateVal instanceof Date)
-          ? Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "dd/MM/yyyy")
-          : String(dateVal);
+      var idStr = String(data[i][0]);
+      var dateStr;
+      // Derive date from Order ID (YYYYMMDD-NNN) — immune to sheet locale/format bugs
+      if (/^\d{8}-\d{3}$/.test(idStr)) {
+        var yyyy = idStr.substr(0, 4);
+        var mm   = parseInt(idStr.substr(4, 2));
+        var dd   = idStr.substr(6, 2);
+        dateStr  = dd + '-' + MONTHS_SHORT[mm - 1] + '-' + yyyy;
+      } else {
+        var dateVal = data[i][1];
+        dateStr = (dateVal instanceof Date)
+            ? Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "dd-MMM-yyyy")
+            : String(dateVal);
+      }
       var timeVal = data[i][2];
       var timeStr = (timeVal instanceof Date)
           ? Utilities.formatDate(timeVal, Session.getScriptTimeZone(), "HH:mm:ss")
@@ -118,7 +129,7 @@ function doPost(e) {
       var lastRow = sheet.getLastRow();
       if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") sheet.deleteRow(lastRow);
       var time = new Date().toLocaleTimeString('en-GB');
-      var date = new Date().toLocaleDateString('en-GB');
+      var date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy");
 
       if (data.items && data.items.length > 0) {
         var newRows = [];
@@ -207,7 +218,7 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({"status": "cleared"})).setMimeType(ContentService.MimeType.JSON);
     }
     var time = new Date().toLocaleTimeString('en-GB');
-    var date = Utilities.formatDate(targetDate, Session.getScriptTimeZone(), "dd/MM/yyyy");
+    var date = Utilities.formatDate(targetDate, Session.getScriptTimeZone(), "dd-MMM-yyyy");
     var newRows = [];
     data.items.forEach(function(item) {
       newRows.push([item.id, date, time, data.user, item.name, item.price, item.cost, 1, item.price - item.cost]);
