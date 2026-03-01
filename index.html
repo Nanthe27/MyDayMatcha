@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" id="themeColorMeta" content="#FFFFFF">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="My Day Matcha">
@@ -67,12 +66,12 @@
         .main-stage, .modal-box, #loginScreen, .cart-area.active, .settings-area.active, #managerPage, #editorModal, #inventoryPage, #invEditorModal { animation: fadeScale var(--anim-speed) var(--anim-curve); }
 
         /* --- HEADER --- */
-        .app-header { 
-            height: calc(70px + env(safe-area-inset-top)); 
-            padding: env(safe-area-inset-top) 20px 0 20px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: var(--surface); border-bottom: 1px solid var(--border); 
-            z-index: 50; flex-shrink: 0; 
+        .app-header {
+            height: calc(54px + env(safe-area-inset-top));
+            padding: env(safe-area-inset-top) 20px 0 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            z-index: 50; flex-shrink: 0;
         }
         
         .brand { font-family: 'Quicksand', sans-serif; font-size: 18px; font-weight: 700; color: var(--primary); letter-spacing: 0.5px; display: flex; align-items: center; gap: 10px; }
@@ -105,10 +104,10 @@
         .drink-info-box { flex: 1; display: flex; align-items: center; overflow: hidden; }
         .drink-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); line-height: 1.2; }
 
-        .cart-area { 
-            display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); 
-            position: fixed; 
-            top: calc(70px + env(safe-area-inset-top)); 
+        .cart-area {
+            display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius);
+            position: fixed;
+            top: calc(54px + env(safe-area-inset-top));
             bottom: 80px; 
             left: 0; width: 100%; height: auto; 
             z-index: 150; opacity: 0; visibility: hidden; pointer-events: none; 
@@ -116,8 +115,8 @@
         }
         .cart-area.active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
 
-        .settings-area { 
-            padding-top: calc(70px + env(safe-area-inset-top)) !important; 
+        .settings-area {
+            padding-top: calc(54px + env(safe-area-inset-top)) !important;
             display: flex; flex-direction: column; background: var(--bg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; opacity: 0; visibility: hidden; pointer-events: none; padding: 20px; transition: all var(--anim-speed) var(--anim-curve); backdrop-filter: blur(10px); 
         }
         .settings-area.active { opacity: 1; visibility: visible; pointer-events: auto; }
@@ -381,15 +380,19 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* DAILY BREAKDOWN */
-        .day-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-        .day-tab {
-            padding: 6px 12px; border-radius: 20px;
-            border: 1px solid var(--border); background: var(--bg);
-            font-size: 12px; font-weight: 700; color: var(--text-muted);
-            cursor: pointer; transition: 0.15s;
+        .day-date-select {
+            width: 100%; padding: 12px 40px 12px 15px;
+            border: 1px solid var(--border); border-radius: var(--radius);
+            background: var(--bg); color: var(--text);
+            font-size: 14px; font-weight: 700; font-family: 'Inter', sans-serif;
+            outline: none; cursor: pointer;
+            appearance: none; -webkit-appearance: none;
+            margin-bottom: 15px; transition: border-color 0.2s;
         }
-        .day-tab.active, .day-tab:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        .day-detail { background: var(--bg); border-radius: var(--radius); padding: 15px; border: 1px solid var(--border); }
+        .day-date-select:focus { border-color: var(--primary); }
+        .day-select-wrap { position: relative; margin-bottom: 0; }
+        .day-select-arrow { position: absolute; right: 14px; top: 50%; transform: translateY(-65%); pointer-events: none; color: var(--text-muted); font-size: 10px; }
+        .day-detail { background: var(--bg); border-radius: var(--radius); padding: 15px; border: 1px solid var(--border); margin-top: 12px; }
         .day-stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; font-weight: 600; }
         .day-stat-row:last-child { border-bottom: none; }
 
@@ -470,9 +473,11 @@
                 <div class="setting-label" style="font-size: 14px; font-weight: 800;">Customer Loyalty</div>
             </a>
 
-            <div class="setting-card" onclick="logout()" style="margin-top:8px; border-color:rgba(255,59,48,0.3);">
-                <div class="setting-label" style="color:#FF3B30;">Logout</div>
-                <div class="setting-val" style="color:#FF3B30;">→</div>
+            <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px;">
+                <div class="setting-card" onclick="logout()" style="border-color:rgba(255,59,48,0.3);">
+                    <div class="setting-label" style="color:#FF3B30;">Logout</div>
+                    <div class="setting-val" style="color:#FF3B30;">→</div>
+                </div>
             </div>
             
             <div class="desktop-nav-group">
@@ -574,8 +579,13 @@
 
                 <div class="dashboard-card" id="dailyBreakdownCard" style="display:none;">
                     <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px;">📅 Daily Breakdown</div>
-                    <div id="dayTabsContainer" class="day-tabs"></div>
-                    <div id="dayDetailContainer" class="day-detail"></div>
+                    <div class="day-select-wrap">
+                        <select id="daySelect" class="day-date-select" onchange="_onDaySelectChange(this)">
+                            <option>Loading...</option>
+                        </select>
+                        <span class="day-select-arrow">▼</span>
+                    </div>
+                    <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
                 </div>
             </div>
 
@@ -1095,7 +1105,13 @@
         }
 
         function closeModal() { document.getElementById('modal').classList.remove('open'); }
-        function toggleTheme() { const b = document.body; const isDark = b.getAttribute('data-theme') === 'dark'; b.setAttribute('data-theme', isDark ? 'light' : 'dark'); document.getElementById('themeDisplay').innerText = isDark ? 'Light Mode' : 'Dark Mode'; }
+        function toggleTheme() {
+            const b = document.body;
+            const isDark = b.getAttribute('data-theme') === 'dark';
+            b.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('themeDisplay').innerText = isDark ? 'Light Mode' : 'Dark Mode';
+            document.getElementById('themeColorMeta').content = isDark ? '#FFFFFF' : '#111111';
+        }
         
         function openHistory() {
             historyMonthDate = new Date();
@@ -1589,43 +1605,69 @@
             showLogin();
         }
 
+        function _normDate(raw) {
+            if (!raw) return '';
+            const s = String(raw);
+            if (s.includes('T') || s.includes('Z')) {
+                const dt = new Date(raw);
+                if (!isNaN(dt)) return dt.toLocaleDateString('en-GB');
+            }
+            return s;
+        }
+
         function _renderDailyBreakdown(invData, histData) {
             const card = document.getElementById('dailyBreakdownCard');
-            const tabsEl = document.getElementById('dayTabsContainer');
+            const selectEl = document.getElementById('daySelect');
             const detailEl = document.getElementById('dayDetailContainer');
-            if (!card || !tabsEl || !detailEl) return;
+            if (!card || !selectEl || !detailEl) return;
 
             if (histData.length === 0 && invData.length === 0) { card.style.display = 'none'; return; }
             card.style.display = 'block';
 
             let days = {};
             histData.forEach(item => {
-                const d = typeof item.date === 'string' ? item.date : String(item.date);
+                const d = _normDate(item.date);
+                if (!d) return;
                 if (!days[d]) days[d] = { income: 0, drinks: 0, cost: 0 };
                 days[d].income += Number(item.price);
                 days[d].drinks++;
             });
             invData.forEach(item => {
-                const d = typeof item.date === 'string' ? item.date : String(item.date);
+                const d = _normDate(item.date);
+                if (!d) return;
                 if (!days[d]) days[d] = { income: 0, drinks: 0, cost: 0 };
                 days[d].cost += Number(item.cost);
             });
 
-            const sortedDays = Object.keys(days).sort((a, b) => b.localeCompare(a));
-            tabsEl.innerHTML = '';
-            sortedDays.forEach((day, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'day-tab' + (idx === 0 ? ' active' : '');
-                btn.innerText = day;
-                btn.onclick = () => {
-                    tabsEl.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
-                    btn.classList.add('active');
-                    _renderDayDetail(days[day], day, detailEl);
-                };
-                tabsEl.appendChild(btn);
+            const sortedDays = Object.keys(days).sort((a, b) => {
+                const [da, ma, ya] = a.split('/').map(Number);
+                const [db, mb, yb] = b.split('/').map(Number);
+                return new Date(yb, mb - 1, db) - new Date(ya, ma - 1, da);
             });
 
-            if (sortedDays.length > 0) _renderDayDetail(days[sortedDays[0]], sortedDays[0], detailEl);
+            selectEl.innerHTML = '';
+            sortedDays.forEach(day => {
+                const opt = document.createElement('option');
+                opt.value = day; opt.innerText = day;
+                selectEl.appendChild(opt);
+            });
+
+            selectEl._daysData = days;
+            if (sortedDays.length > 0) {
+                selectEl.value = sortedDays[0];
+                detailEl.style.display = 'block';
+                _renderDayDetail(days[sortedDays[0]], sortedDays[0], detailEl);
+            }
+        }
+
+        function _onDaySelectChange(sel) {
+            const day = sel.value;
+            const days = sel._daysData;
+            const detailEl = document.getElementById('dayDetailContainer');
+            if (days && days[day] && detailEl) {
+                detailEl.style.display = 'block';
+                _renderDayDetail(days[day], day, detailEl);
+            }
         }
 
         function _renderDayDetail(d, date, el) {
