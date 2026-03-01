@@ -389,19 +389,22 @@
 
         /* DAILY BREAKDOWN */
         .day-cal-wrap { margin-bottom: 8px; }
-        .day-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .day-cal-title { font-size: 13px; font-weight: 800; color: var(--text); }
-        .day-cal-nav { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); cursor: pointer; width: 28px; height: 28px; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
-        .day-cal-nav:active { background: var(--surface-hover); }
-        .day-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-        .day-cal-dow { font-size: 9px; font-weight: 700; color: var(--text-muted); text-align: center; padding: 2px 0 5px; text-transform: uppercase; }
-        .day-cal-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: default; }
-        .day-cal-cell.has-data { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-weight: 700; cursor: pointer; transition: 0.15s; }
-        .day-cal-cell.has-data:active { transform: scale(0.9); }
-        .day-cal-cell.selected { background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; }
+        .day-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .day-cal-title { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: 0.3px; }
+        .day-cal-nav { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); cursor: pointer; width: 32px; height: 32px; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.15s; flex-shrink: 0; }
+        .day-cal-nav:hover { border-color: var(--primary); color: var(--primary); }
+        .day-cal-nav:active { transform: scale(0.9); }
+        .day-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day-cal-dow { font-size: 9px; font-weight: 700; color: var(--text-muted); text-align: center; padding: 4px 0 8px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .day-cal-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: default; transition: 0.15s; }
+        .day-cal-cell.has-data { background: color-mix(in srgb, var(--primary) 10%, var(--bg)); border: 1.5px solid color-mix(in srgb, var(--primary) 35%, transparent); color: var(--primary); font-weight: 800; cursor: pointer; }
+        .day-cal-cell.has-data:hover { background: color-mix(in srgb, var(--primary) 18%, var(--bg)); }
+        .day-cal-cell.has-data:active { transform: scale(0.88); }
+        .day-cal-cell.selected { background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 45%, transparent); }
         .day-detail { background: var(--bg); border-radius: var(--radius); padding: 15px; border: 1px solid var(--border); margin-top: 12px; }
-        .day-stat-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; font-weight: 600; }
+        .day-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600; gap: 8px; }
         .day-stat-row:last-child { border-bottom: none; }
+        .day-stat-profit { background: color-mix(in srgb, #FFD60A 12%, var(--bg)); border-radius: 10px; padding: 12px 14px !important; margin-top: 6px; border: 1.5px solid color-mix(in srgb, #FFD60A 35%, transparent) !important; }
         .day-drinks-modal { position: fixed; inset: 0; z-index: 400; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); animation: fadeScale 0.2s var(--anim-curve); }
         .day-drinks-box { background: var(--surface); border-radius: var(--radius); padding: 20px; width: 88%; max-width: 360px; max-height: 70vh; display: flex; flex-direction: column; }
         .day-drinks-box-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
@@ -593,10 +596,10 @@
             </div>
 
             <div class="dashboard-card" id="dailyBreakdownCard" style="display:none;">
-                <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px;">Daily Breakdown</div>
+                <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 18px; display:flex; align-items:center; gap:6px;">Daily Breakdown</div>
                 <div id="dayCalendar" class="day-cal-wrap"></div>
                 <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
-                <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:10px; font-style:italic; letter-spacing:0.3px;">Today's Date Profit is <b>-NOT-</b> Actual Profit a Month</div>
+                <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:12px; font-style:italic; letter-spacing:0.3px; opacity:0.7;">Day's Net Profit ≠ Monthly Actual Profit</div>
             </div>
 
             <div class="inv-left-col">
@@ -668,7 +671,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v3.3';
+        const APP_VERSION = 'v3.4';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1653,7 +1656,12 @@
             const s = String(raw);
             if (s.includes('T') || s.includes('Z')) {
                 const dt = new Date(raw);
-                if (!isNaN(dt)) return dt.toLocaleDateString('en-GB');
+                if (!isNaN(dt)) {
+                    const day   = String(dt.getUTCDate()).padStart(2, '0');
+                    const month = String(dt.getUTCMonth() + 1).padStart(2, '0');
+                    const year  = dt.getUTCFullYear();
+                    return `${day}/${month}/${year}`;
+                }
             }
             return s;
         }
@@ -1751,17 +1759,18 @@
 
         function _renderDayDetail(d, date, el) {
             const profit = d.income - d.drinksCost;
+            const profitColor = profit >= 0 ? '#34C759' : '#FF3B30';
             el.innerHTML = `
-                <div class="day-stat-row"><span style="color:var(--text-muted)">Date</span><span style="font-weight:700;">${_toDisplayDate(date)}</span></div>
+                <div class="day-stat-row"><span style="color:var(--text-muted)">📅 Date</span><span style="font-weight:700;">${_toDisplayDate(date)}</span></div>
                 <div class="day-stat-row" style="cursor:pointer;" onclick="_showDrinksPopup('${date}')">
-                    <span style="color:var(--text-muted)">Drinks Sold &nbsp;<span style="font-size:10px; opacity:0.6;">Tap to view</span></span>
-                    <span style="color:var(--primary); font-weight:800;">${d.drinks}</span>
+                    <span style="color:var(--text-muted)">Drinks Sold &nbsp;<span style="font-size:10px; opacity:0.6;">tap to view ›</span></span>
+                    <span style="color:var(--primary); font-weight:800; font-size:15px;">${d.drinks}</span>
                 </div>
-                <div class="day-stat-row"><span style="color:var(--text-muted)">Total Income</span><span style="color:var(--primary); font-weight:700;">+${d.income.toLocaleString()} KHR</span></div>
-                <div class="day-stat-row"><span style="color:var(--text-muted)">Drinks Cost</span><span style="color:#FF3B30; font-weight:700;">-${d.drinksCost.toLocaleString()} KHR</span></div>
-                <div class="day-stat-row" style="border-top:1px solid var(--border); padding-top:12px; margin-top:4px;">
-                    <span style="font-weight:800;">Today's Date Profit</span>
-                    <span style="color:#FFD60A; font-weight:800; font-size:16px;">${profit >= 0 ? '+' : ''}${profit.toLocaleString()} KHR</span>
+                <div class="day-stat-row"><span style="color:var(--text-muted)">💵 Total Income</span><span style="color:var(--primary); font-weight:700;">+${d.income.toLocaleString()} KHR</span></div>
+                <div class="day-stat-row"><span style="color:var(--text-muted)">📦 Drinks Cost</span><span style="color:#FF3B30; font-weight:700;">-${d.drinksCost.toLocaleString()} KHR</span></div>
+                <div class="day-stat-row day-stat-profit">
+                    <span style="font-weight:800; color:var(--text);">Day's Net Profit</span>
+                    <span style="color:${profitColor}; font-weight:800; font-size:16px;">${profit >= 0 ? '+' : ''}${profit.toLocaleString()} KHR</span>
                 </div>
             `;
         }
