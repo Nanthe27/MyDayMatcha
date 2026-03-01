@@ -836,16 +836,40 @@
                 html += `<div style="text-align:right; font-size:12px; color:#FF3B30; margin-top:5px;">Order Discount: -${globalOrderDiscount}%</div>`;
             }
             html += `</div><div style="text-align:right; font-weight:700; color:var(--primary); margin-top:10px; font-size:18px;">${finalTotal.toLocaleString()} KHR</div>`;
-            
+
+            const _t = new Date();
+            const _todayStr = `${_t.getFullYear()}-${String(_t.getMonth()+1).padStart(2,'0')}-${String(_t.getDate()).padStart(2,'0')}`;
+            html += `<div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px;">
+                <span style="font-size:12px; color:var(--text-muted); font-weight:600; white-space:nowrap;">ORDER DATE</span>
+                <input type="date" id="orderDatePicker" value="${_todayStr}" style="border:1px solid var(--border); border-radius:8px; padding:6px 10px; font-size:14px; font-family:inherit; background:var(--bg); color:var(--text); flex:1;">
+            </div>`;
+
             openModal('CONFIRM', html, () => processOrder());
         }
 
         function processOrder() {
-            const now = new Date(); dailyOrderCount++;
-            localStorage.setItem('myday_counter_' + now.toDateString(), dailyOrderCount);
-            const id = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(dailyOrderCount).padStart(3,'0')}`;
-            const dateStr = now.toLocaleDateString('en-GB');
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const pickerEl = document.getElementById('orderDatePicker');
+            let orderDate;
+            if (pickerEl && pickerEl.value) {
+                const [y, m, d] = pickerEl.value.split('-').map(Number);
+                orderDate = new Date(y, m - 1, d);
+            } else {
+                orderDate = new Date();
+            }
+            const isToday = orderDate.toDateString() === new Date().toDateString();
+            let counter;
+            if (isToday) {
+                dailyOrderCount++;
+                counter = dailyOrderCount;
+            } else {
+                const pastKey = 'myday_counter_' + orderDate.toDateString();
+                counter = (parseInt(localStorage.getItem(pastKey)) || 0) + 1;
+                localStorage.setItem(pastKey, counter);
+            }
+            const orderDateStr = `${orderDate.getFullYear()}-${String(orderDate.getMonth()+1).padStart(2,'0')}-${String(orderDate.getDate()).padStart(2,'0')}`;
+            const id = `${orderDate.getFullYear()}${String(orderDate.getMonth()+1).padStart(2,'0')}${String(orderDate.getDate()).padStart(2,'0')}-${String(counter).padStart(3,'0')}`;
+            const dateStr = orderDate.toLocaleDateString('en-GB');
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
             const payload = currentOrder.map(i => {
                 let baseP = i.price + (i.milkOption==='Oat'?i.oatPrice:0);
@@ -857,7 +881,7 @@
                 return { id, name: `${i.name} (${i.sweetness})${discNameStr}${globalDiscStr}`, price: finalP, cost: i.cost, qty: 1, profit: 0 };
             });
             
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ user: deviceName, items: payload }) });
+            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ user: deviceName, items: payload, orderDate: orderDateStr }) });
             
             const orderForPrint = { id, date: dateStr, time: timeStr, items: getGroupedItems(currentOrder), globalDiscount: globalOrderDiscount };
             
