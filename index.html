@@ -388,19 +388,13 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* DAILY BREAKDOWN */
-        .day-cal-wrap { margin-bottom: 8px; }
-        .day-cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .day-cal-title { font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: 0.3px; }
-        .day-cal-nav { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; color: var(--text); cursor: pointer; width: 32px; height: 32px; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.15s; flex-shrink: 0; }
-        .day-cal-nav:hover { border-color: var(--primary); color: var(--primary); }
-        .day-cal-nav:active { transform: scale(0.9); }
-        .day-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-cal-dow { font-size: 9px; font-weight: 700; color: var(--text-muted); text-align: center; padding: 4px 0 8px; text-transform: uppercase; letter-spacing: 0.4px; }
-        .day-cal-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: default; transition: 0.15s; }
-        .day-cal-cell.has-data { background: color-mix(in srgb, var(--primary) 10%, var(--bg)); border: 1.5px solid color-mix(in srgb, var(--primary) 35%, transparent); color: var(--primary); font-weight: 800; cursor: pointer; }
-        .day-cal-cell.has-data:hover { background: color-mix(in srgb, var(--primary) 18%, var(--bg)); }
-        .day-cal-cell.has-data:active { transform: scale(0.88); }
-        .day-cal-cell.selected { background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 45%, transparent); }
+        .day-date-scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; margin-bottom: 10px; }
+        .day-date-scroll-wrap::-webkit-scrollbar { height: 3px; }
+        .day-date-scroll-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .day-date-scroll { display: flex; gap: 7px; width: max-content; padding: 2px 1px; }
+        .day-date-pill { padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: var(--bg); border: 1.5px solid var(--border); color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: 0.15s; flex-shrink: 0; }
+        .day-date-pill:active { transform: scale(0.93); }
+        .day-date-pill.selected { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 3px 10px color-mix(in srgb, var(--primary) 40%, transparent); }
         .day-detail { background: var(--bg); border-radius: var(--radius); padding: 15px; border: 1px solid var(--border); margin-top: 12px; }
         .day-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600; gap: 8px; }
         .day-stat-row:last-child { border-bottom: none; }
@@ -597,7 +591,7 @@
 
             <div class="dashboard-card" id="dailyBreakdownCard" style="display:none;">
                 <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 18px; display:flex; align-items:center; gap:6px;">Daily Breakdown</div>
-                <div id="dayCalendar" class="day-cal-wrap"></div>
+                <div class="day-date-scroll-wrap"><div id="dayCalendar" class="day-date-scroll"></div></div>
                 <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
                 <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:12px; font-style:italic; letter-spacing:0.3px; opacity:0.7;">Day's Net Profit ≠ Monthly Actual Profit</div>
             </div>
@@ -671,7 +665,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v3.5';
+        const APP_VERSION = 'v3.6';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1702,58 +1696,43 @@
             });
 
             if (sortedDays.length > 0) {
-                const [df, mf, yf] = sortedDays[0].split('/').map(Number);
-                _renderCalendar(calEl, yf, mf, days, sortedDays[0]);
+                _renderDateScroll(calEl, days, sortedDays[0]);
                 detailEl.style.display = 'block';
                 _renderDayDetail(days[sortedDays[0]], sortedDays[0], detailEl);
             }
         }
 
-        function _renderCalendar(calEl, year, month, days, selectedDay) {
-            calEl._year = year; calEl._month = month; calEl._daysData = days; calEl._selectedDay = selectedDay;
-            const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-            const dataSet = {};
-            Object.keys(days).forEach(k => {
-                const [d, m, y] = k.split('/').map(Number);
-                if (y === year && m === month) dataSet[d] = k;
+        const _MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        function _toPillLabel(s) {
+            const [d, m, y] = s.split('/').map(Number);
+            return `${String(d).padStart(2,'0')}-${_MONTHS_SHORT[m-1]}-${y}`;
+        }
+
+        function _renderDateScroll(scrollEl, days, selectedDay) {
+            scrollEl._daysData = days;
+            scrollEl._selectedDay = selectedDay;
+            const sorted = Object.keys(days).sort((a, b) => {
+                const [da, ma, ya] = a.split('/').map(Number);
+                const [db, mb, yb] = b.split('/').map(Number);
+                return new Date(yb, mb - 1, db) - new Date(ya, ma - 1, da);
             });
-            const firstDow = new Date(year, month - 1, 1).getDay();
-            const daysInMonth = new Date(year, month, 0).getDate();
-            let cells = '';
-            ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => { cells += `<div class="day-cal-dow">${d}</div>`; });
-            for (let i = 0; i < firstDow; i++) cells += '<div class="day-cal-cell"></div>';
-            for (let d = 1; d <= daysInMonth; d++) {
-                const key = dataSet[d];
-                const isSel = key && key === selectedDay;
-                const cls = 'day-cal-cell' + (key ? ' has-data' : '') + (isSel ? ' selected' : '');
-                const cb = key ? `onclick="_onDayCalClick('${key}')"` : '';
-                cells += `<div class="${cls}" ${cb}>${d}</div>`;
-            }
-            calEl.innerHTML = `
-                <div class="day-cal-header">
-                    <button class="day-cal-nav" onclick="_calNav(-1)">‹</button>
-                    <span class="day-cal-title">${MONTHS[month-1]} ${year}</span>
-                    <button class="day-cal-nav" onclick="_calNav(1)">›</button>
-                </div>
-                <div class="day-cal-grid">${cells}</div>`;
+            scrollEl.innerHTML = sorted.map(k =>
+                `<div class="day-date-pill${k === selectedDay ? ' selected' : ''}" onclick="_onDatePillClick('${k}')">${_toPillLabel(k)}</div>`
+            ).join('');
+            const selEl = scrollEl.querySelector('.selected');
+            if (selEl) selEl.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
         }
 
-        function _calNav(dir) {
-            const calEl = document.getElementById('dayCalendar');
-            let m = calEl._month + dir, y = calEl._year;
-            if (m > 12) { m = 1; y++; } if (m < 1) { m = 12; y--; }
-            _renderCalendar(calEl, y, m, calEl._daysData, calEl._selectedDay);
-        }
-
-        function _onDayCalClick(dayStr) {
-            const calEl = document.getElementById('dayCalendar');
+        function _onDatePillClick(dayStr) {
+            const scrollEl = document.getElementById('dayCalendar');
             const detailEl = document.getElementById('dayDetailContainer');
-            calEl._selectedDay = dayStr;
-            const [d, m, y] = dayStr.split('/').map(Number);
-            _renderCalendar(calEl, y, m, calEl._daysData, dayStr);
-            if (calEl._daysData && calEl._daysData[dayStr] && detailEl) {
+            scrollEl._selectedDay = dayStr;
+            scrollEl.querySelectorAll('.day-date-pill').forEach(p => {
+                p.classList.toggle('selected', p.getAttribute('onclick') === `_onDatePillClick('${dayStr}')`);
+            });
+            if (scrollEl._daysData && scrollEl._daysData[dayStr] && detailEl) {
                 detailEl.style.display = 'block';
-                _renderDayDetail(calEl._daysData[dayStr], dayStr, detailEl);
+                _renderDayDetail(scrollEl._daysData[dayStr], dayStr, detailEl);
             }
         }
 
