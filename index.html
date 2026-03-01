@@ -245,6 +245,8 @@
         #loginScreen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
         .login-logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary); margin-bottom: 20px; }
         .login-title { font-family: 'Quicksand', sans-serif; font-size: 24px; color: var(--primary); margin-bottom: 40px; }
+        #updateRefreshBtn { margin-top: 28px; padding: 10px 22px; background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--text-muted); font-size: 12px; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
+        #updateRefreshBtn:active { background: var(--surface); color: var(--primary); border-color: var(--primary); }
         .user-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 260px; height: 60px; margin-bottom: 12px; border-radius: var(--radius); font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 1px; transition: 0.2s; }
         .pin-display { display: flex; gap: 15px; margin-bottom: 30px; width: 200px; justify-content: center; height: 20px; }
         .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--border); transition: 0.2s; }
@@ -414,6 +416,7 @@
         <h2 id="loginTitle" class="login-title">It's loading, wait abit</h2>
         <div id="appVersionDisplay" style="font-size:11px; color:var(--text-muted); margin-top:-30px; margin-bottom:20px; font-weight:600; letter-spacing:1.5px;"></div>
         <div id="userListGrid" style="display:flex; flex-direction:column;"></div>
+        <button id="updateRefreshBtn" onclick="hardRefreshApp()" title="Check for app updates">↻ Check for Update</button>
         <div id="pinContainer" style="display:none; flex-direction:column; align-items:center;">
             <div id="pinDisplay" class="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
             <div class="numpad-grid">
@@ -659,7 +662,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v2.6';
+        const APP_VERSION = 'v2.7';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -700,9 +703,41 @@
             if(e.key === 'Enter') checkPin();
         });
 
+        function hardRefreshApp() {
+            const btn = document.getElementById('updateRefreshBtn');
+            if (btn) { btn.innerText = 'Refreshing…'; btn.disabled = true; }
+            fetch(window.location.href, { cache: 'no-store' })
+                .then(r => r.text())
+                .then(html => {
+                    const m = html.match(/const APP_VERSION\s*=\s*'([^']+)'/);
+                    if (m && m[1] !== APP_VERSION) {
+                        window.location.reload(true);
+                    } else {
+                        if (btn) { btn.innerText = '✓ Already up to date'; btn.disabled = false; }
+                        setTimeout(() => { if (btn) { btn.innerText = '↻ Check for Update'; } }, 2500);
+                    }
+                })
+                .catch(() => {
+                    window.location.reload(true);
+                });
+        }
+
+        function _startVersionPoller() {
+            setInterval(() => {
+                fetch(window.location.href, { cache: 'no-store' })
+                    .then(r => r.text())
+                    .then(html => {
+                        const m = html.match(/const APP_VERSION\s*=\s*'([^']+)'/);
+                        if (m && m[1] !== APP_VERSION) window.location.reload(true);
+                    })
+                    .catch(() => {});
+            }, 5 * 60 * 1000);
+        }
+
         window.onload = () => {
             const verEl = document.getElementById('appVersionDisplay');
             if (verEl) verEl.innerText = APP_VERSION;
+            _startVersionPoller();
 
             fetchUsers(); fetchMenu();
             const savedSess = localStorage.getItem('myday_session');
