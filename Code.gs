@@ -23,7 +23,8 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify(menu)).setMimeType(ContentService.MimeType.JSON);
   }
   if (action == 'get_history') {
-    var monthSheetName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy");
+    var monthParam = e.parameter.month;
+    var monthSheetName = monthParam || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy");
     var ss = SpreadsheetApp.openById(SHEET_ID);
     var sheet = ss.getSheetByName(monthSheetName);
     if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
@@ -36,7 +37,8 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify(history.reverse())).setMimeType(ContentService.MimeType.JSON);
   }
   if (action == 'get_inventory') {
-    var monthSheetName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy") + "_Inv";
+    var monthParam = e.parameter.month;
+    var monthSheetName = (monthParam || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy")) + "_Inv";
     var ss = SpreadsheetApp.openById(SHEET_ID);
     var sheet = ss.getSheetByName(monthSheetName);
     if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);

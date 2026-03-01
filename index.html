@@ -350,6 +350,22 @@
             text-transform: uppercase; color: var(--primary); margin-bottom: 8px;
         }
 
+        .month-nav {
+            display: flex; align-items: center; justify-content: center;
+            gap: 16px; padding: 10px 15px;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            flex-shrink: 0; width: 100%;
+        }
+        .month-nav-btn {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 20px; width: 34px; height: 34px; font-size: 20px;
+            cursor: pointer; color: var(--text);
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.15s; padding: 0; line-height: 1;
+        }
+        .month-nav-btn:active { transform: scale(0.88); background: var(--border); }
+        .month-nav-label { font-size: 15px; font-weight: 700; color: var(--text); min-width: 145px; text-align: center; }
+
         #receiptContainer { display: none; }
         @media print {
             body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal, #inventoryPage, #invEditorModal { display: none !important; }
@@ -452,6 +468,11 @@
             <span id="historyTotalTitle" style="font-weight:700; color:var(--primary); font-size:18px;">0 KHR</span>
             <button class="text-btn" style="color:#FF3B30;" onclick="requestDeleteHistory()">DELETE ALL</button>
         </div>
+        <div class="month-nav">
+            <button class="month-nav-btn" onclick="changeHistoryMonth(-1)">‹</button>
+            <div id="historyMonthLabel" class="month-nav-label">Loading...</div>
+            <button class="month-nav-btn" id="historyNextBtn" onclick="changeHistoryMonth(1)">›</button>
+        </div>
         <div id="historyLastRecord" style="width:100%; max-width:600px; margin:0 auto; padding:10px 10px 0 10px; flex-shrink:0;"></div>
         <div id="historyList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom:100px;"></div>
     </div>
@@ -476,7 +497,13 @@
             
             <div class="dashboard-wrapper">
                 <div class="dashboard-card">
-                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase;">This Month</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px;">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase;" id="finMonthLabel">This Month</div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <button class="month-nav-btn" style="width:28px;height:28px;font-size:16px;" onclick="changeFinMonth(-1)">‹</button>
+                            <button class="month-nav-btn" id="finNextBtn" style="width:28px;height:28px;font-size:16px;" onclick="changeFinMonth(1)">›</button>
+                        </div>
+                    </div>
                     
                     <div id="invDashboard" style="transition: opacity 0.3s ease;">
                         <div class="dash-row"><span style="color:var(--text-muted)">Total Sales Income</span><span class="dash-val" id="dashSales" style="color:var(--primary); transition: color 0.3s ease;">+0 KHR</span></div>
@@ -594,6 +621,20 @@
         let historyData = {}; 
         let pendingInventory = [];
         let globalOrderDiscount = 0;
+        let historyMonthDate = new Date();
+        let finMonthDate = new Date();
+
+        function fmtMonthKey(d) {
+            const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return M[d.getMonth()] + '_' + d.getFullYear();
+        }
+        function fmtMonthLabel(d) {
+            return d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        }
+        function isCurrentMonth(d) {
+            const n = new Date();
+            return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+        }
 
         document.addEventListener('keydown', (e) => {
             if(document.getElementById('loginScreen').classList.contains('hidden')) return;
@@ -603,7 +644,23 @@
             if(e.key === 'Enter') checkPin();
         });
 
-        window.onload = () => { fetchUsers(); fetchMenu(); showLogin(); };
+        window.onload = () => {
+            fetchUsers(); fetchMenu();
+            const savedSess = localStorage.getItem('myday_session');
+            if (savedSess) {
+                try {
+                    const sess = JSON.parse(savedSess);
+                    if (Date.now() - sess.loginTime < 36000000) {
+                        deviceName = sess.user;
+                        const ude = document.getElementById('currentUserDisplay');
+                        if (ude) ude.innerText = deviceName;
+                        document.getElementById('loginScreen').classList.add('hidden');
+                        return;
+                    }
+                } catch(e) {}
+            }
+            showLogin();
+        };
 
         function fetchUsers() {
             const cachedUsers = localStorage.getItem('myday_users');
@@ -654,9 +711,10 @@
             })
             .then(res => res.json()).then(data => {
                 document.getElementById('pinDisplay').style.opacity = '1';
-                if(data.status === 'success') { 
-                    deviceName = tempSelectedUser; 
-                    
+                if(data.status === 'success') {
+                    deviceName = tempSelectedUser;
+                    localStorage.setItem('myday_session', JSON.stringify({ user: deviceName, loginTime: Date.now() }));
+
                     const userDisplayElement = document.getElementById('currentUserDisplay');
                     if (userDisplayElement) { userDisplayElement.innerText = deviceName; }
                     
@@ -791,6 +849,7 @@
             const invPanel = document.getElementById('inventoryPage');
             
             if (t === 'inventory') {
+                finMonthDate = new Date();
                 invPanel.classList.add('open');
                 fetchInventoryAndStats();
             } else {
@@ -989,61 +1048,95 @@
         function toggleTheme() { const b = document.body; const isDark = b.getAttribute('data-theme') === 'dark'; b.setAttribute('data-theme', isDark ? 'light' : 'dark'); document.getElementById('themeDisplay').innerText = isDark ? 'Light Mode' : 'Dark Mode'; }
         
         function openHistory() {
+            historyMonthDate = new Date();
             toggleSettings(false);
+            document.getElementById('historyPage').classList.add('open');
+            _loadHistory();
+        }
+
+        function changeHistoryMonth(dir) {
+            const d = new Date(historyMonthDate.getFullYear(), historyMonthDate.getMonth() + dir, 1);
+            const now = new Date();
+            if (d.getFullYear() > now.getFullYear() || (d.getFullYear() === now.getFullYear() && d.getMonth() > now.getMonth())) return;
+            historyMonthDate = d;
+            _loadHistory();
+        }
+
+        function _loadHistory() {
+            const mk = fmtMonthKey(historyMonthDate);
+            document.getElementById('historyMonthLabel').innerText = fmtMonthLabel(historyMonthDate);
+            const nextBtn = document.getElementById('historyNextBtn');
+            const atCurrent = isCurrentMonth(historyMonthDate);
+            nextBtn.style.opacity = atCurrent ? '0.3' : '1';
+            nextBtn.style.pointerEvents = atCurrent ? 'none' : 'auto';
+
             const list = document.getElementById('historyList');
             const lastRec = document.getElementById('historyLastRecord');
-            list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading...</div>';
-            lastRec.innerHTML = '';
-            document.getElementById('historyPage').classList.add('open');
             document.getElementById('historyTotalTitle').innerText = '0 KHR';
-            fetch(GOOGLE_SCRIPT_URL + '?action=get_history').then(r=>r.json()).then(data => {
-                list.innerHTML = '';
-                if(data.length === 0) { list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">No sales this month</div>'; return; }
-                historyData = {};
-                let grandTotal = 0;
-                data.forEach(item => {
-                    grandTotal += item.price;
-                    let rowId = item.id ? item.id : (item.date + '-' + item.time);
-                    if(!historyData[rowId]) {
-                        historyData[rowId] = { id: rowId, time: item.time, date: item.date, total: 0, items: [] };
-                    }
-                    historyData[rowId].total += item.price;
-                    let existingItem = historyData[rowId].items.find(i => i.name === item.name);
-                    if(existingItem) { existingItem.qty++; } else { historyData[rowId].items.push({ name: item.name, price: item.price, qty: 1, sweetness: '', milkOption: '' }); }
+
+            const cached = localStorage.getItem('myday_history_' + mk);
+            if (cached) {
+                _renderHistory(JSON.parse(cached));
+            } else {
+                list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading...</div>';
+                lastRec.innerHTML = '';
+            }
+
+            fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk)
+                .then(r => r.json())
+                .then(data => {
+                    localStorage.setItem('myday_history_' + mk, JSON.stringify(data));
+                    _renderHistory(data);
+                })
+                .catch(e => {
+                    if (!cached) list.innerHTML = '<div style="padding:20px;text-align:center;color:red">Error loading history</div>';
                 });
-                document.getElementById('historyTotalTitle').innerText = grandTotal.toLocaleString() + ' KHR';
+        }
 
-                const sortedKeys = Object.keys(historyData).sort((a, b) => b.localeCompare(a));
-
-                // Last record highlight
-                if(sortedKeys.length > 0) {
-                    const lastOrder = historyData[sortedKeys[0]];
-                    const lastItems = lastOrder.items.map(i => (i.qty > 1 ? `x${i.qty} ` : '') + i.name).join(', ');
-                    lastRec.innerHTML = `
-                        <div class="last-record-card">
-                            <div class="last-record-label">Last Sale</div>
-                            <div class="hc-header" style="border-bottom:none; padding-bottom:0;">#${lastOrder.id} &nbsp;·&nbsp; ${lastOrder.date} ${lastOrder.time}</div>
-                            <div style="font-size:13px; margin-top:6px; color:var(--text-muted);">${lastItems}</div>
-                            <div class="hc-total" style="font-size:20px;">${lastOrder.total.toLocaleString()} KHR</div>
-                        </div>`;
-                }
-
-                sortedKeys.forEach(id => {
-                    const order = historyData[id];
-                    const div = document.createElement('div');
-                    div.className = 'history-card';
-                    let itemsDisplay = order.items.map(i => (i.qty > 1 ? `x${i.qty} ` : '') + i.name).join(', ');
-                    div.innerHTML = `
-                        <div class="hc-header">
-                            <span>#${id} | ${order.date} ${order.time}</span>
-                            <button class="text-btn" style="padding:4px 8px; font-size:10px; border:1px solid var(--border);" onclick="printHistory('${id}')">PRINT</button>
-                        </div>
-                        <div style="font-size:13px;">${itemsDisplay}</div>
-                        <div class="hc-total">${order.total.toLocaleString()} KHR</div>
-                    `;
-                    list.appendChild(div);
-                });
-            }).catch(e => { list.innerHTML = '<div style="padding:20px;text-align:center;color:red">Error loading history</div>'; });
+        function _renderHistory(data) {
+            const list = document.getElementById('historyList');
+            const lastRec = document.getElementById('historyLastRecord');
+            list.innerHTML = '';
+            lastRec.innerHTML = '';
+            if (data.length === 0) { list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">No sales this month</div>'; return; }
+            historyData = {};
+            let grandTotal = 0;
+            data.forEach(item => {
+                grandTotal += item.price;
+                let rowId = item.id ? item.id : (item.date + '-' + item.time);
+                if (!historyData[rowId]) historyData[rowId] = { id: rowId, time: item.time, date: item.date, total: 0, items: [] };
+                historyData[rowId].total += item.price;
+                let ex = historyData[rowId].items.find(i => i.name === item.name);
+                if (ex) { ex.qty++; } else { historyData[rowId].items.push({ name: item.name, price: item.price, qty: 1, sweetness: '', milkOption: '' }); }
+            });
+            document.getElementById('historyTotalTitle').innerText = grandTotal.toLocaleString() + ' KHR';
+            const sortedKeys = Object.keys(historyData).sort((a, b) => b.localeCompare(a));
+            if (sortedKeys.length > 0) {
+                const lastOrder = historyData[sortedKeys[0]];
+                const lastItems = lastOrder.items.map(i => (i.qty > 1 ? `x${i.qty} ` : '') + i.name).join(', ');
+                lastRec.innerHTML = `
+                    <div class="last-record-card">
+                        <div class="last-record-label">Last Sale</div>
+                        <div class="hc-header" style="border-bottom:none; padding-bottom:0;">#${lastOrder.id} &nbsp;·&nbsp; ${lastOrder.date} ${lastOrder.time}</div>
+                        <div style="font-size:13px; margin-top:6px; color:var(--text-muted);">${lastItems}</div>
+                        <div class="hc-total" style="font-size:20px;">${lastOrder.total.toLocaleString()} KHR</div>
+                    </div>`;
+            }
+            sortedKeys.forEach(id => {
+                const order = historyData[id];
+                const div = document.createElement('div');
+                div.className = 'history-card';
+                let itemsDisplay = order.items.map(i => (i.qty > 1 ? `x${i.qty} ` : '') + i.name).join(', ');
+                div.innerHTML = `
+                    <div class="hc-header">
+                        <span>#${id} | ${order.date} ${order.time}</span>
+                        <button class="text-btn" style="padding:4px 8px; font-size:10px; border:1px solid var(--border);" onclick="printHistory('${id}')">PRINT</button>
+                    </div>
+                    <div style="font-size:13px;">${itemsDisplay}</div>
+                    <div class="hc-total">${order.total.toLocaleString()} KHR</div>
+                `;
+                list.appendChild(div);
+            });
         }
 
         function printHistory(id) {
@@ -1192,96 +1285,121 @@
             });
         }
 
+        function changeFinMonth(dir) {
+            const d = new Date(finMonthDate.getFullYear(), finMonthDate.getMonth() + dir, 1);
+            const now = new Date();
+            if (d.getFullYear() > now.getFullYear() || (d.getFullYear() === now.getFullYear() && d.getMonth() > now.getMonth())) return;
+            finMonthDate = d;
+            fetchInventoryAndStats();
+        }
+
         function fetchInventoryAndStats() {
+            const mk = fmtMonthKey(finMonthDate);
+            const atCurrent = isCurrentMonth(finMonthDate);
+
+            const finLabel = document.getElementById('finMonthLabel');
+            if (finLabel) finLabel.innerText = atCurrent ? 'This Month' : fmtMonthLabel(finMonthDate);
+            const finNextBtn = document.getElementById('finNextBtn');
+            if (finNextBtn) {
+                finNextBtn.style.opacity = atCurrent ? '0.3' : '1';
+                finNextBtn.style.pointerEvents = atCurrent ? 'none' : 'auto';
+            }
+
             const list = document.getElementById('inventoryList');
             const dash = document.getElementById('invDashboard');
             const lastInvRec = document.getElementById('invLastRecord');
 
-            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">Loading Records...</div>';
-            lastInvRec.innerHTML = '';
-            dash.style.opacity = '0.5';
+            const cachedInv = localStorage.getItem('myday_inv_' + mk);
+            const cachedHist = localStorage.getItem('myday_history_' + mk);
+            if (cachedInv && cachedHist) {
+                _renderFinView(JSON.parse(cachedInv), JSON.parse(cachedHist));
+            } else {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">Loading Records...</div>';
+                lastInvRec.innerHTML = '';
+                dash.style.opacity = '0.5';
+            }
 
             Promise.all([
-                fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory').then(r=>r.json()),
-                fetch(GOOGLE_SCRIPT_URL + '?action=get_history').then(r=>r.json())
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json())
             ]).then(([invData, histData]) => {
-
-                list.innerHTML = '';
-                lastInvRec.innerHTML = '';
-                let totalInvCost = 0;
-
-                // Last purchase highlight
-                if(invData.length > 0) {
-                    const last = invData[0];
-                    lastInvRec.innerHTML = `
-                        <div class="last-record-card" style="margin-bottom:12px;">
-                            <div class="last-record-label">Last Purchase</div>
-                            <div class="hc-header" style="border-bottom:none; padding-bottom:0; font-size:11px;">${last.date} ${last.time} &nbsp;·&nbsp; ${last.user}</div>
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-                                <div style="font-size:14px; font-weight:700;">${last.item} <span style="color:var(--text-muted); font-weight:400; font-size:12px;">(${last.qty})</span></div>
-                                <div style="color:#FF3B30; font-weight:800; font-size:20px;">-${Number(last.cost).toLocaleString()} KHR</div>
-                            </div>
-                        </div>`;
+                localStorage.setItem('myday_inv_' + mk, JSON.stringify(invData));
+                localStorage.setItem('myday_history_' + mk, JSON.stringify(histData));
+                _renderFinView(invData, histData);
+            }).catch(e => {
+                if (!cachedInv) {
+                    list.innerHTML = '<div style="text-align:center; color:red;">Connection Error</div>';
+                    dash.style.opacity = '1';
                 }
-                
-                if(invData.length === 0 || !invData.length) { 
-                    list.innerHTML = '<div style="text-align:center; color:var(--text-muted);">No records found this month.</div>'; 
-                } else {
-                    invData.forEach(log => {
-                        totalInvCost += Number(log.cost);
-                        const div = document.createElement('div');
-                        div.className = 'history-card';
-                        const logStr = encodeURIComponent(JSON.stringify(log));
-                        div.innerHTML = `
-                            <div class="hc-header">
-                                <span>${log.date} ${log.time}</span>
-                                <div>
-                                    <span style="font-weight:500; margin-right: 5px;">${log.user}</span>
-                                    <button class="text-btn" style="padding:2px 6px; font-size:10px; border:1px solid var(--border);" onclick="openInvEditor('${logStr}')">EDIT</button>
-                                    <button class="text-btn" style="padding:2px 6px; font-size:12px; border:1px solid #FF3B30; color:#FF3B30; margin-left: 3px;" onclick="confirmDeleteInv('${logStr}')">×</button>
-                                </div>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; margin-top:8px;">
-                                <div style="font-size:13px;"><b>${log.item}</b> <span style="color:var(--text-muted);">(${log.qty})</span></div>
-                                <div style="color:#FF3B30; font-weight:700; font-size:14px;">-${Number(log.cost).toLocaleString()} KHR</div>
-                            </div>
-                        `;
-                        list.appendChild(div);
-                    });
-                }
-
-                let totalSales = 0;
-                if(histData.length > 0) {
-                    histData.forEach(item => { totalSales += Number(item.price); });
-                }
-
-                let realProfit = totalSales - totalInvCost;
-                let totalCombined = totalSales + totalInvCost;
-                
-                let salesPct = totalCombined > 0 ? Math.round((totalSales / totalCombined) * 100) : 50;
-                let expPct = totalCombined > 0 ? Math.round((totalInvCost / totalCombined) * 100) : 50;
-                
-                let profitColor = realProfit >= 0 ? "var(--primary)" : "#FF3B30";
-
-                document.getElementById('dashSales').innerText = '+' + totalSales.toLocaleString() + ' KHR';
-                document.getElementById('dashCost').innerText = '-' + totalInvCost.toLocaleString() + ' KHR';
-                
-                const dProfit = document.getElementById('dashProfit');
-                dProfit.innerText = 'Actual Profit: ' + realProfit.toLocaleString() + ' KHR';
-                dProfit.style.color = profitColor;
-                
-                document.getElementById('dashPie').style.background = `conic-gradient(var(--primary) 0% ${salesPct}%, #FF3B30 ${salesPct}% 100%)`;
-                document.getElementById('dashPieText').innerText = salesPct + '%';
-                
-                document.getElementById('dashSalesPct').innerText = salesPct;
-                document.getElementById('dashExpPct').innerText = expPct;
-
-                dash.style.opacity = '1';
-
-            }).catch(e => { 
-                list.innerHTML = '<div style="text-align:center; color:red;">Connection Error</div>'; 
-                dash.style.opacity = '1'; 
             });
+        }
+
+        function _renderFinView(invData, histData) {
+            const list = document.getElementById('inventoryList');
+            const dash = document.getElementById('invDashboard');
+            const lastInvRec = document.getElementById('invLastRecord');
+            list.innerHTML = '';
+            lastInvRec.innerHTML = '';
+            let totalInvCost = 0;
+
+            if (invData.length > 0) {
+                const last = invData[0];
+                lastInvRec.innerHTML = `
+                    <div class="last-record-card" style="margin-bottom:12px;">
+                        <div class="last-record-label">Last Purchase</div>
+                        <div class="hc-header" style="border-bottom:none; padding-bottom:0; font-size:11px;">${last.date} ${last.time} &nbsp;·&nbsp; ${last.user}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                            <div style="font-size:14px; font-weight:700;">${last.item} <span style="color:var(--text-muted); font-weight:400; font-size:12px;">(${last.qty})</span></div>
+                            <div style="color:#FF3B30; font-weight:800; font-size:20px;">-${Number(last.cost).toLocaleString()} KHR</div>
+                        </div>
+                    </div>`;
+            }
+
+            if (invData.length === 0) {
+                list.innerHTML = '<div style="text-align:center; color:var(--text-muted);">No records found this month.</div>';
+            } else {
+                invData.forEach(log => {
+                    totalInvCost += Number(log.cost);
+                    const div = document.createElement('div');
+                    div.className = 'history-card';
+                    const logStr = encodeURIComponent(JSON.stringify(log));
+                    div.innerHTML = `
+                        <div class="hc-header">
+                            <span>${log.date} ${log.time}</span>
+                            <div>
+                                <span style="font-weight:500; margin-right: 5px;">${log.user}</span>
+                                <button class="text-btn" style="padding:2px 6px; font-size:10px; border:1px solid var(--border);" onclick="openInvEditor('${logStr}')">EDIT</button>
+                                <button class="text-btn" style="padding:2px 6px; font-size:12px; border:1px solid #FF3B30; color:#FF3B30; margin-left: 3px;" onclick="confirmDeleteInv('${logStr}')">×</button>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                            <div style="font-size:13px;"><b>${log.item}</b> <span style="color:var(--text-muted);">(${log.qty})</span></div>
+                            <div style="color:#FF3B30; font-weight:700; font-size:14px;">-${Number(log.cost).toLocaleString()} KHR</div>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+
+            let totalSales = 0;
+            if (histData.length > 0) histData.forEach(item => { totalSales += Number(item.price); });
+
+            let realProfit = totalSales - totalInvCost;
+            let totalCombined = totalSales + totalInvCost;
+            let salesPct = totalCombined > 0 ? Math.round((totalSales / totalCombined) * 100) : 50;
+            let expPct = totalCombined > 0 ? Math.round((totalInvCost / totalCombined) * 100) : 50;
+            let profitColor = realProfit >= 0 ? "var(--primary)" : "#FF3B30";
+
+            document.getElementById('dashSales').innerText = '+' + totalSales.toLocaleString() + ' KHR';
+            document.getElementById('dashCost').innerText = '-' + totalInvCost.toLocaleString() + ' KHR';
+            const dProfit = document.getElementById('dashProfit');
+            dProfit.innerText = 'Actual Profit: ' + realProfit.toLocaleString() + ' KHR';
+            dProfit.style.color = profitColor;
+            document.getElementById('dashPie').style.background = `conic-gradient(var(--primary) 0% ${salesPct}%, #FF3B30 ${salesPct}% 100%)`;
+            document.getElementById('dashPieText').innerText = salesPct + '%';
+            document.getElementById('dashSalesPct').innerText = salesPct;
+            document.getElementById('dashExpPct').innerText = expPct;
+            dash.style.opacity = '1';
         }
 
         function toggleAllTimeStats() {
