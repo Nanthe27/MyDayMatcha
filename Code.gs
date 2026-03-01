@@ -34,7 +34,7 @@ function doGet(e) {
       if (data[i][0] === "TOTALS") continue;
       var dateVal = data[i][1];
       var dateStr = (dateVal instanceof Date)
-          ? Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "dd/MM/yyyy")
+          ? Utilities.formatDate(dateVal, Session.getScriptTimeZone(), "dd-MMM-yyyy")
           : String(dateVal);
       var timeVal = data[i][2];
       var timeStr = (timeVal instanceof Date)
@@ -118,7 +118,7 @@ function doPost(e) {
       var lastRow = sheet.getLastRow();
       if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") sheet.deleteRow(lastRow);
       var time = new Date().toLocaleTimeString('en-GB');
-      var date = new Date().toLocaleDateString('en-GB');
+      var date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy");
 
       if (data.items && data.items.length > 0) {
         var newRows = [];
@@ -207,7 +207,7 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({"status": "cleared"})).setMimeType(ContentService.MimeType.JSON);
     }
     var time = new Date().toLocaleTimeString('en-GB');
-    var date = Utilities.formatDate(targetDate, Session.getScriptTimeZone(), "dd/MM/yyyy");
+    var date = Utilities.formatDate(targetDate, Session.getScriptTimeZone(), "dd-MMM-yyyy");
     var newRows = [];
     data.items.forEach(function(item) {
       newRows.push([item.id, date, time, data.user, item.name, item.price, item.cost, 1, item.price - item.cost]);

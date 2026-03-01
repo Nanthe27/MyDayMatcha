@@ -665,7 +665,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v3.6';
+        const APP_VERSION = 'v3.7';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1645,9 +1645,12 @@
             showLogin();
         }
 
+        const _MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
         function _normDate(raw) {
             if (!raw) return '';
-            const s = String(raw);
+            const s = String(raw).trim();
+            // ISO format (contains T or Z)
             if (s.includes('T') || s.includes('Z')) {
                 const dt = new Date(raw);
                 if (!isNaN(dt)) {
@@ -1657,14 +1660,23 @@
                     return `${day}/${month}/${year}`;
                 }
             }
+            // New format: "DD-Mon-YYYY" (e.g., "01-Mar-2026") — normalize to D/M/YYYY key
+            if (/^\d{1,2}-[A-Za-z]{3}-\d{4}$/.test(s)) {
+                const [dd, mon, yyyy] = s.split('-');
+                const m = _MONTHS_SHORT.findIndex(x => x.toLowerCase() === mon.toLowerCase()) + 1;
+                if (m > 0) return `${parseInt(dd)}/${m}/${yyyy}`;
+            }
+            // Old format: "DD/MM/YYYY" — return as-is
             return s;
         }
 
-        // Convert "D/M/YYYY" → "DD-MM-YYYY" for display
+        // Convert internal "D/M/YYYY" key → unambiguous "DD-Mon-YYYY" for display
         function _toDisplayDate(s) {
             const p = s.split('/');
             if (p.length !== 3) return s;
-            return p[0].padStart(2,'0') + '-' + p[1].padStart(2,'0') + '-' + p[2];
+            const d = parseInt(p[0]), m = parseInt(p[1]), y = parseInt(p[2]);
+            if (isNaN(d) || isNaN(m) || m < 1 || m > 12) return s;
+            return `${String(d).padStart(2,'0')}-${_MONTHS_SHORT[m-1]}-${y}`;
         }
 
         function _renderDailyBreakdown(invData, histData) {
@@ -1702,7 +1714,6 @@
             }
         }
 
-        const _MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
         function _toPillLabel(s) {
             const [d, m, y] = s.split('/').map(Number);
             return `${String(d).padStart(2,'0')}-${_MONTHS_SHORT[m-1]}-${y}`;
