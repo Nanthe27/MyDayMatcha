@@ -68,8 +68,8 @@
         /* --- HEADER --- */
         .app-header {
             height: calc(70px + env(safe-area-inset-top));
-            padding: env(safe-area-inset-top) 20px 0 20px;
-            display: flex; justify-content: space-between; align-items: center;
+            padding: calc(env(safe-area-inset-top) + 5px) 20px 0 20px; /* ↕ Space from bottom of Dynamic Island to logo/title — change "5px" to adjust */
+            display: flex; justify-content: space-between; align-items: flex-start;
             background: var(--surface); border-bottom: 1px solid var(--border);
             z-index: 50; flex-shrink: 0;
         }
@@ -662,7 +662,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v2.9';
+        const APP_VERSION = 'v3.0';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
