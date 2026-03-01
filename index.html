@@ -1466,8 +1466,9 @@
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ 
-                    action: 'edit_inventory', 
+                body: JSON.stringify({
+                    action: 'edit_inventory',
+                    month: fmtMonthKey(finMonthDate),
                     old_date: oldDate, old_time: oldTime, old_item: oldItem,
                     new_item: newItem, new_qty: newQty, new_cost: Number(newCost)
                 })
@@ -1482,7 +1483,7 @@
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'delete_inventory', date: log.date, time: log.time, item: log.item })
+                    body: JSON.stringify({ action: 'delete_inventory', month: fmtMonthKey(finMonthDate), date: log.date, time: log.time, item: log.item })
                 }).then(r => r.json()).then(data => { fetchInventoryAndStats();
                 }).catch(e => { openModal('ERROR', 'Failed to delete record.', null, 'CLOSE'); fetchInventoryAndStats(); });
             });

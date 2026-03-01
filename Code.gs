@@ -126,7 +126,7 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
     }
     if (data.action === 'edit_inventory') {
-      var monthSheetName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy") + "_Inv";
+      var monthSheetName = (data.month || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy")) + "_Inv";
       var sheet = getOrCreateSheet(monthSheetName, ["Date", "Time", "User", "Item", "Quantity", "Cost"]);
       var displayValues = sheet.getDataRange().getDisplayValues();
       for (var i = 1; i < displayValues.length; i++) {
@@ -142,7 +142,7 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
     }
     if (data.action === 'delete_inventory') {
-      var monthSheetName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy") + "_Inv";
+      var monthSheetName = (data.month || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy")) + "_Inv";
       var sheet = getOrCreateSheet(monthSheetName, ["Date", "Time", "User", "Item", "Quantity", "Cost"]);
       var displayValues = sheet.getDataRange().getDisplayValues();
       for (var i = 1; i < displayValues.length; i++) {
