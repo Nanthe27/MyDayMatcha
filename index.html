@@ -662,7 +662,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v2.7';
+        const APP_VERSION = 'v2.8';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -776,13 +776,14 @@
         }
 
         function showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); cancelLogin(); toggleSettings(false); }
-        function selectUser(name) { tempSelectedUser = name; currentPin = ""; updatePinDisplay(); document.getElementById('userListGrid').style.display = 'none'; document.getElementById('pinContainer').style.display = 'flex'; document.getElementById('loginTitle').innerText = name; }
+        function selectUser(name) { tempSelectedUser = name; currentPin = ""; updatePinDisplay(); document.getElementById('userListGrid').style.display = 'none'; document.getElementById('pinContainer').style.display = 'flex'; document.getElementById('loginTitle').innerText = name; document.getElementById('updateRefreshBtn').style.display = 'none'; }
         
-        function cancelLogin() { 
-            tempSelectedUser = null; currentPin = ""; 
-            document.getElementById('userListGrid').style.display = 'flex'; 
-            document.getElementById('pinContainer').style.display = 'none'; 
-            document.getElementById('loginTitle').innerText = "It's loading, wait abit"; 
+        function cancelLogin() {
+            tempSelectedUser = null; currentPin = "";
+            document.getElementById('userListGrid').style.display = 'flex';
+            document.getElementById('pinContainer').style.display = 'none';
+            document.getElementById('loginTitle').innerText = "It's loading, wait abit";
+            document.getElementById('updateRefreshBtn').style.display = '';
         }
         
         function handleNumpad(val) {
