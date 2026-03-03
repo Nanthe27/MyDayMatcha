@@ -52,8 +52,11 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        
-        body { 
+
+        /* Prevent gray safe-area bleed above header on ARC / Chrome / non-Safari browsers */
+        html { background: var(--surface); margin: 0; padding: 0; }
+
+        body {
             font-family: 'Inter', sans-serif; 
             background: var(--bg); color: var(--text); 
             margin: 0; padding: 0; height: 100vh; width: 100vw; 
@@ -67,8 +70,8 @@
 
         /* --- HEADER --- */
         .app-header {
-            height: calc(54px + env(safe-area-inset-top)); /* ↕ was 42px; +12px clears Dynamic Island in Safari where env() can under-report */
-            padding: calc(env(safe-area-inset-top) + 12px) 20px 0 20px;
+            height: calc(70px + env(safe-area-inset-top)); /* 70px content zone — matches History/Manager headers; align-items:center keeps logo/buttons perfectly centred in the 70px below the safe area */
+            padding: env(safe-area-inset-top) 20px 0 20px;
             display: flex; justify-content: space-between; align-items: center;
             background: var(--surface); border-bottom: 1px solid var(--border);
             z-index: 50; flex-shrink: 0;
@@ -94,9 +97,9 @@
             overflow-y: auto; display: grid; 
             grid-template-columns: 1fr 1fr; grid-auto-rows: 80px; 
             gap: 12px; align-content: start; 
-            padding-bottom: 200px; 
+            padding-bottom: calc(130px + env(safe-area-inset-bottom));
         }
-        
+
         .drink-btn { width: 100%; height: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; padding: 10px; gap: 12px; overflow: hidden; cursor: pointer; position: relative; text-align: left; transition: all 0.2s var(--anim-curve); }
         .drink-btn:hover { border-color: var(--primary); background: var(--surface-hover); transform: scale(0.97); }
         .drink-btn:active { transform: scale(0.94); opacity: 0.9; }
@@ -105,7 +108,7 @@
         .drink-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); line-height: 1.2; }
 
         .cart-area {
-            display: flex; flex-direction: column; background: var(--bg); border-radius: 0;
+            display: flex; flex-direction: column; background: var(--surface); border-radius: 0;
             position: fixed;
             top: 0;
             bottom: 0;
@@ -163,7 +166,7 @@
         .desktop-nav-group { display: none; flex-direction: column; }
 
         /* INVENTORY DESKTOP GRID CLASSES */
-        .inv-container { display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 15px; padding-bottom:120px; }
+        .inv-container { display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 15px; padding-bottom: calc(130px + env(safe-area-inset-bottom)); }
         .dashboard-wrapper { width: 100%; display: flex; flex-direction: column; }
         .inv-left-col, .inv-right-col { display: flex; flex-direction: column; }
 
@@ -213,7 +216,7 @@
         }
 
         .cart-header { padding: 20px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); background: var(--surface); border-radius: 0; }
-        .cart-scroll-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 110px; }
+        .cart-scroll-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: calc(130px + env(safe-area-inset-bottom)); }
         .cart-list { flex: 0 0 auto; padding: 0 20px; }
         /* ── Order-page history panel ─────────────────────────────────── */
         .order-history-section { flex: 1; min-height: 0; background: #f1faf4; border-top: 2px solid #a8ddb5; transition: flex 0.3s var(--anim-curve); }
@@ -580,7 +583,7 @@
             <button class="month-nav-btn" id="historyNextBtn" onclick="changeHistoryMonth(1)">›</button>
         </div>
         <div id="historyLastRecord" style="width:100%; max-width:600px; margin:0 auto; padding:10px 10px 0 10px; flex-shrink:0;"></div>
-        <div id="historyList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom:100px;"></div>
+        <div id="historyList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom: calc(130px + env(safe-area-inset-bottom));"></div>
     </div>
 
     <div id="managerPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
@@ -589,7 +592,7 @@
             <span style="font-weight:700; color:var(--primary); font-size:16px;">MANAGE MENU</span>
             <button class="text-btn" style="color:var(--primary);" onclick="newItem()">+ ADD</button>
         </div>
-        <div id="managerList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom:100px;"></div>
+        <div id="managerList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom: calc(130px + env(safe-area-inset-bottom));"></div>
     </div>
 
     <div id="inventoryPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
@@ -717,7 +720,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v3.11';
+        const APP_VERSION = 'v3.12';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
