@@ -112,7 +112,7 @@
             left: 0; width: 100%; height: auto;
             z-index: 150; opacity: 0; visibility: hidden; pointer-events: none;
             transition: all var(--anim-speed) var(--anim-curve); transform: translateY(10px);
-            padding-top: calc(52px + env(safe-area-inset-top));
+            padding-top: max(env(safe-area-inset-top), 12px);
         }
         .cart-area.active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
 
@@ -215,14 +215,33 @@
         .cart-header { padding: 20px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); background: var(--surface); border-radius: 0; }
         .cart-scroll-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 110px; }
         .cart-list { flex: 0 0 auto; padding: 0 20px; }
-        .order-history-section { flex: 1; min-height: 120px; }
-        .order-history-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 8px 20px; border-top: 1px solid var(--border); }
-        .order-history-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
-        .order-history-count { font-size: 11px; color: var(--primary); font-weight: 700; }
-        .mini-history-card { padding: 10px 20px; border-bottom: 1px solid var(--border); animation: fadeScale 0.15s; }
-        .mini-history-card:active { background: var(--surface-hover); }
-        .mini-hc-meta { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; letter-spacing: 0.3px; }
-        .mini-hc-items { font-size: 12px; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* ── Order-page history panel ─────────────────────────────────── */
+        .order-history-section { flex: 1; min-height: 0; background: #f1faf4; border-top: 2px solid #a8ddb5; transition: flex 0.3s var(--anim-curve); }
+        .order-history-section.collapsed { flex: 0 0 auto; }
+        .order-history-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; cursor: pointer; user-select: none;
+            -webkit-user-select: none;
+        }
+        .order-history-header:active { background: rgba(52,199,89,0.08); }
+        .order-history-title-group { display: flex; align-items: center; gap: 8px; }
+        .order-history-arrow {
+            width: 24px; height: 24px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; line-height: 1; flex-shrink: 0;
+            transition: transform 0.3s var(--anim-curve);
+            transform: rotate(0deg); /* ▼ collapsed = tap to expand; flips to ▲ when expanded */
+        }
+        .order-history-section:not(.collapsed) .order-history-arrow { transform: rotate(180deg); }
+        .order-history-label { font-size: 10px; font-weight: 700; color: #1a7a3a; text-transform: uppercase; letter-spacing: 1.5px; }
+        .order-history-count { font-size: 11px; color: #1a7a3a; font-weight: 700; opacity: 0.8; }
+        .order-history-body { overflow: hidden; }
+        .order-history-section.collapsed .order-history-body { display: none; }
+        .mini-history-card { padding: 10px 16px; border-bottom: 1px solid #c8e6c9; animation: fadeScale 0.15s; }
+        .mini-history-card:active { background: rgba(52,199,89,0.06); }
+        .mini-hc-meta { font-size: 10px; font-weight: 700; color: #388e3c; margin-bottom: 3px; letter-spacing: 0.3px; }
+        .mini-hc-items { font-size: 12px; color: #2d5a35; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .mini-hc-total { font-size: 13px; font-weight: 700; color: var(--primary); }
         .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); animation: fadeScale 0.2s; }
         .item-name { font-size: 13px; font-weight: 600; color: var(--text); }
@@ -465,12 +484,17 @@
             <div class="cart-header">Current Order</div>
             <div class="cart-scroll-body">
                 <div class="cart-list" id="cartList"></div>
-                <div class="order-history-section" id="orderHistorySection">
-                    <div class="order-history-header">
-                        <span class="order-history-label">Recent Orders</span>
+                <div class="order-history-section collapsed" id="orderHistorySection">
+                    <div class="order-history-header" onclick="toggleOrderHistory()">
+                        <div class="order-history-title-group">
+                            <div class="order-history-arrow" id="orderHistoryArrow">▼</div>
+                            <span class="order-history-label">Recent Orders</span>
+                        </div>
                         <span class="order-history-count" id="orderHistoryCount"></span>
                     </div>
-                    <div id="orderHistoryList"></div>
+                    <div class="order-history-body">
+                        <div id="orderHistoryList"></div>
+                    </div>
                 </div>
             </div>
             <div class="cart-footer">
@@ -684,7 +708,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v3.9';
+        const APP_VERSION = 'v3.10';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -959,6 +983,10 @@
         }
         
         let _orderHistoryLastFetch = 0;
+        function toggleOrderHistory() {
+            document.getElementById('orderHistorySection').classList.toggle('collapsed');
+        }
+
         function _loadOrderHistory() {
             const mk = fmtMonthKey(new Date());
             const cached = localStorage.getItem('myday_history_' + mk);
