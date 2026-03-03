@@ -180,7 +180,7 @@
                 border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,0.05);
                 padding-top: 0;
             }
-            .cart-list { padding-bottom: 20px; }
+            .cart-scroll-body { padding-bottom: 0; }
             .cart-header { border-radius: var(--radius) var(--radius) 0 0; }
             .cart-footer { border-radius: var(--radius) var(--radius) 0 0; }
             .settings-area { width: 400px; right: 0; left: auto; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.05); padding-top: 20px !important; }
@@ -213,7 +213,17 @@
         }
 
         .cart-header { padding: 20px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid var(--border); background: var(--surface); border-radius: 0; }
-        .cart-list { flex: 1; overflow-y: auto; padding: 0 20px; padding-bottom: 110px; }
+        .cart-scroll-body { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 110px; }
+        .cart-list { flex: 0 0 auto; padding: 0 20px; }
+        .order-history-section { flex: 1; min-height: 120px; }
+        .order-history-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 8px 20px; border-top: 1px solid var(--border); }
+        .order-history-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+        .order-history-count { font-size: 11px; color: var(--primary); font-weight: 700; }
+        .mini-history-card { padding: 10px 20px; border-bottom: 1px solid var(--border); animation: fadeScale 0.15s; }
+        .mini-history-card:active { background: var(--surface-hover); }
+        .mini-hc-meta { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; letter-spacing: 0.3px; }
+        .mini-hc-items { font-size: 12px; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-hc-total { font-size: 13px; font-weight: 700; color: var(--primary); }
         .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); animation: fadeScale 0.2s; }
         .item-name { font-size: 13px; font-weight: 600; color: var(--text); }
         .mini-select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 10px; font-weight: 500; padding: 4px; color: var(--text); outline: none; margin-top: 4px; }
@@ -453,7 +463,16 @@
 
         <div class="cart-area" id="cartPanel">
             <div class="cart-header">Current Order</div>
-            <div class="cart-list" id="cartList"></div>
+            <div class="cart-scroll-body">
+                <div class="cart-list" id="cartList"></div>
+                <div class="order-history-section" id="orderHistorySection">
+                    <div class="order-history-header">
+                        <span class="order-history-label">Recent Orders</span>
+                        <span class="order-history-count" id="orderHistoryCount"></span>
+                    </div>
+                    <div id="orderHistoryList"></div>
+                </div>
+            </div>
             <div class="cart-footer">
                 <div class="total-row">
                     <span class="total-label" style="display:flex; align-items:center;">
@@ -665,7 +684,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v3.8';
+        const APP_VERSION = 'v3.9';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -939,6 +958,57 @@
             }); 
         }
         
+        let _orderHistoryLastFetch = 0;
+        function _loadOrderHistory() {
+            const mk = fmtMonthKey(new Date());
+            const cached = localStorage.getItem('myday_history_' + mk);
+            if (cached) _renderOrderHistory(JSON.parse(cached));
+            else document.getElementById('orderHistoryList').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px;">Loading...</div>';
+            const now = Date.now();
+            if (now - _orderHistoryLastFetch < 30000 && cached) return;
+            _orderHistoryLastFetch = now;
+            fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk)
+                .then(r => r.json())
+                .then(data => { localStorage.setItem('myday_history_' + mk, JSON.stringify(data)); _renderOrderHistory(data); })
+                .catch(() => {});
+        }
+
+        function _renderOrderHistory(data) {
+            const listEl = document.getElementById('orderHistoryList');
+            const countEl = document.getElementById('orderHistoryCount');
+            if (!listEl || !countEl) return;
+            if (!data || data.length === 0) {
+                countEl.innerText = '';
+                listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px;">No sales recorded yet</div>';
+                return;
+            }
+            const orders = {};
+            let grandTotal = 0;
+            data.forEach(item => {
+                const key = item.id || (item.date + '-' + item.time);
+                if (!orders[key]) orders[key] = { id: item.id, date: item.date, time: item.time, total: 0, items: [] };
+                orders[key].total += item.price;
+                grandTotal += item.price;
+                const ex = orders[key].items.find(i => i.name === item.name);
+                if (ex) ex.qty++; else orders[key].items.push({ name: item.name, qty: 1 });
+            });
+            const sortedKeys = Object.keys(orders).sort((a, b) => b.localeCompare(a));
+            countEl.innerText = sortedKeys.length + ' orders · ' + grandTotal.toLocaleString() + ' KHR';
+            const frag = document.createDocumentFragment();
+            sortedKeys.forEach(id => {
+                const o = orders[id];
+                const div = document.createElement('div');
+                div.className = 'mini-history-card';
+                const itemsText = o.items.map(i => (i.qty > 1 ? '×' + i.qty + ' ' : '') + i.name).join(', ');
+                div.innerHTML = '<div class="mini-hc-meta">#' + o.id + ' &nbsp;·&nbsp; ' + o.date + ' &nbsp;·&nbsp; ' + o.time + '</div>'
+                    + '<div class="mini-hc-items">' + itemsText + '</div>'
+                    + '<div class="mini-hc-total">' + o.total.toLocaleString() + ' KHR</div>';
+                frag.appendChild(div);
+            });
+            listEl.innerHTML = '';
+            listEl.appendChild(frag);
+        }
+
         function switchTab(t) {
             document.getElementById('historyPage').classList.remove('open');
             document.getElementById('managerPage').classList.remove('open');
@@ -957,7 +1027,7 @@
                 document.getElementById('menuArea').style.display = t === 'menu' ? 'grid' : 'none';
                 
                 const panel = document.getElementById('cartPanel');
-                if (t === 'cart') panel.classList.add('active'); else panel.classList.remove('active');
+                if (t === 'cart') { panel.classList.add('active'); _loadOrderHistory(); } else panel.classList.remove('active');
             }
             
             document.getElementById('btnMenu').classList.toggle('active', t === 'menu');
@@ -1062,9 +1132,10 @@
             const orderForPrint = { id, date: dateStr, time: timeStr, items: getGroupedItems(currentOrder), globalDiscount: globalOrderDiscount };
             
             currentOrder = []; 
-            globalOrderDiscount = 0; 
+            globalOrderDiscount = 0;
             document.getElementById('globalDiscountSelect').value = '0';
-            renderCart(); 
+            _orderHistoryLastFetch = 0;
+            renderCart();
             switchTab('menu');
             
             const html = generateReceiptHTML(orderForPrint);
