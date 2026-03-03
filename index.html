@@ -67,8 +67,8 @@
 
         /* --- HEADER --- */
         .app-header {
-            height: calc(42px + env(safe-area-inset-top)); /* ↕ Space from Dynamic Island to logo/title — change "42px" to adjust (formula: gap×2 + 32px logo height; 42px = 5px gap each side) */
-            padding: env(safe-area-inset-top) 20px 0 20px;
+            height: calc(54px + env(safe-area-inset-top)); /* ↕ was 42px; +12px clears Dynamic Island in Safari where env() can under-report */
+            padding: calc(env(safe-area-inset-top) + 12px) 20px 0 20px;
             display: flex; justify-content: space-between; align-items: center;
             background: var(--surface); border-bottom: 1px solid var(--border);
             z-index: 50; flex-shrink: 0;
@@ -236,13 +236,22 @@
         .order-history-section:not(.collapsed) .order-history-arrow { transform: rotate(180deg); }
         .order-history-label { font-size: 10px; font-weight: 700; color: #1a7a3a; text-transform: uppercase; letter-spacing: 1.5px; }
         .order-history-count { font-size: 11px; color: #1a7a3a; font-weight: 700; opacity: 0.8; }
-        .order-history-body { overflow: hidden; }
+        .order-history-body { overflow: hidden; padding-top: 6px; }
         .order-history-section.collapsed .order-history-body { display: none; }
-        .mini-history-card { padding: 10px 16px; border-bottom: 1px solid #c8e6c9; animation: fadeScale 0.15s; }
-        .mini-history-card:active { background: rgba(52,199,89,0.06); }
-        .mini-hc-meta { font-size: 10px; font-weight: 700; color: #388e3c; margin-bottom: 3px; letter-spacing: 0.3px; }
-        .mini-hc-items { font-size: 12px; color: #2d5a35; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-hc-total { font-size: 13px; font-weight: 700; color: var(--primary); }
+        .mini-history-card {
+            background: #fff; border: 1px solid #a8ddb5; border-radius: 12px;
+            padding: 12px 14px; margin: 0 12px 10px 12px;
+            display: flex; flex-direction: column; gap: 5px;
+            animation: fadeScale 0.15s;
+            box-shadow: 0 2px 6px rgba(52,199,89,0.07);
+        }
+        .mini-history-card:active { background: #f6fff8; }
+        .mini-hc-meta {
+            font-size: 10px; font-weight: 700; color: #388e3c; letter-spacing: 0.3px;
+            padding-bottom: 7px; border-bottom: 1px dashed #c8e6c9;
+        }
+        .mini-hc-items { font-size: 12px; color: #2d5a35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mini-hc-total { font-size: 13px; font-weight: 700; color: var(--primary); text-align: right; }
         .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); animation: fadeScale 0.2s; }
         .item-name { font-size: 13px; font-weight: 600; color: var(--text); }
         .mini-select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-size: 10px; font-weight: 500; padding: 4px; color: var(--text); outline: none; margin-top: 4px; }
@@ -708,7 +717,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v3.10';
+        const APP_VERSION = 'v3.11';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
