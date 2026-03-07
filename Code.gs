@@ -28,7 +28,7 @@ function doGet(e) {
     var ss = SpreadsheetApp.openById(SHEET_ID);
     var sheet = ss.getSheetByName(monthSheetName);
     if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-    var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getValues();
+    var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 7).getValues();
     var history = [];
     var MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     for (var i = 0; i < data.length; i++) {
@@ -51,7 +51,7 @@ function doGet(e) {
       var timeStr = (timeVal instanceof Date)
           ? Utilities.formatDate(timeVal, Session.getScriptTimeZone(), "HH:mm:ss")
           : String(timeVal);
-      history.push({ id: data[i][0], date: dateStr, time: timeStr, name: data[i][4], price: data[i][5] });
+      history.push({ id: data[i][0], date: dateStr, time: timeStr, name: data[i][4], price: data[i][5], cost: data[i][6] });
     }
     return ContentService.createTextOutput(JSON.stringify(history.reverse())).setMimeType(ContentService.MimeType.JSON);
   }
