@@ -107,6 +107,15 @@
         .drink-info-box { flex: 1; display: flex; align-items: center; overflow: hidden; }
         .drink-name { font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); line-height: 1.2; }
 
+        /* top sale highlight */
+        .drink-btn.top-sale { background: linear-gradient(135deg, #f0faf0 0%, #dff2df 100%); border-color: #a8d5a2; }
+        .drink-btn.top-sale:hover { background: linear-gradient(135deg, #dff2df 0%, #c8e8c8 100%); border-color: var(--primary); }
+        .drink-btn.top-sale .drink-info-box { flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+        .top-sale-badge { font-size: 9px; font-weight: 800; color: var(--primary-dim); text-transform: uppercase; letter-spacing: 0.6px; line-height: 1; }
+        [data-theme="dark"] .drink-btn.top-sale { background: linear-gradient(135deg, #0d2e0d 0%, #142814 100%); border-color: #2d7a2d; }
+        [data-theme="dark"] .drink-btn.top-sale:hover { background: linear-gradient(135deg, #142814 0%, #1a3a1a 100%); border-color: var(--primary); }
+        /* end top sale highlight */
+
         .cart-area {
             display: flex; flex-direction: column; background: var(--surface); border-radius: 0;
             position: fixed;
@@ -720,7 +729,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v4.0.1';
+        const APP_VERSION = 'v4.0.2';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -907,14 +916,19 @@
 
         function renderMenu() {
             const container = document.getElementById('menuArea'); container.innerHTML = '';
+            let idx = 0;
             MENU_DATA.forEach(grp => {
                 grp.items.forEach(item => {
-                    const btn = document.createElement('div'); btn.className = 'drink-btn';
+                    const btn = document.createElement('div');
+                    const isTop = idx < 6;
+                    btn.className = 'drink-btn' + (isTop ? ' top-sale' : '');
                     let imgUrl = item.image;
                     if(!imgUrl || imgUrl === "") imgUrl = 'https://img.pikbest.com/origin/10/37/43/56YpIkbEsTKmG.png!bw700';
-                    btn.innerHTML = `<div class="drink-icon-box" style="background-image: url('${imgUrl}');"></div><div class="drink-info-box"><div class="drink-name">${item.name}</div></div>`;
+                    const badge = isTop ? '<div class="top-sale-badge">Top-selling</div>' : '';
+                    btn.innerHTML = `<div class="drink-icon-box" style="background-image: url('${imgUrl}');"></div><div class="drink-info-box">${badge}<div class="drink-name">${item.name}</div></div>`;
                     btn.onclick = () => addToCart(item);
                     container.appendChild(btn);
+                    idx++;
                 });
             });
         }
