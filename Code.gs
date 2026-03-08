@@ -244,3 +244,148 @@ function getOrCreateSheet(name, headers) {
   if (!sheet) { sheet = ss.insertSheet(name); sheet.getRange(1, 1, 1, headers.length).setValues([headers]); }
   return sheet;
 }
+
+// ============================================================
+// TELEGRAM DAILY REPORT — My Day Matcha
+// ============================================================
+var TELEGRAM_TOKEN   = '8506198049:AAE-DBS9XW6gxzm92T7ALWFbMR37JWBLElY';
+var TELEGRAM_CHAT_ID = '6544003518';
+var REPORT_TZ        = 'Asia/Bangkok'; // UTC+7 — same as Phnom Penh / Cambodia
+
+// Send an HTML-formatted message to Telegram
+function sendTelegram_(msg) {
+  var url = 'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage';
+  UrlFetchApp.fetch(url, {
+    method: 'post',
+    contentType: 'application/json',
+    muteHttpExceptions: true,
+    payload: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'HTML' })
+  });
+}
+
+// Format a number as KHR with comma separators (no decimals)
+function fmtKHR_(n) {
+  var s = Math.round(n || 0).toString();
+  var result = '';
+  for (var i = s.length - 1, c = 0; i >= 0; i--, c++) {
+    if (c > 0 && c % 3 === 0) result = ',' + result;
+    result = s[i] + result;
+  }
+  return result + ' KHR';
+}
+
+// Fetch orders for a specific date string 'dd-MMM-yyyy'
+// filter: 'on_time' (recorded ≤ 19:30), 'late' (recorded > 19:30)
+function getDayOrders_(dateStr, filter) {
+  var parts     = dateStr.split('-');           // ['08', 'Mar', '2026']
+  var sheetName = parts[1] + '_' + parts[2];   // 'Mar_2026'
+  var ss        = SpreadsheetApp.openById(SHEET_ID);
+  var sheet     = ss.getSheetByName(sheetName);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var rows   = sheet.getRange(2, 1, sheet.getLastRow() - 1, 9).getValues();
+  var cutoff = 19 * 60 + 30; // 19:30 in minutes since midnight
+  var result = [];
+
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r[0] || r[0] === 'TOTALS') continue;
+
+    // Resolve row date — prefer Order ID (YYYYMMDD-NNN) for reliability
+    var idStr = String(r[0]);
+    var rowDate;
+    if (/^\d{8}-\d{3}$/.test(idStr)) {
+      var yr = idStr.substr(0, 4);
+      var mo = parseInt(idStr.substr(4, 2));
+      var dd = idStr.substr(6, 2);
+      rowDate = dd + '-' + MONTHS[mo - 1] + '-' + yr;
+    } else {
+      rowDate = (r[1] instanceof Date)
+        ? Utilities.formatDate(r[1], REPORT_TZ, 'dd-MMM-yyyy')
+        : String(r[1]);
+    }
+    if (rowDate !== dateStr) continue;
+
+    // Resolve time — stored as 'HH:mm:ss' string or a Date serial
+    var rawTime = r[2];
+    var timeStr = (rawTime instanceof Date)
+      ? Utilities.formatDate(rawTime, REPORT_TZ, 'HH:mm:ss')
+      : String(rawTime);
+    var tp      = timeStr.split(':');
+    var rowMins = (parseInt(tp[0]) || 0) * 60 + (parseInt(tp[1]) || 0);
+    var isLate  = rowMins > cutoff;
+
+    if (filter === 'on_time' && isLate)  continue;
+    if (filter === 'late'    && !isLate) continue;
+
+    result.push({ price: parseFloat(r[5]) || 0, cost: parseFloat(r[6]) || 0, profit: parseFloat(r[8]) || 0 });
+  }
+  return result;
+}
+
+// Sum orders into report stats
+function sumOrders_(orders) {
+  var s = { drinks: orders.length, income: 0, cost: 0, profit: 0 };
+  orders.forEach(function(o) { s.income += o.price; s.cost += o.cost; s.profit += o.profit; });
+  return s;
+}
+
+// ── Triggered at 7:30 PM — sends today's daily report ───────
+function sendDailyReport() {
+  var today  = Utilities.formatDate(new Date(), REPORT_TZ, 'dd-MMM-yyyy');
+  var orders = getDayOrders_(today, 'on_time');
+  var msg;
+
+  if (orders.length === 0) {
+    msg = "🍵 Looks like we're on a day off today, Goodnight. 🌙";
+  } else {
+    var s = sumOrders_(orders);
+    msg = "🍵 <b>Sell day</b>\n\n"
+        + "Goodnight My Beautiful owner 🌙\n"
+        + "Here is your report of the day,\n\n"
+        + "📅 <b>Date:</b> " + today + "\n"
+        + "🧋 <b>Drinks sell:</b> " + s.drinks + " cups\n"
+        + "💰 <b>Income:</b> " + fmtKHR_(s.income) + "\n"
+        + "📦 <b>Cost:</b> " + fmtKHR_(s.cost) + "\n"
+        + "✨ <b>Profit:</b> " + fmtKHR_(s.profit) + "\n\n"
+        + "<i>⚠️ Note: Day's Net Profit is NOT Monthly Actual Profit</i>";
+  }
+  sendTelegram_(msg);
+}
+
+// ── Triggered at 6:00 AM — sends late-order report for yesterday ──
+function sendLateReport() {
+  var yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+  var yStr      = Utilities.formatDate(yesterday, REPORT_TZ, 'dd-MMM-yyyy');
+  var orders    = getDayOrders_(yStr, 'late');
+  if (orders.length === 0) return; // Nothing to report — stay quiet
+
+  var s   = sumOrders_(orders);
+  var msg = "⏰ <b>Looks like someone forgot to do Homework.</b>\n\n"
+          + "Here is your late report of the day,\n\n"
+          + "📅 <b>Date:</b> " + yStr + "\n"
+          + "🧋 <b>Drinks sell:</b> " + s.drinks + " cups\n"
+          + "💰 <b>Income:</b> " + fmtKHR_(s.income) + "\n"
+          + "📦 <b>Cost:</b> " + fmtKHR_(s.cost) + "\n"
+          + "✨ <b>Profit:</b> " + fmtKHR_(s.profit) + "\n\n"
+          + "<i>⚠️ Note: Day's Net Profit is NOT Monthly Actual Profit</i>";
+  sendTelegram_(msg);
+}
+
+// ── Run ONCE manually from the Apps Script editor ────────────
+// Opens: Extensions → Apps Script → select createDailyTriggers → Run
+function createDailyTriggers() {
+  // Remove any existing triggers for these functions to avoid duplicates
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    var fn = t.getHandlerFunction();
+    if (fn === 'sendDailyReport' || fn === 'sendLateReport') ScriptApp.deleteTrigger(t);
+  });
+  // 7:30 PM Phnom Penh time (UTC+7)
+  ScriptApp.newTrigger('sendDailyReport')
+    .timeBased().atHour(19).nearMinute(30).everyDays(1).inTimezone(REPORT_TZ).create();
+  // 6:00 AM Phnom Penh time (UTC+7)
+  ScriptApp.newTrigger('sendLateReport')
+    .timeBased().atHour(6).nearMinute(0).everyDays(1).inTimezone(REPORT_TZ).create();
+  Logger.log('Triggers created: sendDailyReport @ 19:30 and sendLateReport @ 06:00 (Asia/Bangkok / Phnom Penh)');
+}
