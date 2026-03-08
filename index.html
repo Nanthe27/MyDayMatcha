@@ -130,14 +130,30 @@
 
         .settings-area {
             padding-top: calc(42px + env(safe-area-inset-top)) !important;
-            display: flex; flex-direction: column; background: var(--bg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; opacity: 0; visibility: hidden; pointer-events: none; padding: 20px; transition: all var(--anim-speed) var(--anim-curve); backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; background: var(--bg); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 160; opacity: 0; visibility: hidden; pointer-events: none; padding: 20px; overflow-y: auto; transition: all var(--anim-speed) var(--anim-curve);
         }
         .settings-area.active { opacity: 1; visibility: visible; pointer-events: auto; }
-        
-        .setting-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s var(--anim-curve); }
-        .setting-card:hover { border-color: var(--primary); background: var(--surface-hover); transform: scale(0.98); }
-        .setting-label { font-weight: 600; font-size: 14px; }
-        .setting-val { color: var(--text-muted); font-size: 13px; font-weight: 500; }
+
+        .settings-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 28px; }
+        .settings-title { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+
+        .settings-section { margin-bottom: 22px; }
+        .settings-section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.8px; margin-bottom: 8px; padding-left: 4px; text-transform: uppercase; }
+        .settings-group { background: var(--surface); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+
+        .setting-card { padding: 13px 16px; display: flex; align-items: center; cursor: pointer; gap: 12px; margin: 0; border: none; border-radius: 0; background: transparent; transition: background 0.15s ease; }
+        .setting-card:hover { background: var(--surface-hover); }
+        .setting-card:active { background: var(--surface-hover); }
+        .setting-divider { height: 1px; background: var(--border); margin-left: 58px; }
+        .setting-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .setting-label { font-weight: 600; font-size: 15px; flex: 1; }
+        .setting-val { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+
+        .loyalty-btn { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #2d6a4f 0%, #40916c 50%, #52b788 100%); color: white; border-radius: 14px; padding: 15px 16px; transition: transform 0.15s ease, opacity 0.15s ease; box-shadow: 0 4px 14px rgba(45,106,79,0.3); }
+        .loyalty-btn:active { transform: scale(0.98); opacity: 0.92; }
+        .loyalty-title { font-size: 15px; font-weight: 700; color: white; flex: 1; }
+
+        .settings-footer { margin-top: auto; padding-top: 8px; padding-bottom: max(env(safe-area-inset-bottom), 90px); text-align: center; font-size: 12px; color: var(--text-muted); }
 
         /* FLOATING PILL BOTTOM NAV (MOBILE) */
         .bottom-nav { 
@@ -163,7 +179,7 @@
         .nav-item.active { background: var(--primary); color: white; }
         .nav-item:active { transform: scale(0.95); }
         
-        /* LOYALTY FADE BLUE STYLING */
+        /* LOYALTY FADE BLUE STYLING (kept for compatibility) */
         .loyalty-pill { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); color: #0284c7; }
 
         .nav-badge { 
@@ -539,26 +555,65 @@
         </div>
 
         <div class="settings-area" id="settingsPanel">
-            <h3 style="margin-bottom:20px; color:var(--text-muted); font-size:12px; letter-spacing:1px;">SETTINGS</h3>
-            <div class="setting-card" onclick="toggleTheme()"><div class="setting-label">Theme Mode</div><div class="setting-val" id="themeDisplay">Light Mode</div></div>
-            <div class="setting-card" onclick="openHistory()"><div class="setting-label">History</div><div class="setting-val">View ></div></div>
-            <div class="setting-card" onclick="openManager()"><div class="setting-label">Manage Menu</div><div class="setting-val">></div></div>
-            
-            <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="setting-card loyalty-pill" style="text-decoration: none; border: none; justify-content: center; margin-top: 15px;">
-                <div class="setting-label" style="font-size: 14px; font-weight: 800;">Customer Loyalty</div>
-            </a>
+            <div class="settings-header">
+                <span class="settings-title">Settings</span>
+            </div>
 
-            <div style="border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px;">
-                <div class="setting-card" onclick="logout()" style="border-color:rgba(255,59,48,0.3);">
-                    <div class="setting-label" style="color:#FF3B30;">Logout</div>
-                    <div class="setting-val" style="color:#FF3B30;">→</div>
+            <div class="settings-section">
+                <div class="settings-section-label">Preferences</div>
+                <div class="settings-group">
+                    <div class="setting-card" onclick="toggleTheme()">
+                        <div class="setting-icon" style="background:#5856d6"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+                        <div class="setting-label">Theme</div>
+                        <div class="setting-val" id="themeDisplay">Light Mode</div>
+                    </div>
+                    <div class="setting-divider"></div>
+                    <div class="setting-card" onclick="openHistory()">
+                        <div class="setting-icon" style="background:#007aff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                        <div class="setting-label">History</div>
+                        <div class="setting-val">View ›</div>
+                    </div>
+                    <div class="setting-divider"></div>
+                    <div class="setting-card" onclick="openManager()">
+                        <div class="setting-icon" style="background:#34c759"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></div>
+                        <div class="setting-label">Manage Menu</div>
+                        <div class="setting-val">›</div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="desktop-nav-group">
-                <h3 style="margin-top:20px; margin-bottom:20px; color:var(--text-muted); font-size:12px; letter-spacing:1px;">APP NAVIGATION</h3>
-                <div class="setting-card" onclick="switchTab('inventory')"><div class="setting-label">Financial Overview</div><div class="setting-val">></div></div>
+
+            <div class="settings-section">
+                <div class="settings-section-label">Quick Access</div>
+                <a href="https://nanthe27.github.io/MyDayMatcha/staff/" class="loyalty-btn" style="text-decoration:none;">
+                    <div class="setting-icon" style="background:rgba(255,255,255,0.2)"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+                    <span class="loyalty-title">Customer Loyalty</span>
+                    <svg style="opacity:.7" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
             </div>
+
+            <div class="settings-section">
+                <div class="settings-section-label">Account</div>
+                <div class="settings-group">
+                    <div class="setting-card" onclick="logout()">
+                        <div class="setting-icon" style="background:#ff3b30"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+                        <div class="setting-label" style="color:#FF3B30;">Logout</div>
+                        <div class="setting-val" style="color:#FF3B30;">›</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="desktop-nav-group">
+                <div class="settings-section-label">App Navigation</div>
+                <div class="settings-group">
+                    <div class="setting-card" onclick="switchTab('inventory')">
+                        <div class="setting-icon" style="background:#ff9500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                        <div class="setting-label">Financial Overview</div>
+                        <div class="setting-val">›</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-footer">v4.0.4</div>
         </div>
     </div>
 
@@ -729,7 +784,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v4.0.3';
+        const APP_VERSION = 'v4.0.4';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
