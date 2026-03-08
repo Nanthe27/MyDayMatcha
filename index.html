@@ -70,8 +70,8 @@
 
         /* --- HEADER --- */
         .app-header {
-            height: calc(70px + env(safe-area-inset-top)); /* 70px content zone — matches History/Manager headers; align-items:center keeps logo/buttons perfectly centred in the 70px below the safe area */
-            padding: env(safe-area-inset-top) 20px 0 20px;
+            height: calc(70px + max(env(safe-area-inset-top), 20px)); /* min 20px keeps logo clear of status bar in browser mode; env() handles PWA standalone */
+            padding: max(env(safe-area-inset-top), 20px) 20px 0 20px;
             display: flex; justify-content: space-between; align-items: center;
             background: var(--surface); border-bottom: 1px solid var(--border);
             z-index: 50; flex-shrink: 0;
@@ -337,8 +337,8 @@
         }
         
         #historyPage .app-header, #managerPage .app-header, #inventoryPage .app-header {
-            height: calc(70px + env(safe-area-inset-top));
-            padding: env(safe-area-inset-top) 20px 0 20px;
+            height: calc(70px + max(env(safe-area-inset-top), 20px));
+            padding: max(env(safe-area-inset-top), 20px) 20px 0 20px;
         }
 
         .hc-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
@@ -393,7 +393,7 @@
         .editor-form { width: 90%; max-width: 400px; background: var(--surface); padding: 25px; border-radius: var(--radius); max-height: 85vh; overflow-y: auto; }
 
         #testBanner { display: none; background: var(--primary); color: #fff; text-align: center; font-weight: 800; font-size: 10px; padding: 5px; position: fixed; top: 0; width: 100%; z-index: 10000; }
-        body.testing .app-header { margin-top: 20px; }
+        /* body.testing .app-header margin-top removed — safe-area min(20px) in header handles browser-mode gap */
 
         .last-record-card {
             background: rgba(76, 175, 80, 0.07);
@@ -729,7 +729,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v4.0.2';
+        const APP_VERSION = 'v4.0.3';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
