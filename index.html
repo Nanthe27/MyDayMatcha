@@ -751,7 +751,7 @@
             <div style="width:40px;"></div>
         </div>
 
-        <div class="fin-page-wrap">
+        <div class="fin-page-wrap" id="finPageWrap">
 
             <!-- Sub Navigation -->
             <div class="fin-subnav">
@@ -1340,6 +1340,8 @@
             if (t === 'inventory') {
                 finMonthDate = new Date();
                 invPanel.classList.add('open');
+                const wrap = document.getElementById('finPageWrap');
+                if (wrap) wrap.scrollTop = 0;
                 fetchInventoryAndStats();
             } else {
                 invPanel.classList.remove('open');
