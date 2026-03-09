@@ -483,6 +483,31 @@
         .day-drinks-row:last-child { border-bottom: none; }
 
         #receiptContainer { display: none; }
+
+        /* FINVIEW REDESIGN COMPONENTS */
+        .fin-card-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+        .fin-card-body { padding:18px; }
+        .fin-kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+        .fin-kpi-card { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px 16px; }
+        .fin-kpi-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:8px; }
+        .fin-kpi-value { font-size:19px; font-weight:800; letter-spacing:-0.3px; line-height:1.1; }
+        .fin-profit-block { display:flex; justify-content:space-between; align-items:center; background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:14px 18px; margin-bottom:16px; }
+        .fin-profit-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
+        .fin-profit-value { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
+        .fin-toggle-btn { width:100%; background:none; border:none; border-top:1px solid var(--border); padding:12px 0 2px; margin-top:16px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); cursor:pointer; transition:color 0.2s; text-align:center; }
+        .fin-toggle-btn:hover { color:var(--text); }
+        .fin-inv-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:8px; animation:fadeScale 0.2s; }
+        .fin-inv-meta { font-size:10px; font-weight:600; color:var(--text-muted); letter-spacing:0.3px; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .fin-inv-body { display:flex; justify-content:space-between; align-items:flex-end; }
+        .fin-inv-name { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
+        .fin-inv-qty { font-size:11px; font-weight:500; color:var(--text-muted); }
+        .fin-inv-cost { font-size:15px; font-weight:800; color:#FF3B30; flex-shrink:0; margin-left:12px; }
+        .fin-inv-actions { display:flex; gap:4px; flex-shrink:0; }
+        .fin-action-btn { background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:10px; font-weight:700; letter-spacing:0.5px; padding:3px 8px; cursor:pointer; color:var(--text-muted); transition:0.15s; }
+        .fin-action-btn:hover { color:var(--text); border-color:var(--text-muted); }
+        .fin-action-btn.delete { border-color:rgba(255,59,48,0.4); color:#FF3B30; }
+        .fin-action-btn.delete:hover { background:rgba(255,59,48,0.08); border-color:#FF3B30; }
+
         @media print {
             body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal, #inventoryPage, #invEditorModal { display: none !important; }
             #receiptContainer { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
@@ -685,79 +710,105 @@
     <div id="inventoryPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
         <div class="app-header" style="width:100%;">
             <button class="text-btn" style="font-size:28px; line-height:1; padding:0 15px;" onclick="switchTab('menu')">‹</button>
-            <span style="font-weight:700; color:var(--primary); font-size:16px;">Financial Overview</span>
+            <span style="font-weight:700; color:var(--primary); font-size:16px; letter-spacing:-0.3px;">Financial Overview</span>
             <div style="width:40px;"></div>
         </div>
-        
+
         <div class="inv-container">
-            
+
             <div class="dashboard-wrapper">
-                <div class="dashboard-card">
-                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 15px;">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase;" id="finMonthLabel">This Month</div>
-                        <div style="display:flex; align-items:center; gap:6px;">
+                <div class="dashboard-card" style="padding:0; overflow:hidden;">
+                    <div class="fin-card-header">
+                        <div id="finMonthLabel" style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase;">This Month</div>
+                        <div style="display:flex; gap:6px;">
                             <button class="month-nav-btn" style="width:28px;height:28px;font-size:16px;" onclick="changeFinMonth(-1)">‹</button>
                             <button class="month-nav-btn" id="finNextBtn" style="width:28px;height:28px;font-size:16px;" onclick="changeFinMonth(1)">›</button>
                         </div>
                     </div>
-                    
-                    <div id="invDashboard" style="transition: opacity 0.3s ease;">
-                        <div class="dash-row"><span style="color:var(--text-muted)">Total Sales Income</span><span class="dash-val" id="dashSales" style="color:var(--primary); transition: color 0.3s ease;">+0 KHR</span></div>
-                        <div class="dash-row"><span style="color:var(--text-muted)">Total Inventory Cost</span><span class="dash-val" id="dashCost" style="color:#FF3B30; transition: color 0.3s ease;">-0 KHR</span></div>
-                        
-                        <div class="profit-val" id="dashProfit" style="color:var(--primary); transition: color 0.3s ease;">Actual Profit: 0 KHR</div>
-                        
-                        <div class="chart-container">
-                            <div class="pie-chart" id="dashPie" style="background: conic-gradient(var(--primary) 0% 50%, #FF3B30 50% 100%); transition: background 0.5s ease;">
-                                <div class="pie-center-text" id="dashPieText">50%</div>
+                    <div class="fin-card-body">
+                        <div id="invDashboard" style="transition:opacity 0.3s ease;">
+                            <div class="fin-kpi-grid">
+                                <div class="fin-kpi-card">
+                                    <div class="fin-kpi-label">Sales Income</div>
+                                    <div class="fin-kpi-value" id="dashSales" style="color:var(--primary); transition:color 0.3s ease;">+0 KHR</div>
+                                </div>
+                                <div class="fin-kpi-card">
+                                    <div class="fin-kpi-label">Inventory Cost</div>
+                                    <div class="fin-kpi-value" id="dashCost" style="color:#FF3B30; transition:color 0.3s ease;">-0 KHR</div>
+                                </div>
                             </div>
-                            <div class="chart-legend">
-                                <div class="legend-item"><div class="dot sales"></div> Income (<span id="dashSalesPct">50</span>%)</div>
-                                <div class="legend-item"><div class="dot expenses"></div> Expense (<span id="dashExpPct">50</span>%)</div>
+                            <div class="fin-profit-block">
+                                <div class="fin-profit-label">Actual Profit</div>
+                                <div class="fin-profit-value" id="dashProfit" style="color:var(--primary); transition:color 0.3s ease;">0 KHR</div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="pie-chart" id="dashPie" style="background:conic-gradient(var(--primary) 0% 50%, #FF3B30 50% 100%); transition:background 0.5s ease;">
+                                    <div class="pie-center-text" id="dashPieText">50%</div>
+                                </div>
+                                <div class="chart-legend">
+                                    <div class="legend-item"><div class="dot sales"></div>Income (<span id="dashSalesPct">50</span>%)</div>
+                                    <div class="legend-item"><div class="dot expenses"></div>Expense (<span id="dashExpPct">50</span>%)</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <button class="text-btn" style="width:100%; margin-top:20px; font-size:12px; font-weight:800; color:var(--text-muted); text-align:center; border-top:1px solid var(--border); border-radius:0; padding-top:15px; padding-bottom:5px;" onclick="toggleAllTimeStats()">VIEW ALL TIME PROFIT ▾</button>
+                        <button class="fin-toggle-btn" onclick="toggleAllTimeStats()">View All-Time Profit ▾</button>
 
-                    <div id="allTimeStats" style="display:none; flex-direction:column; margin-top:10px; padding-top:15px; border-top:1px dashed var(--border);">
-                        <div style="text-align:center; color:var(--text-muted); font-size:12px;" id="allTimeLoading">Loading All-Time Data...</div>
-                        <div id="allTimeContent" style="display:none;">
-                            <div class="dash-row"><span style="color:var(--text-muted)">All Time Income</span><span class="dash-val" id="atSales" style="color:var(--primary)">+0 KHR</span></div>
-                            <div class="dash-row"><span style="color:var(--text-muted)">All Time Cost</span><span class="dash-val" id="atCost" style="color:#FF3B30">-0 KHR</span></div>
-                            <div class="profit-val" id="atProfit" style="font-size:16px; border-top:none; margin-top:5px; padding-top:5px;">All Time Profit: 0 KHR</div>
+                        <div id="allTimeStats" style="display:none; flex-direction:column; margin-top:12px; padding-top:16px; border-top:1px dashed var(--border);">
+                            <div style="text-align:center; color:var(--text-muted); font-size:12px; font-weight:500;" id="allTimeLoading">Loading All-Time Data...</div>
+                            <div id="allTimeContent" style="display:none;">
+                                <div class="fin-kpi-grid" style="margin-bottom:10px;">
+                                    <div class="fin-kpi-card">
+                                        <div class="fin-kpi-label">All-Time Income</div>
+                                        <div class="fin-kpi-value" id="atSales" style="color:var(--primary);">+0 KHR</div>
+                                    </div>
+                                    <div class="fin-kpi-card">
+                                        <div class="fin-kpi-label">All-Time Cost</div>
+                                        <div class="fin-kpi-value" id="atCost" style="color:#FF3B30;">-0 KHR</div>
+                                    </div>
+                                </div>
+                                <div class="fin-profit-block" style="margin-bottom:0;">
+                                    <div class="fin-profit-label">All-Time Profit</div>
+                                    <div class="fin-profit-value" id="atProfit" style="color:var(--primary);">0 KHR</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="dashboard-card" id="dailyBreakdownCard" style="display:none;">
-                <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 18px; display:flex; align-items:center; gap:6px;">Daily Breakdown</div>
-                <div class="day-date-scroll-wrap"><div id="dayCalendar" class="day-date-scroll"></div></div>
-                <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
-                <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:12px; font-style:italic; letter-spacing:0.3px; opacity:0.7;">Day's Net Profit ≠ Monthly Actual Profit</div>
+            <div class="dashboard-card" id="dailyBreakdownCard" style="display:none; padding:0; overflow:hidden;">
+                <div class="fin-card-header">
+                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Daily Breakdown</div>
+                </div>
+                <div class="fin-card-body">
+                    <div class="day-date-scroll-wrap"><div id="dayCalendar" class="day-date-scroll"></div></div>
+                    <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
+                    <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:12px; letter-spacing:0.3px; opacity:0.7;">Day's Net Profit reflects drink costs only, not inventory purchases.</div>
+                </div>
             </div>
 
             <div class="inv-left-col">
-                <div class="cart-header" style="border-radius:var(--radius); margin-bottom: 10px; padding:15px; background:none;">ADD EXPENSE</div>
-                <div style="background:var(--surface); padding:20px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom: 25px;">
-                    <div class="form-group"><label class="form-label">Ingredient Name</label><input id="invItem" class="form-input" placeholder="e.g., Matcha Powder"></div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <div class="form-group"><label class="form-label">Unit Size (e.g., 1L)</label><input id="invUnit" class="form-input" placeholder="e.g., 1 kg"></div>
-                        <div class="form-group"><label class="form-label">Amount Bought</label><input id="invAmount" type="number" class="form-input" placeholder="e.g., 2"></div>
+                <div class="dashboard-card" style="padding:0; overflow:hidden; margin-bottom:20px;">
+                    <div class="fin-card-header">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Add Expense</div>
                     </div>
-                    <div class="form-group"><label class="form-label">Total Cost (KHR)</label><input id="invCost" type="number" class="form-input" placeholder="0"></div>
-                    
-                    <button class="btn btn-clear" style="width:100%; margin-top:10px; border-color:var(--primary); color:var(--primary);" onclick="addPendingInventory()">+ ADD TO LIST</button>
-                    
-                    <div id="pendingInvList" style="margin-top:15px; display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto; padding-right:5px;"></div>
-                    
-                    <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:15px; display:none;" onclick="saveInventory()">SAVE ALL RECORDS</button>
+                    <div class="fin-card-body">
+                        <div class="form-group"><label class="form-label">Ingredient Name</label><input id="invItem" class="form-input" placeholder="e.g., Matcha Powder"></div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div class="form-group"><label class="form-label">Unit Size</label><input id="invUnit" class="form-input" placeholder="e.g., 1 kg"></div>
+                            <div class="form-group"><label class="form-label">Amount Bought</label><input id="invAmount" type="number" class="form-input" placeholder="e.g., 2"></div>
+                        </div>
+                        <div class="form-group"><label class="form-label">Total Cost (KHR)</label><input id="invCost" type="number" class="form-input" placeholder="0"></div>
+                        <button class="btn" style="width:100%; margin-top:4px; background:var(--bg); border-color:var(--border); color:var(--text); font-size:12px; letter-spacing:0.5px;" onclick="addPendingInventory()">+ Add to List</button>
+                        <div id="pendingInvList" style="margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto; padding-right:5px;"></div>
+                        <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:12px; display:none;" onclick="saveInventory()">Save All Records</button>
+                    </div>
                 </div>
             </div>
 
             <div class="inv-right-col">
-                <div class="cart-header" style="border-radius:var(--radius); margin-bottom: 10px; padding:15px; background:none;">RECENT PURCHASES</div>
+                <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border);">Recent Purchases</div>
                 <div id="invLastRecord"></div>
                 <div id="inventoryList"></div>
             </div>
@@ -807,7 +858,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v4.0.4';
+        const APP_VERSION = 'v4.0.5';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1659,7 +1710,7 @@
             if (cachedInv && cachedHist) {
                 _renderFinView(JSON.parse(cachedInv), JSON.parse(cachedHist));
             } else {
-                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">Loading Records...</div>';
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">Loading...</div>';
                 lastInvRec.innerHTML = '';
                 dash.style.opacity = '0.5';
             }
@@ -1690,36 +1741,43 @@
             if (invData.length > 0) {
                 const last = invData[0];
                 lastInvRec.innerHTML = `
-                    <div class="last-record-card" style="margin-bottom:12px;">
-                        <div class="last-record-label">Last Purchase</div>
-                        <div class="hc-header" style="border-bottom:none; padding-bottom:0; font-size:11px;">${last.date} ${last.time} &nbsp;·&nbsp; ${last.user}</div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-                            <div style="font-size:14px; font-weight:700;">${last.item} <span style="color:var(--text-muted); font-weight:400; font-size:12px;">(${last.qty})</span></div>
-                            <div style="color:#FF3B30; font-weight:800; font-size:20px;">-${Number(last.cost).toLocaleString()} KHR</div>
+                    <div class="fin-inv-card" style="margin-bottom:10px; border-color:var(--primary); background:color-mix(in srgb, var(--primary) 4%, var(--surface));">
+                        <div class="fin-inv-meta" style="border-bottom-color:color-mix(in srgb, var(--primary) 25%, var(--border));">
+                            <span style="font-size:9px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--primary);">Last Purchase</span>
+                            <span>${last.date} · ${last.user}</span>
+                        </div>
+                        <div class="fin-inv-body">
+                            <div>
+                                <div class="fin-inv-name">${last.item}</div>
+                                <div class="fin-inv-qty">${last.qty}</div>
+                            </div>
+                            <div class="fin-inv-cost">-${Number(last.cost).toLocaleString()} KHR</div>
                         </div>
                     </div>`;
             }
 
             if (invData.length === 0) {
-                list.innerHTML = '<div style="text-align:center; color:var(--text-muted);">No records found this month.</div>';
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">No records this month.</div>';
             } else {
                 invData.forEach(log => {
                     totalInvCost += Number(log.cost);
                     const div = document.createElement('div');
-                    div.className = 'history-card';
+                    div.className = 'fin-inv-card';
                     const logStr = encodeURIComponent(JSON.stringify(log));
                     div.innerHTML = `
-                        <div class="hc-header">
-                            <span>${log.date} ${log.time}</span>
-                            <div>
-                                <span style="font-weight:500; margin-right: 5px;">${log.user}</span>
-                                <button class="text-btn" style="padding:2px 6px; font-size:10px; border:1px solid var(--border);" onclick="openInvEditor('${logStr}')">EDIT</button>
-                                <button class="text-btn" style="padding:2px 6px; font-size:12px; border:1px solid #FF3B30; color:#FF3B30; margin-left: 3px;" onclick="confirmDeleteInv('${logStr}')">×</button>
+                        <div class="fin-inv-meta">
+                            <span>${log.date} · ${log.time} · ${log.user}</span>
+                            <div class="fin-inv-actions">
+                                <button class="fin-action-btn" onclick="openInvEditor('${logStr}')">Edit</button>
+                                <button class="fin-action-btn delete" onclick="confirmDeleteInv('${logStr}')">Delete</button>
                             </div>
                         </div>
-                        <div style="display:flex; justify-content:space-between; margin-top:8px;">
-                            <div style="font-size:13px;"><b>${log.item}</b> <span style="color:var(--text-muted);">(${log.qty})</span></div>
-                            <div style="color:#FF3B30; font-weight:700; font-size:14px;">-${Number(log.cost).toLocaleString()} KHR</div>
+                        <div class="fin-inv-body">
+                            <div>
+                                <div class="fin-inv-name">${log.item}</div>
+                                <div class="fin-inv-qty">${log.qty}</div>
+                            </div>
+                            <div class="fin-inv-cost">-${Number(log.cost).toLocaleString()} KHR</div>
                         </div>
                     `;
                     list.appendChild(div);
@@ -1738,7 +1796,7 @@
             document.getElementById('dashSales').innerText = '+' + totalSales.toLocaleString() + ' KHR';
             document.getElementById('dashCost').innerText = '-' + totalInvCost.toLocaleString() + ' KHR';
             const dProfit = document.getElementById('dashProfit');
-            dProfit.innerText = 'Actual Profit: ' + realProfit.toLocaleString() + ' KHR';
+            dProfit.innerText = (realProfit >= 0 ? '+' : '') + realProfit.toLocaleString() + ' KHR';
             dProfit.style.color = profitColor;
             document.getElementById('dashPie').style.background = `conic-gradient(var(--primary) 0% ${salesPct}%, #FF3B30 ${salesPct}% 100%)`;
             document.getElementById('dashPieText').innerText = salesPct + '%';
@@ -1770,7 +1828,7 @@
                     document.getElementById('atCost').innerText = '-' + cost.toLocaleString() + ' KHR';
                     
                     let pEl = document.getElementById('atProfit');
-                    pEl.innerText = 'All Time Profit: ' + profit.toLocaleString() + ' KHR';
+                    pEl.innerText = (profit >= 0 ? '+' : '') + profit.toLocaleString() + ' KHR';
                     pEl.style.color = profit >= 0 ? "var(--primary)" : "#FF3B30";
 
                     loading.style.display = 'none';
