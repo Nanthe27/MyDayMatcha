@@ -199,15 +199,18 @@
         .fin-stock-grid { display:flex; flex-direction:column; }
         /* FinView — Sub Navigation Buttons */
         .fin-subnav { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
-        .fin-subnav-btn { background:var(--surface); border:1.5px solid var(--border); border-radius:18px; padding:20px 10px; min-height:90px; font-family:inherit; cursor:pointer; transition:all 0.2s cubic-bezier(0.2,0,0,1); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; box-shadow:0 2px 6px rgba(0,0,0,0.05); -webkit-tap-highlight-color:transparent; width:100%; }
+        .fin-subnav-btn { background:var(--surface); border:1.5px solid var(--border); border-radius:18px; padding:20px 10px; min-height:108px; font-family:inherit; cursor:pointer; transition:all 0.2s cubic-bezier(0.2,0,0,1); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(0,0,0,0.05); -webkit-tap-highlight-color:transparent; width:100%; }
+        .fin-subnav-icon { width:26px; height:26px; color:var(--text-muted); transition:color 0.2s; flex-shrink:0; display:block; }
         .fin-subnav-title { font-size:12px; font-weight:800; letter-spacing:0.8px; text-transform:uppercase; color:var(--text-muted); transition:color 0.2s; display:block; text-align:center; line-height:1.2; }
         .fin-subnav-bar { display:block; width:22px; height:2px; border-radius:2px; background:var(--border); transition:all 0.2s; flex-shrink:0; }
         .fin-subnav-desc { font-size:10px; font-weight:600; color:var(--text-muted); opacity:0.6; letter-spacing:0.2px; transition:all 0.2s; display:block; text-align:center; line-height:1.4; }
         .fin-subnav-btn.active { background:var(--primary); border-color:var(--primary); box-shadow:0 8px 24px rgba(52,141,80,0.28); transform:translateY(-2px); }
+        .fin-subnav-btn.active .fin-subnav-icon { color:#fff; }
         .fin-subnav-btn.active .fin-subnav-title { color:#fff; }
         .fin-subnav-btn.active .fin-subnav-bar { background:rgba(255,255,255,0.35); width:30px; }
         .fin-subnav-btn.active .fin-subnav-desc { color:rgba(255,255,255,0.72); opacity:1; }
         .fin-subnav-btn:not(.active):hover { border-color:var(--primary); }
+        .fin-subnav-btn:not(.active):hover .fin-subnav-icon { color:var(--primary); }
         .fin-subnav-btn:not(.active):hover .fin-subnav-title { color:var(--primary); }
         .fin-subnav-btn:not(.active):hover .fin-subnav-bar { background:var(--primary); opacity:0.35; width:28px; }
         .fin-subnav-btn:not(.active):hover .fin-subnav-desc { opacity:0.9; }
@@ -238,7 +241,8 @@
 
             /* Desktop FinView Layout */
             .fin-page-wrap { max-width:1000px !important; padding-bottom:30px !important; }
-            .fin-subnav-btn { padding:26px 20px; min-height:108px; }
+            .fin-subnav-btn { padding:26px 20px; min-height:124px; }
+            .fin-subnav-icon { width:30px; height:30px; }
             .fin-subnav-title { font-size:14px; letter-spacing:1px; }
             .fin-subnav-desc { font-size:11px; }
             .fin-stock-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:30px; align-items:start; }
@@ -684,7 +688,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer">v4.0.8</div>
+            <div class="settings-footer">v4.0.9</div>
         </div>
     </div>
 
@@ -742,11 +746,13 @@
             <!-- Sub Navigation -->
             <div class="fin-subnav">
                 <button class="fin-subnav-btn active" id="btnFinAnalysis" onclick="switchFinView('analysis')">
+                    <svg class="fin-subnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="13" width="5" height="9" rx="1"/><rect x="9.5" y="8" width="5" height="14" rx="1"/><rect x="17" y="4" width="5" height="18" rx="1"/><line x1="1" y1="22" x2="23" y2="22"/></svg>
                     <span class="fin-subnav-title">Analysis</span>
                     <span class="fin-subnav-bar"></span>
                     <span class="fin-subnav-desc">Revenue, profit &amp; trends</span>
                 </button>
                 <button class="fin-subnav-btn" id="btnFinStock" onclick="switchFinView('stock')">
+                    <svg class="fin-subnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
                     <span class="fin-subnav-title">Stock Management</span>
                     <span class="fin-subnav-bar"></span>
                     <span class="fin-subnav-desc">Inventory &amp; expenses</span>
@@ -930,7 +936,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v4.0.8';
+        const APP_VERSION = 'v4.0.9';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
