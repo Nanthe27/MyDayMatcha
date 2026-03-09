@@ -4,8 +4,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Site Update</title>
+<title>Website Update</title>
 
 <!-- Force no caching -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -15,7 +14,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&family=Quicksand:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-
 body{
     margin:0;
     height:100vh;
@@ -59,25 +57,11 @@ p{
 }
 
 @media (max-width:600px){
-
-.container{
-    padding:30px 22px;
+.container{padding:30px 22px;}
+img{width:100px;}
+h1{font-size:24px;}
+p{font-size:14px;}
 }
-
-img{
-    width:100px;
-}
-
-h1{
-    font-size:24px;
-}
-
-p{
-    font-size:14px;
-}
-
-}
-
 </style>
 </head>
 
@@ -104,27 +88,26 @@ Thank you for your patience.
 </div>
 
 <script>
-
-/* Destroy service workers (important for web apps) */
+/* Destroy service workers (so cached web app is ignored) */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    for (let registration of registrations) {
-      registration.unregister();
-    }
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    for (let registration of registrations) registration.unregister();
   });
 }
 
-/* Clear storage used by web apps */
+/* Clear web app storage */
 localStorage.clear();
 sessionStorage.clear();
 
 /* Clear caches */
 if ('caches' in window) {
-  caches.keys().then(function(names) {
+  caches.keys().then(names => {
     for (let name of names) caches.delete(name);
   });
 }
 
+/* Force reload once if somehow cached */
+if (performance.navigation.type === 1) location.reload(true);
 </script>
 
 </body>
