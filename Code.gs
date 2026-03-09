@@ -248,8 +248,10 @@ function getOrCreateSheet(name, headers) {
 // ============================================================
 // TELEGRAM DAILY REPORT — My Day Matcha
 // ============================================================
-var TELEGRAM_TOKEN   = '8506198049:AAE-DBS9XW6gxzm92T7ALWFbMR37JWBLElY';
-var TELEGRAM_CHAT_ID = '6544003518';
+// Store secrets in: Apps Script > Project Settings > Script Properties
+// Add: TELEGRAM_TOKEN = <your bot token>  |  TELEGRAM_CHAT_ID = <your chat id>
+var TELEGRAM_TOKEN   = PropertiesService.getScriptProperties().getProperty('TELEGRAM_TOKEN');
+var TELEGRAM_CHAT_ID = PropertiesService.getScriptProperties().getProperty('TELEGRAM_CHAT_ID');
 var REPORT_TZ        = 'Asia/Bangkok'; // UTC+7 — same as Phnom Penh / Cambodia
 
 // Send an HTML-formatted message to Telegram
