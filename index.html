@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Site Update</title>
+
+<!-- Force no caching -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&family=Quicksand:wght@400;500&display=swap" rel="stylesheet">
 
@@ -52,8 +58,6 @@ p{
     color:#666;
 }
 
-/* phone */
-
 @media (max-width:600px){
 
 .container{
@@ -98,6 +102,30 @@ Thank you for your patience.
 </div>
 
 </div>
+
+<script>
+
+/* Destroy service workers (important for web apps) */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for (let registration of registrations) {
+      registration.unregister();
+    }
+  });
+}
+
+/* Clear storage used by web apps */
+localStorage.clear();
+sessionStorage.clear();
+
+/* Clear caches */
+if ('caches' in window) {
+  caches.keys().then(function(names) {
+    for (let name of names) caches.delete(name);
+  });
+}
+
+</script>
 
 </body>
 </html>
