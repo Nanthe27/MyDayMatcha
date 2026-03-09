@@ -527,12 +527,14 @@
         .fin-chart-legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
 
         /* FinView — Monthly Compare */
-        .fin-compare-table { width:100%; border-collapse:collapse; }
-        .fin-compare-th { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); padding:6px 8px 10px; text-align:right; white-space:nowrap; }
-        .fin-compare-th:first-child { text-align:left; }
-        .fin-compare-td { font-size:13px; font-weight:700; padding:10px 8px; border-top:1px solid var(--border); text-align:right; white-space:nowrap; }
-        .fin-compare-td:first-child { text-align:left; color:var(--text-muted); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; white-space:normal; }
-        .fin-compare-delta { font-size:11px; font-weight:700; display:inline-block; padding:2px 6px; border-radius:6px; }
+        .fin-compare-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+        .fin-compare-th { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.3px; color:var(--text-muted); padding:6px 4px 10px; text-align:right; white-space:nowrap; overflow:hidden; }
+        .fin-compare-th:first-child { text-align:left; width:22%; }
+        .fin-compare-th:nth-child(2), .fin-compare-th:nth-child(3) { width:30%; }
+        .fin-compare-th:nth-child(4) { width:18%; }
+        .fin-compare-td { font-size:11px; font-weight:700; padding:9px 4px; border-top:1px solid var(--border); text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .fin-compare-td:first-child { text-align:left; color:var(--text-muted); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; white-space:normal; word-break:break-word; }
+        .fin-compare-delta { font-size:10px; font-weight:700; display:inline-block; padding:2px 4px; border-radius:5px; }
         .fin-compare-delta.up { color:#34C759; background:rgba(52,199,89,0.10); }
         .fin-compare-delta.down { color:#FF3B30; background:rgba(255,59,48,0.10); }
         .fin-compare-delta.flat { color:var(--text-muted); }
@@ -834,7 +836,7 @@
                         <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Monthly Comparison</div>
                         <div id="finCompareSubtitle" style="font-size:10px; font-weight:600; color:var(--text-muted); opacity:0.7;"></div>
                     </div>
-                    <div class="fin-card-body" style="padding:14px 18px;">
+                    <div class="fin-card-body" style="padding:12px 10px;">
                         <div id="finCompareTable"></div>
                     </div>
                 </div>
