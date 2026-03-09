@@ -196,6 +196,7 @@
         .inv-container { display: flex; flex-direction: column; width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 15px; padding-bottom: calc(130px + env(safe-area-inset-bottom)); }
         .dashboard-wrapper { width: 100%; display: flex; flex-direction: column; }
         .inv-left-col, .inv-right-col { display: flex; flex-direction: column; }
+        .fin-right-col { display: flex; flex-direction: column; }
 
         /* DESKTOP STYLES */
         @media (min-width: 1024px) {
@@ -226,18 +227,13 @@
                 max-width: 1200px !important;
                 display: grid !important;
                 grid-template-columns: 1fr 1fr;
-                grid-template-rows: auto auto auto auto 1fr;
                 gap: 0 40px;
                 padding-bottom: 30px !important;
                 align-items: start;
             }
-            .dashboard-wrapper { grid-column: 2; grid-row: 1; }
-            #dailyBreakdownCard { grid-column: 2; grid-row: 2; }
-            #finTrendCard { grid-column: 2; grid-row: 3; }
-            #finCompareCard { grid-column: 2; grid-row: 4; }
-            .inv-right-col { grid-column: 2; grid-row: 5; }
+            .fin-right-col { grid-column: 2; }
             .inv-left-col {
-                grid-column: 1; grid-row: 1 / 6;
+                grid-column: 1;
                 position: sticky; top: 0;
                 max-height: calc(100vh - 100px);
                 overflow-y: auto; padding-right: 10px;
@@ -748,7 +744,9 @@
 
         <div class="inv-container">
 
-            <div class="dashboard-wrapper">
+            <!-- Right column: data cards (col 2 on desktop; stacks first on mobile) -->
+            <div class="fin-right-col">
+
                 <div class="dashboard-card" style="padding:0; overflow:hidden;">
                     <div class="fin-card-header">
                         <div id="finMonthLabel" style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase;">This Month</div>
@@ -805,45 +803,60 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="dashboard-card" id="dailyBreakdownCard" style="padding:0; overflow:hidden;">
-                <div class="fin-card-header">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Daily Breakdown</div>
-                </div>
-                <div class="fin-card-body">
-                    <div class="day-date-scroll-wrap"><div id="dayCalendar" class="day-date-scroll"></div></div>
-                    <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
-                    <div id="dayEmptyState" style="text-align:center; padding:18px 0 6px; color:var(--text-muted); font-size:12px; font-weight:500; display:none;">No sales data for this period.</div>
-                    <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:12px; letter-spacing:0.3px; opacity:0.7;">Day's Net Profit reflects drink costs only, not inventory purchases.</div>
-                </div>
-            </div>
-
-            <div class="dashboard-card" id="finTrendCard" style="display:none; padding:0; overflow:hidden;">
-                <div class="fin-card-header">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">4-Month Trend</div>
-                </div>
-                <div class="fin-card-body">
-                    <div id="finBarChart" style="width:100%;"></div>
-                    <div class="fin-chart-legend">
-                        <div class="fin-chart-legend-item"><div class="fin-chart-legend-dot" style="background:#FF6B6B;"></div>Expense</div>
-                        <div class="fin-chart-legend-item"><div class="fin-chart-legend-dot" style="background:var(--primary);"></div>Net Profit</div>
+                <div class="dashboard-card" id="dailyBreakdownCard" style="padding:0; overflow:hidden;">
+                    <div class="fin-card-header">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Daily Breakdown</div>
+                    </div>
+                    <div class="fin-card-body">
+                        <div class="day-date-scroll-wrap"><div id="dayCalendar" class="day-date-scroll"></div></div>
+                        <div id="dayDetailContainer" class="day-detail" style="display:none;"></div>
+                        <div id="dayEmptyState" style="text-align:center; padding:18px 0 6px; color:var(--text-muted); font-size:12px; font-weight:500; display:none;">No sales data for this period.</div>
+                        <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:12px; letter-spacing:0.3px; opacity:0.7;">Day's Net Profit reflects drink costs only, not inventory purchases.</div>
                     </div>
                 </div>
-            </div>
 
-            <div class="dashboard-card" id="finCompareCard" style="display:none; padding:0; overflow:hidden;">
-                <div class="fin-card-header">
-                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Monthly Comparison</div>
-                    <div id="finCompareSubtitle" style="font-size:10px; font-weight:600; color:var(--text-muted); opacity:0.7;"></div>
+                <div class="dashboard-card" id="finTrendCard" style="display:none; padding:0; overflow:hidden;">
+                    <div class="fin-card-header">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">4-Month Trend</div>
+                    </div>
+                    <div class="fin-card-body">
+                        <div id="finBarChart" style="width:100%;"></div>
+                        <div class="fin-chart-legend">
+                            <div class="fin-chart-legend-item"><div class="fin-chart-legend-dot" style="background:#FF6B6B;"></div>Expense</div>
+                            <div class="fin-chart-legend-item"><div class="fin-chart-legend-dot" style="background:var(--primary);"></div>Net Profit</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="fin-card-body" style="padding:14px 18px;">
-                    <div id="finCompareTable"></div>
-                </div>
-            </div>
 
+                <div class="dashboard-card" id="finCompareCard" style="display:none; padding:0; overflow:hidden;">
+                    <div class="fin-card-header">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Monthly Comparison</div>
+                        <div id="finCompareSubtitle" style="font-size:10px; font-weight:600; color:var(--text-muted); opacity:0.7;"></div>
+                    </div>
+                    <div class="fin-card-body" style="padding:14px 18px;">
+                        <div id="finCompareTable"></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-card" style="padding:0; overflow:hidden;">
+                    <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('recentPurchasesBody','recentPurchasesArrow')">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Recent Purchases</div>
+                        <button class="fin-collapse-btn" id="recentPurchasesArrow">▾</button>
+                    </div>
+                    <div class="fin-collapsible" id="recentPurchasesBody">
+                        <div class="fin-card-body" style="padding-top:12px;">
+                            <div id="invLastRecord"></div>
+                            <div id="inventoryList"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end fin-right-col -->
+
+            <!-- Left column: Add Expense (col 1 sticky on desktop; stacks below on mobile) -->
             <div class="inv-left-col">
-                <div class="dashboard-card" style="padding:0; overflow:hidden; margin-bottom:20px;">
+                <div class="dashboard-card" style="padding:0; overflow:hidden;">
                     <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('addExpenseBody','addExpenseArrow')">
                         <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Add Expense</div>
                         <button class="fin-collapse-btn" id="addExpenseArrow">▾</button>
@@ -862,22 +875,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div><!-- end inv-left-col -->
 
-            <div class="inv-right-col">
-                <div class="dashboard-card" style="padding:0; overflow:hidden;">
-                    <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('recentPurchasesBody','recentPurchasesArrow')">
-                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Recent Purchases</div>
-                        <button class="fin-collapse-btn" id="recentPurchasesArrow">▾</button>
-                    </div>
-                    <div class="fin-collapsible" id="recentPurchasesBody">
-                        <div class="fin-card-body" style="padding-top:12px;">
-                            <div id="invLastRecord"></div>
-                            <div id="inventoryList"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
