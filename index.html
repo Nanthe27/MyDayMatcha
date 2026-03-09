@@ -966,30 +966,46 @@
 
         function hardRefreshApp() {
             const btn = document.getElementById('updateRefreshBtn');
-            if (btn) { btn.innerText = 'Refreshing…'; btn.disabled = true; }
-            fetch(window.location.href, { cache: 'no-store' })
+            if (btn) { btn.innerText = 'Checking…'; btn.disabled = true; }
+            // Timestamp query param ensures SW cache has no match → always hits network
+            const bustUrl = location.pathname + '?_bust=' + Date.now();
+            fetch(bustUrl, { cache: 'no-store' })
                 .then(r => r.text())
                 .then(html => {
                     const m = html.match(/const APP_VERSION\s*=\s*'([^']+)'/);
                     if (m && m[1] !== APP_VERSION) {
-                        window.location.reload(true);
+                        // Unregister SW so reload fetches all assets fresh from network
+                        const doReload = () => window.location.reload(true);
+                        if ('serviceWorker' in navigator) {
+                            navigator.serviceWorker.getRegistrations()
+                                .then(regs => Promise.all(regs.map(r => r.unregister())))
+                                .then(doReload).catch(doReload);
+                        } else { doReload(); }
                     } else {
                         if (btn) { btn.innerText = '✓ Already up to date'; btn.disabled = false; }
-                        setTimeout(() => { if (btn) { btn.innerText = '↻ Check for Update'; } }, 2500);
+                        setTimeout(() => { if (btn) btn.innerText = '↻ Check for Update'; }, 2500);
                     }
                 })
                 .catch(() => {
-                    window.location.reload(true);
+                    if (btn) { btn.innerText = '↻ Check for Update'; btn.disabled = false; }
                 });
         }
 
         function _startVersionPoller() {
             setInterval(() => {
-                fetch(window.location.href, { cache: 'no-store' })
+                const bustUrl = location.pathname + '?_bust=' + Date.now();
+                fetch(bustUrl, { cache: 'no-store' })
                     .then(r => r.text())
                     .then(html => {
                         const m = html.match(/const APP_VERSION\s*=\s*'([^']+)'/);
-                        if (m && m[1] !== APP_VERSION) window.location.reload(true);
+                        if (m && m[1] !== APP_VERSION) {
+                            const doReload = () => window.location.reload(true);
+                            if ('serviceWorker' in navigator) {
+                                navigator.serviceWorker.getRegistrations()
+                                    .then(regs => Promise.all(regs.map(r => r.unregister())))
+                                    .then(doReload).catch(doReload);
+                            } else { doReload(); }
+                        }
                     })
                     .catch(() => {});
             }, 5 * 60 * 1000);
