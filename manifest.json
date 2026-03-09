@@ -1,27 +1,27 @@
 {
-    "name": "My Day Matcha — Loyalty",
-    "short_name": "MDM Loyalty",
-    "description": "Loyalty program management for My Day Matcha",
+    "name": "My Day Matcha",
+    "short_name": "My Day Matcha",
+    "description": "My Day Matcha — Order, Menu & Loyalty",
     "start_url": "./",
-    "scope": "../",
+    "scope": "./",
     "display": "standalone",
     "orientation": "portrait-primary",
     "background_color": "#F2F2F7",
     "theme_color": "#4CAF50",
     "icons": [
         {
-            "src": "https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/fac565acc942ff0260de380d21014a133789b493/Logo.png",
+            "src": "https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/fac565acc942ff0260de380d21014a133789b493/Logo.png",
+            "src": "https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }
     ],
-    "categories": ["business", "utilities"],
+    "categories": ["food", "utilities"],
     "prefer_related_applications": false
 }
