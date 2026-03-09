@@ -224,16 +224,17 @@
                 max-width: 1200px !important;
                 display: grid !important;
                 grid-template-columns: 1fr 1fr;
-                grid-template-rows: auto auto 1fr;
+                grid-template-rows: auto auto auto 1fr;
                 gap: 0 40px;
                 padding-bottom: 30px !important;
                 align-items: start;
             }
             .dashboard-wrapper { grid-column: 2; grid-row: 1; }
             #dailyBreakdownCard { grid-column: 2; grid-row: 2; }
-            .inv-right-col { grid-column: 2; grid-row: 3; }
+            #finTrendCard { grid-column: 2; grid-row: 3; }
+            .inv-right-col { grid-column: 2; grid-row: 4; }
             .inv-left-col {
-                grid-column: 1; grid-row: 1 / 4;
+                grid-column: 1; grid-row: 1 / 5;
                 position: sticky; top: 0;
                 max-height: calc(100vh - 100px);
                 overflow-y: auto; padding-right: 10px;
@@ -508,6 +509,24 @@
         .fin-action-btn.delete { border-color:rgba(255,59,48,0.4); color:#FF3B30; }
         .fin-action-btn.delete:hover { background:rgba(255,59,48,0.08); border-color:#FF3B30; }
 
+        /* FinView — single-row KPI items */
+        .fin-kpi-row { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:13px 16px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+        .fin-kpi-row-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
+        .fin-kpi-row-value { font-size:19px; font-weight:800; letter-spacing:-0.3px; line-height:1.1; }
+
+        /* FinView — collapsible sections */
+        .fin-collapsible { overflow:hidden; max-height:0; transition:max-height 0.4s cubic-bezier(0.2,0,0,1); }
+        .fin-collapsible.open { max-height:1200px; }
+        .fin-collapse-btn { background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:14px; line-height:1; transition:transform 0.35s cubic-bezier(0.2,0,0,1); display:flex; align-items:center; padding:2px 4px; flex-shrink:0; }
+        .fin-collapse-btn.open { transform:rotate(180deg); }
+        .fin-card-header-clickable { cursor:pointer; }
+        .fin-card-header-clickable:hover .fin-collapse-btn { color:var(--text); }
+
+        /* FinView — bar chart */
+        .fin-chart-legend { display:flex; gap:18px; justify-content:center; margin-top:14px; }
+        .fin-chart-legend-item { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--text-muted); letter-spacing:0.3px; }
+        .fin-chart-legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+
         @media print {
             body, .app-header, .main-stage, .bottom-nav, #modal, #historyPage, #managerPage, #editorModal, #inventoryPage, #invEditorModal { display: none !important; }
             #receiptContainer { display: block !important; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
@@ -539,7 +558,6 @@
     <!-- Logout confirmation overlay -->
     <div id="logoutConfirmOverlay">
         <div id="logoutConfirmBox">
-            <div style="font-size:38px; margin-bottom:12px;">👋</div>
             <div style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px;">Log Out?</div>
             <div style="font-size:14px; color:var(--text-muted); margin-bottom:24px; line-height:1.5;">You'll need your PIN to get back in.</div>
             <div style="display:flex; gap:10px;">
@@ -727,19 +745,17 @@
                     </div>
                     <div class="fin-card-body">
                         <div id="invDashboard" style="transition:opacity 0.3s ease;">
-                            <div class="fin-kpi-grid">
-                                <div class="fin-kpi-card">
-                                    <div class="fin-kpi-label">Sales Income</div>
-                                    <div class="fin-kpi-value" id="dashSales" style="color:var(--primary); transition:color 0.3s ease;">+0 KHR</div>
-                                </div>
-                                <div class="fin-kpi-card">
-                                    <div class="fin-kpi-label">Inventory Cost</div>
-                                    <div class="fin-kpi-value" id="dashCost" style="color:#FF3B30; transition:color 0.3s ease;">-0 KHR</div>
-                                </div>
+                            <div class="fin-kpi-row">
+                                <div class="fin-kpi-row-label">Sales Income</div>
+                                <div class="fin-kpi-row-value" id="dashSales" style="color:var(--primary); transition:color 0.3s ease;">+0 KHR</div>
                             </div>
-                            <div class="fin-profit-block">
-                                <div class="fin-profit-label">Actual Profit</div>
-                                <div class="fin-profit-value" id="dashProfit" style="color:var(--primary); transition:color 0.3s ease;">0 KHR</div>
+                            <div class="fin-kpi-row">
+                                <div class="fin-kpi-row-label">Inventory Cost</div>
+                                <div class="fin-kpi-row-value" id="dashCost" style="color:#FF3B30; transition:color 0.3s ease;">-0 KHR</div>
+                            </div>
+                            <div class="fin-kpi-row" style="margin-bottom:16px; border-color:color-mix(in srgb, var(--primary) 35%, var(--border));">
+                                <div class="fin-kpi-row-label" style="color:var(--text);">Actual Profit</div>
+                                <div class="fin-kpi-row-value" id="dashProfit" style="color:var(--primary); transition:color 0.3s ease; font-size:22px; letter-spacing:-0.5px;">0 KHR</div>
                             </div>
                             <div class="chart-container">
                                 <div class="pie-chart" id="dashPie" style="background:conic-gradient(var(--primary) 0% 50%, #FF3B30 50% 100%); transition:background 0.5s ease;">
@@ -788,29 +804,54 @@
                 </div>
             </div>
 
+            <div class="dashboard-card" id="finTrendCard" style="display:none; padding:0; overflow:hidden;">
+                <div class="fin-card-header">
+                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">4-Month Trend</div>
+                </div>
+                <div class="fin-card-body">
+                    <div id="finBarChart" style="width:100%;"></div>
+                    <div class="fin-chart-legend">
+                        <div class="fin-chart-legend-item"><div class="fin-chart-legend-dot" style="background:#FF6B6B;"></div>Expense</div>
+                        <div class="fin-chart-legend-item"><div class="fin-chart-legend-dot" style="background:var(--primary);"></div>Net Profit</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="inv-left-col">
                 <div class="dashboard-card" style="padding:0; overflow:hidden; margin-bottom:20px;">
-                    <div class="fin-card-header">
+                    <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('addExpenseBody','addExpenseArrow')">
                         <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Add Expense</div>
+                        <button class="fin-collapse-btn" id="addExpenseArrow">▾</button>
                     </div>
-                    <div class="fin-card-body">
-                        <div class="form-group"><label class="form-label">Ingredient Name</label><input id="invItem" class="form-input" placeholder="e.g., Matcha Powder"></div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <div class="form-group"><label class="form-label">Unit Size</label><input id="invUnit" class="form-input" placeholder="e.g., 1 kg"></div>
-                            <div class="form-group"><label class="form-label">Amount Bought</label><input id="invAmount" type="number" class="form-input" placeholder="e.g., 2"></div>
+                    <div class="fin-collapsible" id="addExpenseBody">
+                        <div class="fin-card-body">
+                            <div class="form-group"><label class="form-label">Ingredient Name</label><input id="invItem" class="form-input" placeholder="e.g., Matcha Powder"></div>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div class="form-group"><label class="form-label">Unit Size</label><input id="invUnit" class="form-input" placeholder="e.g., 1 kg"></div>
+                                <div class="form-group"><label class="form-label">Amount Bought</label><input id="invAmount" type="number" class="form-input" placeholder="e.g., 2"></div>
+                            </div>
+                            <div class="form-group"><label class="form-label">Total Cost (KHR)</label><input id="invCost" type="number" class="form-input" placeholder="0"></div>
+                            <button class="btn" style="width:100%; margin-top:4px; background:var(--bg); border-color:var(--border); color:var(--text); font-size:12px; letter-spacing:0.5px;" onclick="addPendingInventory()">+ Add to List</button>
+                            <div id="pendingInvList" style="margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto; padding-right:5px;"></div>
+                            <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:12px; display:none;" onclick="saveInventory()">Save All Records</button>
                         </div>
-                        <div class="form-group"><label class="form-label">Total Cost (KHR)</label><input id="invCost" type="number" class="form-input" placeholder="0"></div>
-                        <button class="btn" style="width:100%; margin-top:4px; background:var(--bg); border-color:var(--border); color:var(--text); font-size:12px; letter-spacing:0.5px;" onclick="addPendingInventory()">+ Add to List</button>
-                        <div id="pendingInvList" style="margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto; padding-right:5px;"></div>
-                        <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:12px; display:none;" onclick="saveInventory()">Save All Records</button>
                     </div>
                 </div>
             </div>
 
             <div class="inv-right-col">
-                <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border);">Recent Purchases</div>
-                <div id="invLastRecord"></div>
-                <div id="inventoryList"></div>
+                <div class="dashboard-card" style="padding:0; overflow:hidden;">
+                    <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('recentPurchasesBody','recentPurchasesArrow')">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Recent Purchases</div>
+                        <button class="fin-collapse-btn" id="recentPurchasesArrow">▾</button>
+                    </div>
+                    <div class="fin-collapsible" id="recentPurchasesBody">
+                        <div class="fin-card-body" style="padding-top:12px;">
+                            <div id="invLastRecord"></div>
+                            <div id="inventoryList"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -858,7 +899,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v4.0.5';
+        const APP_VERSION = 'v4.0.6';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1709,6 +1750,7 @@
             const cachedHist = localStorage.getItem('myday_history_' + mk);
             if (cachedInv && cachedHist) {
                 _renderFinView(JSON.parse(cachedInv), JSON.parse(cachedHist));
+                fetchAndRenderTrendChart();
             } else {
                 list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">Loading...</div>';
                 lastInvRec.innerHTML = '';
@@ -1722,11 +1764,13 @@
                 localStorage.setItem('myday_inv_' + mk, JSON.stringify(invData));
                 localStorage.setItem('myday_history_' + mk, JSON.stringify(histData));
                 _renderFinView(invData, histData);
+                fetchAndRenderTrendChart();
             }).catch(e => {
                 if (!cachedInv) {
                     list.innerHTML = '<div style="text-align:center; color:red;">Connection Error</div>';
                     dash.style.opacity = '1';
                 }
+                fetchAndRenderTrendChart();
             });
         }
 
@@ -1805,6 +1849,103 @@
             dash.style.opacity = '1';
 
             _renderDailyBreakdown(invData, histData);
+        }
+
+        function toggleFinSection(bodyId, arrowId) {
+            const body = document.getElementById(bodyId);
+            const arrow = document.getElementById(arrowId);
+            if (!body) return;
+            const isOpen = body.classList.toggle('open');
+            if (arrow) arrow.classList.toggle('open', isOpen);
+        }
+
+        function fetchAndRenderTrendChart() {
+            const card = document.getElementById('finTrendCard');
+            if (!card) return;
+
+            const months = [];
+            for (let i = 3; i >= 0; i--) {
+                const d = new Date(finMonthDate.getFullYear(), finMonthDate.getMonth() - i, 1);
+                months.push({ key: fmtMonthKey(d), label: d.toLocaleString('en-US', { month: 'short' }) });
+            }
+
+            const chartData = months.map(m => {
+                const inv = localStorage.getItem('myday_inv_' + m.key);
+                const hist = localStorage.getItem('myday_history_' + m.key);
+                if (inv && hist) {
+                    const cost = JSON.parse(inv).reduce((s, x) => s + Number(x.cost || 0), 0);
+                    const sales = JSON.parse(hist).reduce((s, x) => s + Number(x.price || 0), 0);
+                    return { label: m.label, cost, profit: sales - cost, pending: false };
+                }
+                return { label: m.label, cost: 0, profit: 0, pending: true };
+            });
+
+            card.style.display = 'block';
+            _renderBarChart(chartData);
+
+            const missingIdx = months.reduce((acc, m, i) => { if (chartData[i].pending) acc.push(i); return acc; }, []);
+            if (missingIdx.length === 0) return;
+
+            Promise.all(missingIdx.map(i => {
+                const m = months[i];
+                return Promise.all([
+                    fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + m.key).then(r => r.json()).catch(() => []),
+                    fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + m.key).then(r => r.json()).catch(() => [])
+                ]).then(([inv, hist]) => {
+                    localStorage.setItem('myday_inv_' + m.key, JSON.stringify(inv));
+                    localStorage.setItem('myday_history_' + m.key, JSON.stringify(hist));
+                    const cost = inv.reduce((s, x) => s + Number(x.cost || 0), 0);
+                    const sales = hist.reduce((s, x) => s + Number(x.price || 0), 0);
+                    chartData[i] = { label: m.label, cost, profit: sales - cost, pending: false };
+                });
+            })).then(() => _renderBarChart(chartData));
+        }
+
+        function _renderBarChart(data) {
+            const container = document.getElementById('finBarChart');
+            if (!container || !data.length) return;
+
+            const chartH = 110;
+            const barW = 26;
+            const barGap = 5;
+            const groupGap = 22;
+            const padL = 4, padR = 4;
+            const totalGroupW = barW * 2 + barGap;
+            const totalW = padL + data.length * totalGroupW + (data.length - 1) * groupGap + padR;
+            const svgH = chartH + 30;
+
+            const allVals = data.flatMap(d => [Math.abs(d.cost), Math.abs(d.profit)]);
+            const maxVal = Math.max(...allVals, 1);
+
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            const labelColor = isDark ? '#666' : '#8E8E93';
+            const lineColor = isDark ? '#333' : '#E5E5EA';
+            const green = '#4CAF50';
+            const expRed = '#FF6B6B';
+            const lossAmber = '#FF9500';
+
+            let svg = `<line x1="${padL}" y1="${chartH}" x2="${totalW - padR}" y2="${chartH}" stroke="${lineColor}" stroke-width="1.5" stroke-linecap="round"/>`;
+
+            data.forEach((d, i) => {
+                const gx = padL + i * (totalGroupW + groupGap);
+                const isCurrent = i === data.length - 1;
+                const alpha = isCurrent ? '1' : '0.55';
+
+                const costH = d.cost > 0 ? Math.max(Math.round((d.cost / maxVal) * chartH), 4) : 0;
+                const profitAbs = Math.abs(d.profit);
+                const profitH = profitAbs > 0 ? Math.max(Math.round((profitAbs / maxVal) * chartH), 4) : 0;
+                const profitColor = d.profit >= 0 ? green : lossAmber;
+
+                svg += `<rect x="${gx}" y="${chartH - costH}" width="${barW}" height="${costH}" rx="3" fill="${expRed}" opacity="${alpha}"/>`;
+                svg += `<rect x="${gx + barW + barGap}" y="${chartH - profitH}" width="${barW}" height="${profitH}" rx="3" fill="${profitColor}" opacity="${alpha}"/>`;
+
+                const cx = gx + totalGroupW / 2;
+                const fw = isCurrent ? '800' : '600';
+                const fc = isCurrent ? (isDark ? '#ccc' : '#555') : labelColor;
+                svg += `<text x="${cx}" y="${chartH + 18}" text-anchor="middle" font-size="10" font-family="Inter,sans-serif" font-weight="${fw}" fill="${fc}">${d.label}</text>`;
+            });
+
+            container.innerHTML = `<svg viewBox="0 0 ${totalW} ${svgH}" width="100%" style="display:block; overflow:visible;">${svg}</svg>`;
         }
 
         function toggleAllTimeStats() {
