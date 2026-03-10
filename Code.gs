@@ -103,12 +103,39 @@ function doGet(e) {
     }
     return ContentService.createTextOutput(JSON.stringify({ sales: totalSales, cost: totalInvCost })).setMimeType(ContentService.MimeType.JSON);
   }
+
+  // --- Face ID: return stored credential status for a specific user ---
+  if (action == 'get_faceid_status') {
+    var user = e.parameter.user;
+    if (!user) return ContentService.createTextOutput(JSON.stringify({enabled: false, credentialId: ''})).setMimeType(ContentService.MimeType.JSON);
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = ss.getSheetByName("Users");
+    if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify({enabled: false, credentialId: ''})).setMimeType(ContentService.MimeType.JSON);
+    var lastRow = sheet.getLastRow();
+    var numCols = Math.max(sheet.getLastColumn(), 4);
+    var users = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
+    for (var i = 0; i < users.length; i++) {
+      if (String(users[i][0]).trim() === user.trim()) {
+        return ContentService.createTextOutput(JSON.stringify({
+          enabled: String(users[i][2] || '').trim() === 'Yes',
+          credentialId: String(users[i][3] || '').trim()
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({enabled: false, credentialId: ''})).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
 
     if (data.action === 'login') {
+      var username = String(data.user || '').trim();
+      var pin = String(data.pin || '').trim();
+      // Validate: both fields must be non-empty
+      if (!username || !pin) {
+        return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": "Username and PIN are required"})).setMimeType(ContentService.MimeType.JSON);
+      }
       var sheet = getOrCreateSheet("Users", ["Name", "Pin"]);
       var lastRow = sheet.getLastRow();
       if (lastRow < 2) {
@@ -116,12 +143,63 @@ function doPost(e) {
       }
       var users = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
       for (var i = 0; i < users.length; i++) {
-        if (String(users[i][0]).trim() === String(data.user).trim() && String(users[i][1]).trim() === String(data.pin).trim()) {
+        if (String(users[i][0]).trim() === username && String(users[i][1]).trim() === pin) {
           return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
         }
       }
-      return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": "Incorrect PIN"})).setMimeType(ContentService.MimeType.JSON);
+      // Generic message to avoid revealing whether username or PIN was wrong
+      return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": "Invalid username or PIN"})).setMimeType(ContentService.MimeType.JSON);
     }
+
+    // --- Face ID: save or clear the WebAuthn credential ID for a user ---
+    // Stores result in Users sheet columns 3 (FaceID_Enabled) and 4 (CredentialID)
+    if (data.action === 'save_faceid') {
+      var username = String(data.user || '').trim();
+      if (!username) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Missing user'})).setMimeType(ContentService.MimeType.JSON);
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getSheetByName("Users");
+      if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Users sheet not found'})).setMimeType(ContentService.MimeType.JSON);
+      var lastRow = sheet.getLastRow();
+      var users = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+      for (var i = 0; i < users.length; i++) {
+        if (String(users[i][0]).trim() === username) {
+          // Write FaceID_Enabled (col 3) and CredentialID (col 4)
+          sheet.getRange(i + 2, 3).setValue(data.enabled ? 'Yes' : 'No');
+          sheet.getRange(i + 2, 4).setValue(data.enabled && data.credentialId ? String(data.credentialId) : '');
+          return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({status:'error', message:'User not found'})).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // --- Face ID: verify login by matching the credential ID stored for this user ---
+    // The device OS has already verified the biometric; GAS checks the credential ID matches
+    if (data.action === 'faceid_login') {
+      var username = String(data.user || '').trim();
+      var credId = String(data.credentialId || '').trim();
+      if (!username || !credId) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Missing credentials'})).setMimeType(ContentService.MimeType.JSON);
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getSheetByName("Users");
+      if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Users sheet not found'})).setMimeType(ContentService.MimeType.JSON);
+      var lastRow = sheet.getLastRow();
+      var numCols = Math.max(sheet.getLastColumn(), 4);
+      var users = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
+      for (var i = 0; i < users.length; i++) {
+        if (String(users[i][0]).trim() === username) {
+          var faceEnabled = String(users[i][2] || '').trim() === 'Yes';
+          var storedCred = String(users[i][3] || '').trim();
+          if (!faceEnabled || !storedCred) {
+            return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Face ID not enabled'})).setMimeType(ContentService.MimeType.JSON);
+          }
+          if (storedCred === credId) {
+            return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
+          }
+          return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Credential mismatch'})).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({status:'error', message:'User not found'})).setMimeType(ContentService.MimeType.JSON);
+    }
+
     if (data.action === 'save_inventory') {
       var monthSheetName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy") + "_Inv";
       var sheet = getOrCreateSheet(monthSheetName, ["Date", "Time", "User", "Item", "Quantity", "Cost"]);
