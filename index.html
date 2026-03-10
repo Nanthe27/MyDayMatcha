@@ -544,6 +544,7 @@
 
         /* PIN container */
         #pinContainer { display: none; flex-direction: column; align-items: center; width: 100%; }
+        #numpadSection { display: flex; flex-direction: column; align-items: center; width: 100%; }
 
         /* Face ID / Touch ID button */
         #faceIdLoginBtn {
@@ -557,8 +558,7 @@
         #faceIdLoginBtn.show { display: flex; }
         #faceIdLoginBtn:active { opacity: 0.82; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.2); }
 
-        .pin-or-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1.2px; margin-bottom: 18px; text-transform: uppercase; display: none; }
-        .pin-or-label.show { display: block; }
+        .pin-or-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1.2px; margin-bottom: 18px; text-transform: uppercase; }
 
         .pin-display { display: flex; gap: 15px; margin-bottom: 28px; width: 200px; justify-content: center; height: 20px; }
         .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--border); transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
@@ -566,7 +566,7 @@
         @keyframes pinSuccess { 0% { transform: scale(1.25); } 40% { transform: scale(1.65); } 70% { transform: scale(1.35); } 100% { transform: scale(1.45); } }
         .pin-dot.success { background: #34c759 !important; animation: pinSuccess 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
-        .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 300px; }
+        .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 300px; margin: 0 auto; }
         .num-btn {
             background: var(--bg); border: 1px solid var(--border); color: var(--text);
             font-size: 22px; font-weight: 600; height: 62px; border-radius: 14px; cursor: pointer;
@@ -868,26 +868,28 @@
                     </svg>
                     Use Face ID / Touch ID
                 </button>
-                <div class="pin-or-label" id="pinOrLabel">— or enter PIN —</div>
-                <div id="pinDisplay" class="pin-display">
-                    <div class="pin-dot"></div><div class="pin-dot"></div>
-                    <div class="pin-dot"></div><div class="pin-dot"></div>
+                <div id="numpadSection" style="display:none;">
+                    <div class="pin-or-label" id="pinOrLabel">— or enter PIN —</div>
+                    <div id="pinDisplay" class="pin-display">
+                        <div class="pin-dot"></div><div class="pin-dot"></div>
+                        <div class="pin-dot"></div><div class="pin-dot"></div>
+                    </div>
+                    <div class="numpad-grid">
+                        <button class="num-btn" onclick="handleNumpad(1,this)">1</button>
+                        <button class="num-btn" onclick="handleNumpad(2,this)">2</button>
+                        <button class="num-btn" onclick="handleNumpad(3,this)">3</button>
+                        <button class="num-btn" onclick="handleNumpad(4,this)">4</button>
+                        <button class="num-btn" onclick="handleNumpad(5,this)">5</button>
+                        <button class="num-btn" onclick="handleNumpad(6,this)">6</button>
+                        <button class="num-btn" onclick="handleNumpad(7,this)">7</button>
+                        <button class="num-btn" onclick="handleNumpad(8,this)">8</button>
+                        <button class="num-btn" onclick="handleNumpad(9,this)">9</button>
+                        <span class="num-spacer"></span>
+                        <button class="num-btn" onclick="handleNumpad(0,this)">0</button>
+                        <button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
+                    </div>
                 </div>
-                <div class="numpad-grid">
-                    <button class="num-btn" onclick="handleNumpad(1,this)">1</button>
-                    <button class="num-btn" onclick="handleNumpad(2,this)">2</button>
-                    <button class="num-btn" onclick="handleNumpad(3,this)">3</button>
-                    <button class="num-btn" onclick="handleNumpad(4,this)">4</button>
-                    <button class="num-btn" onclick="handleNumpad(5,this)">5</button>
-                    <button class="num-btn" onclick="handleNumpad(6,this)">6</button>
-                    <button class="num-btn" onclick="handleNumpad(7,this)">7</button>
-                    <button class="num-btn" onclick="handleNumpad(8,this)">8</button>
-                    <button class="num-btn" onclick="handleNumpad(9,this)">9</button>
-                    <span class="num-spacer"></span>
-                    <button class="num-btn" onclick="handleNumpad(0,this)">0</button>
-                    <button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
-                </div>
-                <!-- Back to user list -->
+                <!-- Back to user list — always visible outside numpadSection -->
                 <button class="login-switch-btn" id="backToUsernameBtn" onclick="cancelLogin()">← Back</button>
             </div>
 
@@ -1618,13 +1620,29 @@
                     setTimeout(() => { document.getElementById('loginScreen').classList.add('hidden'); _backgroundSync(); }, 650);
                 } else {
                     alert('Face ID login failed. Please enter your PIN instead.');
+                    showNumpad();
                 }
             } catch(err) {
                 // NotAllowedError = user dismissed — quiet fallback to PIN
                 if (err.name !== 'NotAllowedError') alert('Face ID error. Please use your PIN.');
+                showNumpad();
             } finally {
                 btn.disabled = false; btn.style.opacity = '';
             }
+        }
+
+        function showNumpad() {
+            const ns = document.getElementById('numpadSection');
+            if (!ns || ns.style.display !== 'none') return;
+            ns.style.opacity = '0';
+            ns.style.transform = 'translateY(14px)';
+            ns.style.transition = 'none';
+            ns.style.display = 'flex';
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                ns.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
+                ns.style.opacity = '1';
+                ns.style.transform = 'translateY(0)';
+            }));
         }
 
         // ─── App startup ──────────────────────────────────────────────────────────
@@ -1709,9 +1727,16 @@
             if (updBtn) updBtn.style.display = 'none';
             _showHeroAvatar(name, 'Welcome back');
             const faceBtn = document.getElementById('faceIdLoginBtn');
-            const orLabel = document.getElementById('pinOrLabel');
-            if (hasBiometric) { faceBtn.classList.add('show'); orLabel.classList.add('show'); }
-            else               { faceBtn.classList.remove('show'); orLabel.classList.remove('show'); }
+            const numpadSection = document.getElementById('numpadSection');
+            if (hasBiometric) {
+                faceBtn.classList.add('show');
+                // Hide numpad — will only appear if biometric fails
+                if (numpadSection) { numpadSection.style.display = 'none'; numpadSection.style.opacity = ''; numpadSection.style.transform = ''; numpadSection.style.transition = ''; }
+            } else {
+                faceBtn.classList.remove('show');
+                // No biometric — show numpad immediately
+                if (numpadSection) { numpadSection.style.display = 'flex'; numpadSection.style.opacity = ''; numpadSection.style.transform = ''; numpadSection.style.transition = ''; }
+            }
             if (switchBtn) {
                 if (allowBack) switchBtn.classList.remove('hidden-btn');
                 else           switchBtn.classList.add('hidden-btn');
@@ -1815,7 +1840,8 @@
             }
             tempSelectedUser = null; currentPin = '';
             document.getElementById('faceIdLoginBtn').classList.remove('show');
-            document.getElementById('pinOrLabel').classList.remove('show');
+            const ns = document.getElementById('numpadSection');
+            if (ns) { ns.style.display = 'none'; ns.style.opacity = ''; ns.style.transform = ''; ns.style.transition = ''; }
         }
 
         function numBtnPress(btn) { btn.classList.add('pressing'); setTimeout(() => btn.classList.remove('pressing'), 150); }
