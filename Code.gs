@@ -201,6 +201,55 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": "ID not found"})).setMimeType(ContentService.MimeType.JSON);
     }
 
+    if (data.action === 'delete_order') {
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getSheetByName(data.month);
+      if (!sheet) return ContentService.createTextOutput(JSON.stringify({"status":"error","message":"Sheet not found"})).setMimeType(ContentService.MimeType.JSON);
+      var values = sheet.getDataRange().getValues();
+      // Delete matching rows bottom-up so row indices stay valid
+      for (var i = values.length - 1; i >= 1; i--) {
+        if (String(values[i][0]) === String(data.order_id)) sheet.deleteRow(i + 1);
+      }
+      // Rebuild TOTALS
+      var lastRow = sheet.getLastRow();
+      if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") sheet.deleteRow(lastRow);
+      var newLast = sheet.getLastRow();
+      if (newLast >= 2) {
+        var finalRow = newLast + 1;
+        sheet.getRange(finalRow, 1).setValue("TOTALS").setFontWeight("bold");
+        sheet.getRange(finalRow, 6).setFormula("=SUM(F2:F" + newLast + ")").setFontWeight("bold");
+        sheet.getRange(finalRow, 7).setFormula("=SUM(G2:G" + newLast + ")").setFontWeight("bold");
+        sheet.getRange(finalRow, 8).setFormula("=SUM(H2:H" + newLast + ")").setFontWeight("bold");
+        sheet.getRange(finalRow, 9).setFormula("=SUM(I2:I" + newLast + ")").setFontWeight("bold");
+      }
+      return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
+    }
+    if (data.action === 'delete_order_item') {
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getSheetByName(data.month);
+      if (!sheet) return ContentService.createTextOutput(JSON.stringify({"status":"error","message":"Sheet not found"})).setMimeType(ContentService.MimeType.JSON);
+      var values = sheet.getDataRange().getValues();
+      for (var i = 1; i < values.length; i++) {
+        if (String(values[i][0]) === String(data.order_id) && String(values[i][4]) === String(data.item_name)) {
+          sheet.deleteRow(i + 1);
+          var lastRow = sheet.getLastRow();
+          if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") {
+            var dataEnd = lastRow - 1;
+            if (dataEnd < 2) {
+              sheet.getRange(lastRow, 6).setValue(0); sheet.getRange(lastRow, 7).setValue(0);
+              sheet.getRange(lastRow, 8).setValue(0); sheet.getRange(lastRow, 9).setValue(0);
+            } else {
+              sheet.getRange(lastRow, 6).setFormula("=SUM(F2:F" + dataEnd + ")");
+              sheet.getRange(lastRow, 7).setFormula("=SUM(G2:G" + dataEnd + ")");
+              sheet.getRange(lastRow, 8).setFormula("=SUM(H2:H" + dataEnd + ")");
+              sheet.getRange(lastRow, 9).setFormula("=SUM(I2:I" + dataEnd + ")");
+            }
+          }
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
+    }
     // --- ORDER SAVING: use orderDate from app if provided, otherwise use current date ---
     var targetDate;
     if (data.orderDate) {
