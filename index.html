@@ -446,10 +446,156 @@
         .text-btn { background: transparent; border: none; font-size: 14px; font-weight: 700; color: var(--text); padding: 10px 15px; border-radius: 8px; cursor: pointer; letter-spacing: 0.5px; }
         .text-btn:active { background: var(--surface-hover); }
 
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s, transform 0.4s; will-change: transform, opacity; }
-        #loginScreen.hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
-        #clearDataBtn { position: absolute; bottom: calc(18px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: none; border: none; color: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.3px; cursor: pointer; padding: 8px 16px; border-radius: 20px; opacity: 0.55; transition: opacity 0.2s, background 0.2s; white-space: nowrap; font-family: inherit; }
-        #clearDataBtn:hover { opacity: 1; background: var(--surface); }
+        /* ═══════════════ LOGIN SCREEN — SPLIT HERO/CARD LAYOUT ═══════════════ */
+        #loginScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2000; display: flex; flex-direction: column;
+            transition: opacity 0.4s, transform 0.4s; will-change: transform, opacity;
+            background: var(--primary);          /* hero bg visible during transition */
+        }
+        #loginScreen.hidden { opacity: 0; pointer-events: none; transform: scale(1.04); }
+
+        /* ── Hero (top gradient area) ── */
+        .login-hero {
+            flex: 0 0 auto;
+            min-height: 240px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            padding: max(env(safe-area-inset-top), 36px) 24px 32px;
+            background: linear-gradient(155deg, #1b5e20 0%, var(--primary-dim) 40%, var(--primary) 100%);
+            position: relative; overflow: hidden;
+        }
+        .login-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        /* logo state (username step) */
+        #loginHeroLogo { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .login-logo-hero { width: 72px; height: 72px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.6); box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
+        .login-hero-brand { font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
+        .login-hero-tagline { font-size: 12px; color: rgba(255,255,255,0.72); font-weight: 500; letter-spacing: 0.3px; margin-top: 2px; }
+        /* avatar state (PIN / biometric step) */
+        #loginHeroAvatar { display: none; flex-direction: column; align-items: center; gap: 10px; }
+        .login-avatar-circle {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: rgba(255,255,255,0.22); border: 2.5px solid rgba(255,255,255,0.55);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Quicksand', sans-serif; font-size: 28px; font-weight: 800; color: #fff;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .login-avatar-name { font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 800; color: #fff; }
+        .login-avatar-sub { font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 500; }
+
+        /* ── Card (bottom white panel) ── */
+        .login-card {
+            flex: 1; background: var(--surface);
+            border-radius: 26px 26px 0 0;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 28px 24px max(env(safe-area-inset-bottom), 20px);
+            overflow-y: auto; position: relative;
+        }
+        [data-theme="dark"] .login-card { background: #0e0e0e; }
+
+        /* version badge inside card */
+        .login-version-badge {
+            font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-muted);
+            background: var(--bg); border-radius: 20px; padding: 3px 10px;
+            margin-bottom: 22px; text-transform: uppercase; opacity: 0.7;
+        }
+
+        /* username step */
+        #usernameStep { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 300px; }
+        .login-card-title { font-family: 'Quicksand', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+        .login-card-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 22px; }
+        .login-username-input {
+            width: 100%; padding: 15px 18px; border: 1.5px solid var(--border); border-radius: var(--radius);
+            background: var(--bg); color: var(--text); font-size: 15px; font-family: 'Inter', sans-serif;
+            font-weight: 600; text-align: left; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; caret-color: var(--primary);
+        }
+        .login-username-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
+        .login-username-input::placeholder { color: var(--text-muted); font-weight: 400; }
+        /* continue button */
+        .login-continue-btn {
+            width: 100%; height: 54px; margin-top: 12px; border-radius: var(--radius);
+            background: var(--primary); color: #fff; border: none; font-size: 15px; font-weight: 700;
+            cursor: pointer; letter-spacing: 0.3px; font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 18px rgba(76,175,80,0.35);
+            transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+        }
+        .login-continue-btn:active { opacity: 0.84; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.2); }
+        #updateRefreshBtn {
+            margin-top: 14px; padding: 8px 18px; background: transparent;
+            border: 1px solid var(--border); border-radius: 20px; color: var(--text-muted);
+            font-size: 11px; font-weight: 600; letter-spacing: 0.8px; cursor: pointer; transition: 0.2s;
+            touch-action: manipulation;
+        }
+        #updateRefreshBtn:active { background: var(--bg); color: var(--primary); border-color: var(--primary); }
+
+        /* PIN container */
+        #pinContainer { display: none; flex-direction: column; align-items: center; width: 100%; }
+
+        /* Face ID / Touch ID button */
+        #faceIdLoginBtn {
+            display: none; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; max-width: 300px; padding: 16px; background: var(--primary); color: white;
+            border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer;
+            margin-bottom: 16px; box-shadow: 0 4px 18px rgba(76,175,80,0.35);
+            transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+            letter-spacing: 0.3px; font-family: 'Inter', sans-serif;
+        }
+        #faceIdLoginBtn.show { display: flex; }
+        #faceIdLoginBtn:active { opacity: 0.82; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.2); }
+
+        .pin-or-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1.2px; margin-bottom: 18px; text-transform: uppercase; display: none; }
+        .pin-or-label.show { display: block; }
+
+        .pin-display { display: flex; gap: 15px; margin-bottom: 28px; width: 200px; justify-content: center; height: 20px; }
+        .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--border); transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .pin-dot.active { background: var(--primary); transform: scale(1.25); }
+        @keyframes pinSuccess { 0% { transform: scale(1.25); } 40% { transform: scale(1.65); } 70% { transform: scale(1.35); } 100% { transform: scale(1.45); } }
+        .pin-dot.success { background: #34c759 !important; animation: pinSuccess 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+        .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 300px; }
+        .num-btn {
+            background: var(--bg); border: 1px solid var(--border); color: var(--text);
+            font-size: 22px; font-weight: 600; height: 62px; border-radius: 14px; cursor: pointer;
+            transition: transform 0.12s cubic-bezier(0.2, 0, 0.3, 1), box-shadow 0.12s ease, background 0.1s ease;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 0 var(--border), 0 3px 8px rgba(0,0,0,0.05);
+            will-change: transform; -webkit-tap-highlight-color: transparent;
+        }
+        .num-btn:active { transform: scale(0.88) translateY(2px); box-shadow: 0 0 0 var(--border); background: var(--surface-hover); }
+        .num-btn.pressing { transform: scale(0.88) translateY(2px) !important; box-shadow: 0 0 0 var(--border) !important; background: var(--surface-hover) !important; transition: transform 0.08s cubic-bezier(0.2, 0, 0.3, 1), box-shadow 0.08s ease, background 0.08s ease !important; }
+        .num-btn.clear { color: #FF3B30; font-size: 14px; font-weight: 700; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .shake { animation: shake 0.3s ease-in-out; }
+
+        /* "Switch account" link shown below numpad */
+        .login-switch-btn {
+            background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600;
+            cursor: pointer; padding: 10px 20px; margin-top: 6px; border-radius: 20px;
+            letter-spacing: 0.3px; font-family: 'Inter', sans-serif; transition: color 0.18s, background 0.18s;
+            touch-action: manipulation;
+        }
+        .login-switch-btn:hover { color: var(--primary); background: var(--bg); }
+        .login-switch-btn.hidden-btn { opacity: 0; pointer-events: none; }
+
+        /* Clear browser data button — pinned to bottom of card */
+        #clearDataBtn {
+            background: none; border: none; color: var(--text-muted); font-size: 11px; font-weight: 600;
+            letter-spacing: 0.3px; cursor: pointer; padding: 8px 16px; border-radius: 20px;
+            opacity: 0.5; transition: opacity 0.2s, background 0.2s; white-space: nowrap;
+            font-family: inherit; margin-top: auto; padding-top: 20px; touch-action: manipulation;
+        }
+        #clearDataBtn:hover { opacity: 1; background: var(--bg); }
+
+        /* legacy alias kept so existing JS still works */
+        .login-logo { display: none; }
+        .login-title { display: none; }
+        .user-btn { display: none; }
+
         #clearDataSheet { position: fixed; inset: 0; z-index: 2100; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
         #clearDataSheet.open { opacity: 1; visibility: visible; }
         #clearDataSheetBox { background: var(--surface); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 8px 20px 20px; transform: translateY(100%); transition: transform 0.3s var(--anim-curve); }
@@ -458,36 +604,6 @@
         #clearDataSheetBox .sheet-title { font-weight: 800; font-size: 15px; color: var(--text); margin-bottom: 10px; font-family: 'Quicksand', sans-serif; }
         #clearDataSheetBox .sheet-msg { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 22px; }
         #clearDataSheetBox .sheet-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: env(safe-area-inset-bottom); }
-        .login-logo { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--primary); margin-bottom: 20px; }
-        .login-title { font-family: 'Quicksand', sans-serif; font-size: 24px; color: var(--primary); margin-bottom: 40px; }
-        #updateRefreshBtn { margin-top: 28px; padding: 10px 22px; background: transparent; border: 1px solid var(--border); border-radius: 20px; color: var(--text-muted); font-size: 12px; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
-        #updateRefreshBtn:active { background: var(--surface); color: var(--primary); border-color: var(--primary); }
-        .user-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 260px; height: 60px; margin-bottom: 12px; border-radius: var(--radius); font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 1px; transition: background 0.18s ease, border-color 0.18s ease, transform 0.16s ease, box-shadow 0.16s ease; box-shadow: 0 2px 0 var(--border), 0 4px 10px rgba(0,0,0,0.05); -webkit-tap-highlight-color: transparent; }
-        .user-btn:hover { border-color: var(--primary); }
-        .user-btn:active { transform: scale(0.97) translateY(1px); box-shadow: 0 0 0 var(--border); }
-        .pin-display { display: flex; gap: 15px; margin-bottom: 30px; width: 200px; justify-content: center; height: 20px; }
-        .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--border); transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .pin-dot.active { background: var(--primary); transform: scale(1.25); }
-        @keyframes pinSuccess { 0% { transform: scale(1.25); } 40% { transform: scale(1.65); } 70% { transform: scale(1.35); } 100% { transform: scale(1.45); } }
-        .pin-dot.success { background: #34c759 !important; animation: pinSuccess 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 280px; }
-        .num-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 22px; font-weight: 600; height: 65px; border-radius: var(--radius); cursor: pointer; transition: transform 0.12s cubic-bezier(0.2, 0, 0.3, 1), box-shadow 0.12s ease, background 0.1s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 var(--border), 0 4px 10px rgba(0,0,0,0.06); will-change: transform; -webkit-tap-highlight-color: transparent; }
-        .num-btn:active { transform: scale(0.88) translateY(2px); box-shadow: 0 0 0 var(--border); background: var(--surface-hover); }
-        .num-btn.pressing { transform: scale(0.88) translateY(2px) !important; box-shadow: 0 0 0 var(--border) !important; background: var(--surface-hover) !important; transition: transform 0.08s cubic-bezier(0.2, 0, 0.3, 1), box-shadow 0.08s ease, background 0.08s ease !important; }
-        .num-btn.clear { color: #FF3B30; font-size: 16px; font-weight: 700; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        .shake { animation: shake 0.3s ease-in-out; }
-        /* --- Username text input on login screen --- */
-        #usernameStep { display: flex; flex-direction: column; align-items: center; }
-        .login-username-input { width: 260px; padding: 16px 20px; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font-size: 16px; font-family: 'Inter', sans-serif; font-weight: 600; text-align: center; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; caret-color: var(--primary); }
-        .login-username-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
-        .login-username-input::placeholder { color: var(--text-muted); font-weight: 400; }
-        /* --- Face ID login button on PIN screen --- */
-        #faceIdLoginBtn { display: none; align-items: center; justify-content: center; gap: 10px; width: 260px; padding: 16px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 18px rgba(76,175,80,0.35); transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s; letter-spacing: 0.3px; font-family: 'Inter', sans-serif; }
-        #faceIdLoginBtn.show { display: flex; }
-        #faceIdLoginBtn:active { opacity: 0.82; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.2); }
-        .pin-or-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1.2px; margin-bottom: 18px; text-transform: uppercase; display: none; }
-        .pin-or-label.show { display: block; }
         #logoutConfirmOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.22s ease; }
         #logoutConfirmOverlay.lco-show { display: flex; }
         #logoutConfirmOverlay.lco-visible { opacity: 1; }
@@ -694,37 +810,73 @@
     <div id="toast" class="toast-msg">Item Added</div>
 
     <div id="loginScreen">
-        <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo">
-        <h2 id="loginTitle" class="login-title">Sign In</h2>
-        <div id="appVersionDisplay" style="font-size:11px; color:var(--text-muted); margin-top:-30px; margin-bottom:20px; font-weight:600; letter-spacing:1.5px;"></div>
-        <!-- Username text input step — user types their name instead of tapping a list -->
-        <div id="usernameStep">
-            <input id="usernameInput" class="login-username-input" type="text" placeholder="Enter your name" autocomplete="username" autocorrect="off" autocapitalize="words" spellcheck="false" onkeydown="if(event.key==='Enter')proceedToAuth()">
-            <button class="user-btn" id="continueBtn" onclick="proceedToAuth()" style="margin-top:12px;">Continue →</button>
-        </div>
-        <button id="updateRefreshBtn" onclick="hardRefreshApp()" title="Check for app updates">↻ Check for Update</button>
-        <div id="pinContainer" style="display:none; flex-direction:column; align-items:center;">
-            <!-- Face ID / Touch ID login button — shown only if credential is registered on this device -->
-            <button id="faceIdLoginBtn" onclick="doFaceIdLogin()">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/>
-                    <path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/>
-                    <circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none"/>
-                    <circle cx="15" cy="11" r="1.5" fill="currentColor" stroke="none"/>
-                    <path d="M8 15.5c1.33 1.2 6.67 1.2 8 0"/>
-                </svg>
-                Login with Face ID
-            </button>
-            <div class="pin-or-label" id="pinOrLabel">— or enter PIN —</div>
-            <div id="pinDisplay" class="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
-            <div class="numpad-grid">
-                <button class="num-btn" onclick="handleNumpad(1,this)">1</button><button class="num-btn" onclick="handleNumpad(2,this)">2</button><button class="num-btn" onclick="handleNumpad(3,this)">3</button>
-                <button class="num-btn" onclick="handleNumpad(4,this)">4</button><button class="num-btn" onclick="handleNumpad(5,this)">5</button><button class="num-btn" onclick="handleNumpad(6,this)">6</button>
-                <button class="num-btn" onclick="handleNumpad(7,this)">7</button><button class="num-btn" onclick="handleNumpad(8,this)">8</button><button class="num-btn" onclick="handleNumpad(9,this)">9</button>
-                <button class="num-btn clear" id="backToUsernameBtn" onclick="numBtnPress(this);cancelLogin()">BACK</button><button class="num-btn" onclick="handleNumpad(0,this)">0</button><button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
+        <!-- ── Hero: green gradient top area ── -->
+        <div class="login-hero">
+            <!-- Logo state shown when no remembered user (username entry) -->
+            <div id="loginHeroLogo">
+                <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo-hero" alt="My Day Matcha">
+                <div class="login-hero-brand">My Day Matcha</div>
+                <div class="login-hero-tagline">Your daily matcha companion</div>
+            </div>
+            <!-- Avatar state shown when user is known (PIN / biometric) -->
+            <div id="loginHeroAvatar">
+                <div class="login-avatar-circle" id="loginAvatarInitial">?</div>
+                <div class="login-avatar-name" id="loginAvatarName"></div>
+                <div class="login-avatar-sub" id="loginAvatarSub">Welcome back</div>
             </div>
         </div>
-        <button id="clearDataBtn" onclick="showClearDataSheet()">Clear Browser Data</button>
+
+        <!-- ── Card: white panel with inputs ── -->
+        <div class="login-card">
+            <!-- version badge -->
+            <div class="login-version-badge" id="appVersionDisplay"></div>
+
+            <!-- Username entry step -->
+            <div id="usernameStep">
+                <div class="login-card-title">Sign in</div>
+                <div class="login-card-sub">Enter your name to continue</div>
+                <input id="usernameInput" class="login-username-input" type="text" placeholder="Your name" autocomplete="username" autocorrect="off" autocapitalize="words" spellcheck="false" onkeydown="if(event.key==='Enter')proceedToAuth()">
+                <button class="login-continue-btn" id="continueBtn" onclick="proceedToAuth()">Continue →</button>
+            </div>
+            <button id="updateRefreshBtn" onclick="hardRefreshApp()" title="Check for app updates">↻ Check for Update</button>
+
+            <!-- PIN / biometric step -->
+            <div id="pinContainer">
+                <!-- Face ID / Touch ID button — shown only when credential registered on this device -->
+                <button id="faceIdLoginBtn" onclick="doFaceIdLogin()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/>
+                        <path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/>
+                        <circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none"/>
+                        <circle cx="15" cy="11" r="1.5" fill="currentColor" stroke="none"/>
+                        <path d="M8 15.5c1.33 1.2 6.67 1.2 8 0"/>
+                    </svg>
+                    Use Face ID / Touch ID
+                </button>
+                <div class="pin-or-label" id="pinOrLabel">— or enter PIN —</div>
+                <div id="pinDisplay" class="pin-display">
+                    <div class="pin-dot"></div><div class="pin-dot"></div>
+                    <div class="pin-dot"></div><div class="pin-dot"></div>
+                </div>
+                <div class="numpad-grid">
+                    <button class="num-btn" onclick="handleNumpad(1,this)">1</button>
+                    <button class="num-btn" onclick="handleNumpad(2,this)">2</button>
+                    <button class="num-btn" onclick="handleNumpad(3,this)">3</button>
+                    <button class="num-btn" onclick="handleNumpad(4,this)">4</button>
+                    <button class="num-btn" onclick="handleNumpad(5,this)">5</button>
+                    <button class="num-btn" onclick="handleNumpad(6,this)">6</button>
+                    <button class="num-btn" onclick="handleNumpad(7,this)">7</button>
+                    <button class="num-btn" onclick="handleNumpad(8,this)">8</button>
+                    <button class="num-btn" onclick="handleNumpad(9,this)">9</button>
+                    <button class="num-btn clear" onclick="handleNumpad(0,this)">0</button>
+                    <button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
+                </div>
+                <!-- "Switch account" replaces the old BACK button in the numpad -->
+                <button class="login-switch-btn" id="backToUsernameBtn" onclick="cancelLogin()">Switch account</button>
+            </div>
+
+            <button id="clearDataBtn" onclick="showClearDataSheet()">Clear Browser Data</button>
+        </div>
     </div>
 
     <!-- Clear Browser Data confirmation sheet (login screen only, z-index above loginScreen) -->
@@ -1182,7 +1334,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v5.0.0';
+        const APP_VERSION = 'v5.0.2';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1407,11 +1559,12 @@
                 if (data.status === 'success') {
                     deviceName = username;
                     localStorage.setItem('myday_session', JSON.stringify({ user: deviceName, loginTime: Date.now() }));
+                    localStorage.setItem('myday_remembered_user', deviceName); // remember for next open
                     const ude = document.getElementById('currentUserDisplay'); if (ude) ude.innerText = deviceName;
                     const dude = document.getElementById('deskUserDisplay');   if (dude) dude.innerText = deviceName;
                     document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('active', 'success'));
                     checkFaceIdAvailable();
-                    _onUnlocked(); // clear auto-lock state and restore BACK button
+                    _onUnlocked(); // clear auto-lock state and restore Switch button
                     setTimeout(() => { document.getElementById('loginScreen').classList.add('hidden'); _backgroundSync(); }, 650);
                 } else {
                     alert('Face ID login failed. Please enter your PIN instead.');
@@ -1460,11 +1613,57 @@
             }).catch(() => {});
         }
 
+        /* ── Hero helpers ── */
+        function _showHeroLogo() {
+            document.getElementById('loginHeroLogo').style.display = 'flex';
+            document.getElementById('loginHeroAvatar').style.display = 'none';
+        }
+        function _showHeroAvatar(name, sub) {
+            document.getElementById('loginHeroLogo').style.display = 'none';
+            const av = document.getElementById('loginHeroAvatar');
+            av.style.display = 'flex';
+            document.getElementById('loginAvatarInitial').textContent = name ? name.charAt(0).toUpperCase() : '?';
+            document.getElementById('loginAvatarName').textContent = name || '';
+            if (sub) document.getElementById('loginAvatarSub').textContent = sub;
+        }
+        function _switchToPinView(name, hasBiometric, allowBack) {
+            const step = document.getElementById('usernameStep');
+            const pin  = document.getElementById('pinContainer');
+            const updBtn = document.getElementById('updateRefreshBtn');
+            const switchBtn = document.getElementById('backToUsernameBtn');
+            step.style.display = 'none';
+            if (updBtn) updBtn.style.display = 'none';
+            _showHeroAvatar(name, 'Welcome back');
+            const faceBtn = document.getElementById('faceIdLoginBtn');
+            const orLabel = document.getElementById('pinOrLabel');
+            if (hasBiometric) { faceBtn.classList.add('show'); orLabel.classList.add('show'); }
+            else               { faceBtn.classList.remove('show'); orLabel.classList.remove('show'); }
+            if (switchBtn) {
+                if (allowBack) switchBtn.classList.remove('hidden-btn');
+                else           switchBtn.classList.add('hidden-btn');
+            }
+            pin.style.display = 'flex';
+        }
+
         function showLogin() {
             document.getElementById('loginScreen').classList.remove('hidden');
-            cancelLogin();
             toggleSettings(false);
-            // Auto-focus the username field after the animation settles
+
+            // If a remembered user has Face ID registered, jump straight to biometric prompt
+            const rem = localStorage.getItem('myday_remembered_user');
+            if (rem) {
+                const credId = localStorage.getItem('myday_faceid_cred_' + rem);
+                const fidOn  = localStorage.getItem('myday_faceid_enabled_' + rem) === 'true';
+                if (credId && fidOn) {
+                    tempSelectedUser = rem; currentPin = ''; updatePinDisplay();
+                    _switchToPinView(rem, true, true);
+                    setTimeout(() => doFaceIdLogin(), 420); // auto-trigger OS biometric prompt
+                    return;
+                }
+            }
+
+            // Default: show username entry
+            cancelLogin();
             setTimeout(() => { const inp = document.getElementById('usernameInput'); if (inp) inp.focus(); }, 120);
         }
 
@@ -1482,42 +1681,33 @@
         // Called when user submits the username text field and presses Continue
         function proceedToAuth() {
             const input = document.getElementById('usernameInput');
-            const name = input ? input.value.trim() : '';
+            const name  = input ? input.value.trim() : '';
             if (!name) { if (input) input.focus(); return; }
 
-            tempSelectedUser = name; currentPin = ""; updatePinDisplay();
+            tempSelectedUser = name; currentPin = ''; updatePinDisplay();
             const step = document.getElementById('usernameStep');
             const pin  = document.getElementById('pinContainer');
 
-            // Animate username step out
+            // Animate step out
             step.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-            step.style.opacity = '0'; step.style.transform = 'translateY(-14px)';
+            step.style.opacity = '0'; step.style.transform = 'translateY(-12px)';
             setTimeout(() => {
                 step.style.display = 'none'; step.style.transition = ''; step.style.opacity = ''; step.style.transform = '';
-                document.getElementById('updateRefreshBtn').style.display = 'none';
-                document.getElementById('loginTitle').innerText = name;
-
-                // Show Face ID button if credential is stored locally for this username
-                const credId   = localStorage.getItem('myday_faceid_cred_' + name);
-                const fidOn    = localStorage.getItem('myday_faceid_enabled_' + name) === 'true';
-                const faceBtn  = document.getElementById('faceIdLoginBtn');
-                const orLabel  = document.getElementById('pinOrLabel');
-                if (credId && fidOn) { faceBtn.classList.add('show'); orLabel.classList.add('show'); }
-                else                 { faceBtn.classList.remove('show'); orLabel.classList.remove('show'); }
-
-                // Animate PIN container in
-                pin.style.opacity = '0'; pin.style.transform = 'translateY(18px)'; pin.style.transition = 'none'; pin.style.display = 'flex';
+                const credId = localStorage.getItem('myday_faceid_cred_' + name);
+                const fidOn  = localStorage.getItem('myday_faceid_enabled_' + name) === 'true';
+                _switchToPinView(name, credId && fidOn, true);
+                // Animate card in
+                pin.style.opacity = '0'; pin.style.transform = 'translateY(16px)'; pin.style.transition = 'none';
                 requestAnimationFrame(() => requestAnimationFrame(() => {
                     pin.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
                     pin.style.opacity = '1'; pin.style.transform = 'translateY(0)';
                 }));
-            }, 200);
+            }, 180);
         }
 
         // Lock the app immediately — jump straight to the PIN/Face ID screen for the known user
         function lockApp() {
             const loginScreen = document.getElementById('loginScreen');
-            // Only lock if a user is logged in and the screen is currently accessible
             if (!loginScreen.classList.contains('hidden')) return;
             if (!deviceName || deviceName === 'Unknown') return;
 
@@ -1525,28 +1715,11 @@
             tempSelectedUser = deviceName;
             currentPin = ''; updatePinDisplay();
 
-            // Skip username step — go straight to PIN/Face ID for the known user
-            const step   = document.getElementById('usernameStep');
-            const pin    = document.getElementById('pinContainer');
-            const updBtn = document.getElementById('updateRefreshBtn');
-            const backBtn = document.getElementById('backToUsernameBtn');
-
-            if (step)    { step.style.display = 'none'; }
-            if (updBtn)  { updBtn.style.display = 'none'; }
-            // Hide BACK button — user can't change who they are during a lock
-            if (backBtn) { backBtn.style.opacity = '0'; backBtn.style.pointerEvents = 'none'; }
-
-            document.getElementById('loginTitle').innerText = 'Welcome back, ' + deviceName;
-
-            // Show Face ID button if registered on this device for this user
-            const credId  = localStorage.getItem('myday_faceid_cred_' + deviceName);
-            const fidOn   = localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
-            const faceBtn = document.getElementById('faceIdLoginBtn');
-            const orLabel = document.getElementById('pinOrLabel');
-            if (credId && fidOn) { faceBtn.classList.add('show'); orLabel.classList.add('show'); }
-            else                 { faceBtn.classList.remove('show'); orLabel.classList.remove('show'); }
-
-            pin.style.display = 'flex'; pin.style.opacity = '1'; pin.style.transform = 'none'; pin.style.transition = 'none';
+            const credId = localStorage.getItem('myday_faceid_cred_' + deviceName);
+            const fidOn  = localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
+            _switchToPinView(deviceName, credId && fidOn, false); // allowBack = false while locked
+            const pin = document.getElementById('pinContainer');
+            pin.style.opacity = '1'; pin.style.transform = 'none'; pin.style.transition = 'none';
             toggleSettings(false);
             loginScreen.classList.remove('hidden');
         }
@@ -1554,21 +1727,24 @@
         // Called after a successful PIN or Face ID re-authentication from the locked state
         function _onUnlocked() {
             isAutoLocked = false;
-            const backBtn = document.getElementById('backToUsernameBtn');
-            if (backBtn) { backBtn.style.opacity = ''; backBtn.style.pointerEvents = ''; }
+            const switchBtn = document.getElementById('backToUsernameBtn');
+            if (switchBtn) switchBtn.classList.remove('hidden-btn');
         }
 
-        // Reset login screen back to username entry (used by BACK button and showLogin)
+        // Reset login screen back to username entry (used by Switch account and showLogin)
         function cancelLogin() {
             if (isAutoLocked) return; // can't navigate back while locked — user must authenticate
             const step = document.getElementById('usernameStep');
             const pin  = document.getElementById('pinContainer');
+            const updBtn = document.getElementById('updateRefreshBtn');
             if (pin.style.display === 'flex') {
                 pin.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
                 pin.style.opacity = '0'; pin.style.transform = 'translateY(14px)';
                 setTimeout(() => {
                     pin.style.display = 'none'; pin.style.transition = ''; pin.style.opacity = ''; pin.style.transform = '';
+                    _showHeroLogo();
                     step.style.opacity = '0'; step.style.transform = 'translateY(-14px)'; step.style.transition = 'none'; step.style.display = 'flex';
+                    if (updBtn) updBtn.style.display = '';
                     requestAnimationFrame(() => requestAnimationFrame(() => {
                         step.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
                         step.style.opacity = '1'; step.style.transform = 'translateY(0)';
@@ -1576,14 +1752,12 @@
                 }, 200);
             } else {
                 step.style.display = 'flex';
+                _showHeroLogo();
+                if (updBtn) updBtn.style.display = '';
             }
-            tempSelectedUser = null; currentPin = "";
-            document.getElementById('loginTitle').innerText = 'Sign In';
-            document.getElementById('updateRefreshBtn').style.display = '';
-            // Reset Face ID button visibility
+            tempSelectedUser = null; currentPin = '';
             document.getElementById('faceIdLoginBtn').classList.remove('show');
             document.getElementById('pinOrLabel').classList.remove('show');
-            // Clear the username input for next attempt
             const inp = document.getElementById('usernameInput'); if (inp) inp.value = '';
         }
 
@@ -1614,6 +1788,7 @@
                 if(data.status === 'success') {
                     deviceName = tempSelectedUser;
                     localStorage.setItem('myday_session', JSON.stringify({ user: deviceName, loginTime: Date.now() }));
+                    localStorage.setItem('myday_remembered_user', deviceName); // remember for next open
 
                     const userDisplayElement = document.getElementById('currentUserDisplay');
                     if (userDisplayElement) { userDisplayElement.innerText = deviceName; }
@@ -1622,7 +1797,7 @@
 
                     document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('active', 'success'));
                     checkFaceIdAvailable();
-                    _onUnlocked(); // clear auto-lock state and restore BACK button
+                    _onUnlocked(); // clear auto-lock state and restore Switch button
                     setTimeout(() => {
                         document.getElementById('loginScreen').classList.add('hidden');
                         _backgroundSync();
