@@ -201,6 +201,51 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": "ID not found"})).setMimeType(ContentService.MimeType.JSON);
     }
 
+    if (data.action === 'edit_order_item') {
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getSheetByName(data.month);
+      if (!sheet) return ContentService.createTextOutput(JSON.stringify({"status":"error","message":"Sheet not found"})).setMimeType(ContentService.MimeType.JSON);
+      var values = sheet.getDataRange().getValues();
+      for (var i = 1; i < values.length; i++) {
+        if (String(values[i][0]) === String(data.order_id) && String(values[i][4]) === String(data.old_item_name)) {
+          sheet.getRange(i + 1, 5).setValue(data.new_item_name);
+          sheet.getRange(i + 1, 6).setValue(data.new_price);
+          sheet.getRange(i + 1, 7).setValue(data.new_cost);
+          sheet.getRange(i + 1, 9).setValue(data.new_price - data.new_cost);
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
+    }
+    if (data.action === 'add_order_item') {
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getSheetByName(data.month);
+      if (!sheet) return ContentService.createTextOutput(JSON.stringify({"status":"error","message":"Sheet not found"})).setMimeType(ContentService.MimeType.JSON);
+      // Find existing order row to copy date/time/staff
+      var values = sheet.getDataRange().getValues();
+      var orderDate = '', orderTime = '', orderStaff = '';
+      var MONTHS_S = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      for (var i = 1; i < values.length; i++) {
+        if (String(values[i][0]) === String(data.order_id)) {
+          orderDate = (values[i][1] instanceof Date) ? Utilities.formatDate(values[i][1], Session.getScriptTimeZone(), "dd-MMM-yyyy") : String(values[i][1]);
+          orderTime = (values[i][2] instanceof Date) ? Utilities.formatDate(values[i][2], Session.getScriptTimeZone(), "HH:mm:ss") : String(values[i][2]);
+          orderStaff = String(values[i][3]);
+          break;
+        }
+      }
+      // Remove TOTALS, append new row, rebuild TOTALS
+      var lastRow = sheet.getLastRow();
+      if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") sheet.deleteRow(lastRow);
+      sheet.appendRow([data.order_id, orderDate, orderTime, orderStaff, data.item_name, data.price, data.cost, 1, data.price - data.cost]);
+      var newLast = sheet.getLastRow();
+      var finalRow = newLast + 1;
+      sheet.getRange(finalRow, 1).setValue("TOTALS").setFontWeight("bold");
+      sheet.getRange(finalRow, 6).setFormula("=SUM(F2:F" + newLast + ")").setFontWeight("bold");
+      sheet.getRange(finalRow, 7).setFormula("=SUM(G2:G" + newLast + ")").setFontWeight("bold");
+      sheet.getRange(finalRow, 8).setFormula("=SUM(H2:H" + newLast + ")").setFontWeight("bold");
+      sheet.getRange(finalRow, 9).setFormula("=SUM(I2:I" + newLast + ")").setFontWeight("bold");
+      return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
+    }
     if (data.action === 'delete_order') {
       var ss = SpreadsheetApp.openById(SHEET_ID);
       var sheet = ss.getSheetByName(data.month);
