@@ -613,6 +613,12 @@
         #clearDataSheetBox .sheet-title { font-weight: 800; font-size: 15px; color: var(--text); margin-bottom: 10px; font-family: 'Quicksand', sans-serif; }
         #clearDataSheetBox .sheet-msg { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 22px; }
         #clearDataSheetBox .sheet-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: env(safe-area-inset-bottom); }
+
+        /* Face ID toggle confirmation sheet */
+        #faceIdConfirmSheet { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
+        #faceIdConfirmSheet.open { opacity: 1; visibility: visible; }
+        #faceIdConfirmSheetBox { background: var(--surface); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 8px 20px 20px; transform: translateY(100%); transition: transform 0.3s var(--anim-curve); }
+        #faceIdConfirmSheet.open #faceIdConfirmSheetBox { transform: translateY(0); }
         #logoutConfirmOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.22s ease; }
         #logoutConfirmOverlay.lco-show { display: flex; }
         #logoutConfirmOverlay.lco-visible { opacity: 1; }
@@ -902,6 +908,19 @@
         </div>
     </div>
 
+    <!-- Face ID / Touch ID toggle confirmation sheet -->
+    <div id="faceIdConfirmSheet" onclick="if(event.target===this)hideFaceIdConfirmSheet()">
+        <div id="faceIdConfirmSheetBox">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title" id="faceIdConfirmTitle">Enable Face ID / Touch ID?</div>
+            <div class="sheet-msg" id="faceIdConfirmMsg">Use your face or fingerprint to sign in faster. Your PIN remains as a backup.</div>
+            <div class="sheet-btns">
+                <button onclick="hideFaceIdConfirmSheet()" class="btn btn-clear" style="font-size:13px;">Cancel</button>
+                <button id="faceIdConfirmOkBtn" onclick="confirmFaceIdToggle()" class="btn btn-confirm" style="font-size:13px;">Enable</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Logout confirmation overlay -->
     <div id="logoutConfirmOverlay">
         <div id="logoutConfirmBox">
@@ -1059,11 +1078,11 @@
                 </a>
             </div>
 
-            <div class="settings-section">
-                <div class="settings-section-label">Account</div>
+            <!-- Face ID / Touch ID in its own Security section, away from Logout -->
+            <div class="settings-section" id="faceIdSettingSection" style="display:none;">
+                <div class="settings-section-label">Security</div>
                 <div class="settings-group">
-                    <!-- Face ID / Touch ID toggle — hidden until WebAuthn platform authenticator is confirmed available -->
-                    <div id="faceIdSettingRow" class="setting-card" style="display:none;" onclick="toggleFaceId()">
+                    <div id="faceIdSettingRow" class="setting-card" onclick="toggleFaceId()">
                         <div class="setting-icon" style="background:#5856d6">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/>
@@ -1076,7 +1095,12 @@
                         <div class="setting-label">Face ID / Touch ID</div>
                         <div class="setting-val" id="faceIdStatus">Off</div>
                     </div>
-                    <div class="setting-divider" id="faceIdDivider" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-section-label">Account</div>
+                <div class="settings-group">
                     <div class="setting-card" onclick="logout()">
                         <div class="setting-icon" style="background:#ff3b30"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
                         <div class="setting-label" style="color:#FF3B30;">Logout</div>
@@ -1096,7 +1120,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer">v5.0.0</div>
+            <div class="settings-footer" id="settingsVersionDisplay">v5.0.5</div>
         </div>
     </div>
 
@@ -1448,10 +1472,8 @@
             try {
                 const ok = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
                 if (ok) {
-                    const row = document.getElementById('faceIdSettingRow');
-                    const div = document.getElementById('faceIdDivider');
-                    if (row) row.style.display = '';
-                    if (div) div.style.display = '';
+                    const section = document.getElementById('faceIdSettingSection');
+                    if (section) section.style.display = '';
                     updateFaceIdSettingUI();
                 }
             } catch(e) {}
@@ -1464,10 +1486,28 @@
             if (el) el.innerText = enabled ? 'On' : 'Off';
         }
 
-        /** Toggle Face ID on/off from the settings panel */
+        /** Toggle Face ID on/off — shows a confirmation sheet first */
+        let _pendingFaceIdEnable = false;
         function toggleFaceId() {
             const enabled = deviceName && localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
-            if (enabled) disableFaceId(); else enableFaceId();
+            _pendingFaceIdEnable = !enabled;
+            document.getElementById('faceIdConfirmTitle').textContent =
+                enabled ? 'Disable Face ID / Touch ID?' : 'Enable Face ID / Touch ID?';
+            document.getElementById('faceIdConfirmMsg').textContent = enabled
+                ? "You'll need to enter your PIN every time you sign in."
+                : 'Use your face or fingerprint to sign in faster. Your PIN remains as a backup.';
+            const okBtn = document.getElementById('faceIdConfirmOkBtn');
+            okBtn.textContent = enabled ? 'Turn Off' : 'Enable';
+            okBtn.style.background = enabled ? '#FF3B30' : '';
+            okBtn.style.borderColor = enabled ? '#FF3B30' : '';
+            document.getElementById('faceIdConfirmSheet').classList.add('open');
+        }
+        function hideFaceIdConfirmSheet() {
+            document.getElementById('faceIdConfirmSheet').classList.remove('open');
+        }
+        function confirmFaceIdToggle() {
+            hideFaceIdConfirmSheet();
+            if (_pendingFaceIdEnable) enableFaceId(); else disableFaceId();
         }
 
         /** Register a WebAuthn platform credential (Face ID / Touch ID) for the current user */
@@ -1592,6 +1632,8 @@
         window.onload = () => {
             const verEl = document.getElementById('appVersionDisplay');
             if (verEl) verEl.innerText = APP_VERSION;
+            const sver = document.getElementById('settingsVersionDisplay');
+            if (sver) sver.innerText = APP_VERSION;
             _startVersionPoller();
 
             fetchUsers(); fetchMenu();
