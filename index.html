@@ -451,7 +451,7 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 2000; display: flex; flex-direction: column;
             transition: opacity 0.4s, transform 0.4s; will-change: transform, opacity;
-            background: var(--primary);          /* hero bg visible during transition */
+            background: var(--surface);   /* matches card — eliminates green bleed at rounded corners */
         }
         #loginScreen.hidden { opacity: 0; pointer-events: none; transform: scale(1.04); }
 
@@ -504,27 +504,36 @@
             margin-bottom: 22px; text-transform: uppercase; opacity: 0.7;
         }
 
-        /* username step */
-        #usernameStep { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 300px; }
-        .login-card-title { font-family: 'Quicksand', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-        .login-card-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 22px; }
-        .login-username-input {
-            width: 100%; padding: 15px 18px; border: 1.5px solid var(--border); border-radius: var(--radius);
-            background: var(--bg); color: var(--text); font-size: 15px; font-family: 'Inter', sans-serif;
-            font-weight: 600; text-align: left; outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; caret-color: var(--primary);
+        /* user-selection step */
+        #usernameStep { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .login-who-title { font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 18px; text-align: center; }
+        .login-user-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
+        .login-user-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 7px;
+            background: var(--bg); border: 1.5px solid var(--border); border-radius: 16px;
+            padding: 14px 6px 12px; cursor: pointer; font-family: inherit;
+            transition: border-color 0.18s, transform 0.15s, background 0.18s;
+            touch-action: manipulation; -webkit-tap-highlight-color: transparent;
         }
-        .login-username-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
-        .login-username-input::placeholder { color: var(--text-muted); font-weight: 400; }
-        /* continue button */
-        .login-continue-btn {
-            width: 100%; height: 54px; margin-top: 12px; border-radius: var(--radius);
-            background: var(--primary); color: #fff; border: none; font-size: 15px; font-weight: 700;
-            cursor: pointer; letter-spacing: 0.3px; font-family: 'Inter', sans-serif;
-            box-shadow: 0 4px 18px rgba(76,175,80,0.35);
-            transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
+        .login-user-btn:active { transform: scale(0.92); background: var(--surface-hover); }
+        .login-user-btn.has-faceid { border-color: var(--primary-light); }
+        .login-user-avatar-circle {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-dim), var(--primary));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 800; color: white;
+            position: relative; flex-shrink: 0;
         }
-        .login-continue-btn:active { opacity: 0.84; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.2); }
+        .login-user-faceid-badge {
+            position: absolute; bottom: -2px; right: -2px;
+            width: 17px; height: 17px; background: white; border-radius: 50%; border: 1.5px solid var(--border);
+            display: flex; align-items: center; justify-content: center; color: var(--primary);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        [data-theme="dark"] .login-user-faceid-badge { background: var(--surface); }
+        .login-user-name { font-size: 11px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.2; word-break: break-word; }
+        .login-user-loading { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0; grid-column: 1/-1; }
+        .num-spacer { display: block; }
         #updateRefreshBtn {
             margin-top: 14px; padding: 8px 18px; background: transparent;
             border: 1px solid var(--border); border-radius: 20px; color: var(--text-muted);
@@ -831,12 +840,12 @@
             <!-- version badge -->
             <div class="login-version-badge" id="appVersionDisplay"></div>
 
-            <!-- Username entry step -->
+            <!-- User-selection step -->
             <div id="usernameStep">
-                <div class="login-card-title">Sign in</div>
-                <div class="login-card-sub">Enter your name to continue</div>
-                <input id="usernameInput" class="login-username-input" type="text" placeholder="Your name" autocomplete="username" autocorrect="off" autocapitalize="words" spellcheck="false" onkeydown="if(event.key==='Enter')proceedToAuth()">
-                <button class="login-continue-btn" id="continueBtn" onclick="proceedToAuth()">Continue →</button>
+                <div class="login-who-title">Who's signing in?</div>
+                <div id="userGrid" class="login-user-grid">
+                    <div class="login-user-loading">Loading…</div>
+                </div>
             </div>
             <button id="updateRefreshBtn" onclick="hardRefreshApp()" title="Check for app updates">↻ Check for Update</button>
 
@@ -868,11 +877,12 @@
                     <button class="num-btn" onclick="handleNumpad(7,this)">7</button>
                     <button class="num-btn" onclick="handleNumpad(8,this)">8</button>
                     <button class="num-btn" onclick="handleNumpad(9,this)">9</button>
-                    <button class="num-btn clear" onclick="handleNumpad(0,this)">0</button>
+                    <span class="num-spacer"></span>
+                    <button class="num-btn" onclick="handleNumpad(0,this)">0</button>
                     <button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
                 </div>
-                <!-- "Switch account" replaces the old BACK button in the numpad -->
-                <button class="login-switch-btn" id="backToUsernameBtn" onclick="cancelLogin()">Switch account</button>
+                <!-- Back to user list -->
+                <button class="login-switch-btn" id="backToUsernameBtn" onclick="cancelLogin()">← Back</button>
             </div>
 
             <button id="clearDataBtn" onclick="showClearDataSheet()">Clear Browser Data</button>
@@ -1334,7 +1344,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v5.0.2';
+        const APP_VERSION = 'v5.0.5';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1587,30 +1597,52 @@
             fetchUsers(); fetchMenu();
             checkFaceIdAvailable(); // detect biometric support and show setting if available
 
-            const savedSess = localStorage.getItem('myday_session');
-            if (savedSess) {
-                try {
-                    const sess = JSON.parse(savedSess);
-                    if (Date.now() - sess.loginTime < 36000000) {
-                        deviceName = sess.user;
-                        const ude = document.getElementById('currentUserDisplay');
-                        if (ude) ude.innerText = deviceName;
-                        const dude = document.getElementById('deskUserDisplay');
-                        if (dude) dude.innerText = deviceName;
-                        document.getElementById('loginScreen').classList.add('hidden');
-                        _backgroundSync();
-                        return;
-                    }
-                } catch(e) {}
-            }
+            // Always require authentication on fresh page load.
+            // This ensures the app auto-locks whenever it is closed or the browser is refreshed.
             showLogin();
         };
 
         function fetchUsers() {
-            // Fetch user list from backend (used for server-side validation; not displayed as buttons)
+            // Render cached users instantly so grid appears before network round-trip
+            const cached = localStorage.getItem('myday_users');
+            if (cached) { try { renderUsers(JSON.parse(cached)); } catch(e) {} }
+
             fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(res => res.json()).then(data => {
                 localStorage.setItem('myday_users', JSON.stringify(data));
+                renderUsers(data);
             }).catch(() => {});
+        }
+
+        // Build the user-selection button grid from the fetched user list
+        function renderUsers(data) {
+            const grid = document.getElementById('userGrid');
+            if (!grid) return;
+            // Backend may return array of strings or array of objects with a name/user field
+            const names = Array.isArray(data)
+                ? data.map(u => (typeof u === 'string' ? u : (u.name || u.user || String(u)))).filter(Boolean)
+                : [];
+            if (names.length === 0) {
+                grid.innerHTML = '<div class="login-user-loading">No users found.<br>Check connection.</div>';
+                return;
+            }
+            const frag = document.createDocumentFragment();
+            names.forEach(name => {
+                const credId = localStorage.getItem('myday_faceid_cred_' + name);
+                const fidOn  = localStorage.getItem('myday_faceid_enabled_' + name) === 'true';
+                const hasBio = !!(credId && fidOn);
+                const btn = document.createElement('button');
+                btn.className = 'login-user-btn' + (hasBio ? ' has-faceid' : '');
+                btn.onclick = () => selectUser(name);
+                btn.innerHTML =
+                    `<div class="login-user-avatar-circle">${name.charAt(0).toUpperCase()}` +
+                    (hasBio
+                        ? `<div class="login-user-faceid-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/><path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/></svg></div>`
+                        : '') +
+                    `</div><div class="login-user-name">${name}</div>`;
+                frag.appendChild(btn);
+            });
+            grid.innerHTML = '';
+            grid.appendChild(frag);
         }
 
         /* ── Hero helpers ── */
@@ -1648,23 +1680,7 @@
         function showLogin() {
             document.getElementById('loginScreen').classList.remove('hidden');
             toggleSettings(false);
-
-            // If a remembered user has Face ID registered, jump straight to biometric prompt
-            const rem = localStorage.getItem('myday_remembered_user');
-            if (rem) {
-                const credId = localStorage.getItem('myday_faceid_cred_' + rem);
-                const fidOn  = localStorage.getItem('myday_faceid_enabled_' + rem) === 'true';
-                if (credId && fidOn) {
-                    tempSelectedUser = rem; currentPin = ''; updatePinDisplay();
-                    _switchToPinView(rem, true, true);
-                    setTimeout(() => doFaceIdLogin(), 420); // auto-trigger OS biometric prompt
-                    return;
-                }
-            }
-
-            // Default: show username entry
-            cancelLogin();
-            setTimeout(() => { const inp = document.getElementById('usernameInput'); if (inp) inp.focus(); }, 120);
+            cancelLogin(); // reset to user-grid view
         }
 
         function showClearDataSheet() { document.getElementById('clearDataSheet').classList.add('open'); }
@@ -1678,30 +1694,30 @@
             window.location.reload();
         }
 
-        // Called when user submits the username text field and presses Continue
-        function proceedToAuth() {
-            const input = document.getElementById('usernameInput');
-            const name  = input ? input.value.trim() : '';
-            if (!name) { if (input) input.focus(); return; }
-
+        // Called when user taps a user button in the grid
+        function selectUser(name) {
             tempSelectedUser = name; currentPin = ''; updatePinDisplay();
+            const credId = localStorage.getItem('myday_faceid_cred_' + name);
+            const fidOn  = localStorage.getItem('myday_faceid_enabled_' + name) === 'true';
+            const hasBio = !!(credId && fidOn);
+
             const step = document.getElementById('usernameStep');
             const pin  = document.getElementById('pinContainer');
 
-            // Animate step out
+            // Animate user grid out
             step.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
             step.style.opacity = '0'; step.style.transform = 'translateY(-12px)';
             setTimeout(() => {
                 step.style.display = 'none'; step.style.transition = ''; step.style.opacity = ''; step.style.transform = '';
-                const credId = localStorage.getItem('myday_faceid_cred_' + name);
-                const fidOn  = localStorage.getItem('myday_faceid_enabled_' + name) === 'true';
-                _switchToPinView(name, credId && fidOn, true);
-                // Animate card in
+                _switchToPinView(name, hasBio, true);
+                // Animate PIN numpad in
                 pin.style.opacity = '0'; pin.style.transform = 'translateY(16px)'; pin.style.transition = 'none';
                 requestAnimationFrame(() => requestAnimationFrame(() => {
                     pin.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
                     pin.style.opacity = '1'; pin.style.transform = 'translateY(0)';
                 }));
+                // If Face ID / Touch ID is registered, immediately prompt the OS
+                if (hasBio) setTimeout(() => doFaceIdLogin(), 200);
             }, 180);
         }
 
@@ -1731,11 +1747,11 @@
             if (switchBtn) switchBtn.classList.remove('hidden-btn');
         }
 
-        // Reset login screen back to username entry (used by Switch account and showLogin)
+        // Reset to user-selection grid (used by ← Back button and showLogin)
         function cancelLogin() {
             if (isAutoLocked) return; // can't navigate back while locked — user must authenticate
-            const step = document.getElementById('usernameStep');
-            const pin  = document.getElementById('pinContainer');
+            const step   = document.getElementById('usernameStep');
+            const pin    = document.getElementById('pinContainer');
             const updBtn = document.getElementById('updateRefreshBtn');
             if (pin.style.display === 'flex') {
                 pin.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
@@ -1758,7 +1774,6 @@
             tempSelectedUser = null; currentPin = '';
             document.getElementById('faceIdLoginBtn').classList.remove('show');
             document.getElementById('pinOrLabel').classList.remove('show');
-            const inp = document.getElementById('usernameInput'); if (inp) inp.value = '';
         }
 
         function numBtnPress(btn) { btn.classList.add('pressing'); setTimeout(() => btn.classList.remove('pressing'), 150); }
