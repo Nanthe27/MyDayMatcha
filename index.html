@@ -465,6 +465,17 @@
         .num-btn.clear { color: #FF3B30; font-size: 16px; font-weight: 700; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         .shake { animation: shake 0.3s ease-in-out; }
+        /* --- Username text input on login screen --- */
+        #usernameStep { display: flex; flex-direction: column; align-items: center; }
+        .login-username-input { width: 260px; padding: 16px 20px; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font-size: 16px; font-family: 'Inter', sans-serif; font-weight: 600; text-align: center; outline: none; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; caret-color: var(--primary); }
+        .login-username-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(76,175,80,0.15); }
+        .login-username-input::placeholder { color: var(--text-muted); font-weight: 400; }
+        /* --- Face ID login button on PIN screen --- */
+        #faceIdLoginBtn { display: none; align-items: center; justify-content: center; gap: 10px; width: 260px; padding: 16px; background: var(--primary); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 18px rgba(76,175,80,0.35); transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s; letter-spacing: 0.3px; font-family: 'Inter', sans-serif; }
+        #faceIdLoginBtn.show { display: flex; }
+        #faceIdLoginBtn:active { opacity: 0.82; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.2); }
+        .pin-or-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1.2px; margin-bottom: 18px; text-transform: uppercase; display: none; }
+        .pin-or-label.show { display: block; }
         #logoutConfirmOverlay { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.22s ease; }
         #logoutConfirmOverlay.lco-show { display: flex; }
         #logoutConfirmOverlay.lco-visible { opacity: 1; }
@@ -672,11 +683,27 @@
 
     <div id="loginScreen">
         <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo">
-        <h2 id="loginTitle" class="login-title">It's loading, wait abit</h2>
+        <h2 id="loginTitle" class="login-title">Sign In</h2>
         <div id="appVersionDisplay" style="font-size:11px; color:var(--text-muted); margin-top:-30px; margin-bottom:20px; font-weight:600; letter-spacing:1.5px;"></div>
-        <div id="userListGrid" style="display:flex; flex-direction:column;"></div>
+        <!-- Username text input step — user types their name instead of tapping a list -->
+        <div id="usernameStep">
+            <input id="usernameInput" class="login-username-input" type="text" placeholder="Enter your name" autocomplete="username" autocorrect="off" autocapitalize="words" spellcheck="false" onkeydown="if(event.key==='Enter')proceedToAuth()">
+            <button class="user-btn" id="continueBtn" onclick="proceedToAuth()" style="margin-top:12px;">Continue →</button>
+        </div>
         <button id="updateRefreshBtn" onclick="hardRefreshApp()" title="Check for app updates">↻ Check for Update</button>
         <div id="pinContainer" style="display:none; flex-direction:column; align-items:center;">
+            <!-- Face ID / Touch ID login button — shown only if credential is registered on this device -->
+            <button id="faceIdLoginBtn" onclick="doFaceIdLogin()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/>
+                    <path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/>
+                    <circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none"/>
+                    <circle cx="15" cy="11" r="1.5" fill="currentColor" stroke="none"/>
+                    <path d="M8 15.5c1.33 1.2 6.67 1.2 8 0"/>
+                </svg>
+                Login with Face ID
+            </button>
+            <div class="pin-or-label" id="pinOrLabel">— or enter PIN —</div>
             <div id="pinDisplay" class="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
             <div class="numpad-grid">
                 <button class="num-btn" onclick="handleNumpad(1,this)">1</button><button class="num-btn" onclick="handleNumpad(2,this)">2</button><button class="num-btn" onclick="handleNumpad(3,this)">3</button>
@@ -777,7 +804,7 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </button>
-            <div class="desk-version">v4.1.3</div>
+            <div class="desk-version">v5.0.0</div>
         </div>
     </aside>
 
@@ -861,6 +888,21 @@
             <div class="settings-section">
                 <div class="settings-section-label">Account</div>
                 <div class="settings-group">
+                    <!-- Face ID / Touch ID toggle — hidden until WebAuthn platform authenticator is confirmed available -->
+                    <div id="faceIdSettingRow" class="setting-card" style="display:none;" onclick="toggleFaceId()">
+                        <div class="setting-icon" style="background:#5856d6">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/>
+                                <path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/>
+                                <circle cx="9" cy="11" r="1.5" fill="white" stroke="none"/>
+                                <circle cx="15" cy="11" r="1.5" fill="white" stroke="none"/>
+                                <path d="M8 15.5c1.33 1.2 6.67 1.2 8 0"/>
+                            </svg>
+                        </div>
+                        <div class="setting-label">Face ID / Touch ID</div>
+                        <div class="setting-val" id="faceIdStatus">Off</div>
+                    </div>
+                    <div class="setting-divider" id="faceIdDivider" style="display:none;"></div>
                     <div class="setting-card" onclick="logout()">
                         <div class="setting-icon" style="background:#ff3b30"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
                         <div class="setting-label" style="color:#FF3B30;">Logout</div>
@@ -880,7 +922,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer">v4.1.3</div>
+            <div class="settings-footer">v5.0.0</div>
         </div>
     </div>
 
@@ -1128,7 +1170,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v4.1.3';
+        const APP_VERSION = 'v5.0.0';
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1213,12 +1255,161 @@
             }, 5 * 60 * 1000);
         }
 
+        // ─── Face ID / WebAuthn helpers ───────────────────────────────────────────
+
+        /** Check if this device supports platform biometrics; show Face ID setting if yes */
+        async function checkFaceIdAvailable() {
+            if (!window.PublicKeyCredential) return;
+            try {
+                const ok = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (ok) {
+                    const row = document.getElementById('faceIdSettingRow');
+                    const div = document.getElementById('faceIdDivider');
+                    if (row) row.style.display = '';
+                    if (div) div.style.display = '';
+                    updateFaceIdSettingUI();
+                }
+            } catch(e) {}
+        }
+
+        /** Refresh the Face ID On/Off label in settings for the current user */
+        function updateFaceIdSettingUI() {
+            const enabled = deviceName && localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
+            const el = document.getElementById('faceIdStatus');
+            if (el) el.innerText = enabled ? 'On' : 'Off';
+        }
+
+        /** Toggle Face ID on/off from the settings panel */
+        function toggleFaceId() {
+            const enabled = deviceName && localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
+            if (enabled) disableFaceId(); else enableFaceId();
+        }
+
+        /** Register a WebAuthn platform credential (Face ID / Touch ID) for the current user */
+        async function enableFaceId() {
+            if (!window.PublicKeyCredential) { alert('WebAuthn is not supported on this browser.'); return; }
+            let avail = false;
+            try { avail = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); } catch(e) {}
+            if (!avail) { alert('Face ID / Touch ID is not available on this device.'); return; }
+
+            const challenge = crypto.getRandomValues(new Uint8Array(32));
+            // Use a unique userId per registration to avoid RP conflicts on re-registration
+            const userId = new TextEncoder().encode(deviceName + ':' + Date.now());
+            try {
+                const credential = await navigator.credentials.create({
+                    publicKey: {
+                        challenge,
+                        rp: { name: 'My Day Matcha', id: location.hostname },
+                        user: { id: userId, name: deviceName, displayName: deviceName },
+                        pubKeyCredParams: [
+                            { type: 'public-key', alg: -7   }, // ES256 — preferred on Apple devices
+                            { type: 'public-key', alg: -257 }  // RS256 — fallback
+                        ],
+                        authenticatorSelection: {
+                            authenticatorAttachment: 'platform', // enforce Face ID / Touch ID
+                            userVerification: 'required',
+                            residentKey: 'preferred'
+                        },
+                        timeout: 60000
+                    }
+                });
+
+                // Encode credential ID as URL-safe base64 for localStorage + sheet storage
+                const credId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+                localStorage.setItem('myday_faceid_cred_' + deviceName, credId);
+                localStorage.setItem('myday_faceid_enabled_' + deviceName, 'true');
+
+                // Persist to Google Sheet so any admin can audit / revoke
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'save_faceid', user: deviceName, credentialId: credId, enabled: true })
+                });
+
+                updateFaceIdSettingUI();
+                const t = document.getElementById('toast'); t.innerText = 'Face ID enabled!'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000);
+            } catch(err) {
+                // NotAllowedError = user cancelled — silent. Other errors = show message.
+                if (err.name !== 'NotAllowedError') alert('Face ID setup failed: ' + err.message);
+            }
+        }
+
+        /** Clear the WebAuthn credential for the current user (both locally and in the sheet) */
+        async function disableFaceId() {
+            localStorage.removeItem('myday_faceid_cred_' + deviceName);
+            localStorage.removeItem('myday_faceid_enabled_' + deviceName);
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'save_faceid', user: deviceName, credentialId: '', enabled: false })
+                });
+            } catch(e) {}
+            updateFaceIdSettingUI();
+            const t = document.getElementById('toast'); t.innerText = 'Face ID disabled.'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        /** Attempt Face ID / Touch ID login for tempSelectedUser — called from the login screen button */
+        async function doFaceIdLogin() {
+            const username = tempSelectedUser;
+            if (!username) return;
+            const credId = localStorage.getItem('myday_faceid_cred_' + username);
+            if (!credId) { document.getElementById('faceIdLoginBtn').classList.remove('show'); return; }
+
+            const btn = document.getElementById('faceIdLoginBtn');
+            btn.disabled = true; btn.style.opacity = '0.6';
+
+            try {
+                const challenge   = crypto.getRandomValues(new Uint8Array(32));
+                const credIdBytes = Uint8Array.from(atob(credId), c => c.charCodeAt(0));
+
+                // Ask the device OS to verify biometrics — Face ID / Touch ID prompt appears here
+                await navigator.credentials.get({
+                    publicKey: {
+                        challenge,
+                        allowCredentials: [{ id: credIdBytes, type: 'public-key' }],
+                        userVerification: 'required',
+                        timeout: 60000
+                    }
+                });
+
+                // Device has verified the biometric; ask GAS to confirm credential ID matches
+                const res  = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'faceid_login', user: username, credentialId: credId })
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    deviceName = username;
+                    localStorage.setItem('myday_session', JSON.stringify({ user: deviceName, loginTime: Date.now() }));
+                    const ude = document.getElementById('currentUserDisplay'); if (ude) ude.innerText = deviceName;
+                    const dude = document.getElementById('deskUserDisplay');   if (dude) dude.innerText = deviceName;
+                    document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('active', 'success'));
+                    checkFaceIdAvailable();
+                    setTimeout(() => { document.getElementById('loginScreen').classList.add('hidden'); _backgroundSync(); }, 650);
+                } else {
+                    alert('Face ID login failed. Please enter your PIN instead.');
+                }
+            } catch(err) {
+                // NotAllowedError = user dismissed — quiet fallback to PIN
+                if (err.name !== 'NotAllowedError') alert('Face ID error. Please use your PIN.');
+            } finally {
+                btn.disabled = false; btn.style.opacity = '';
+            }
+        }
+
+        // ─── App startup ──────────────────────────────────────────────────────────
+
         window.onload = () => {
             const verEl = document.getElementById('appVersionDisplay');
             if (verEl) verEl.innerText = APP_VERSION;
             _startVersionPoller();
 
             fetchUsers(); fetchMenu();
+            checkFaceIdAvailable(); // detect biometric support and show setting if available
+
             const savedSess = localStorage.getItem('myday_session');
             if (savedSess) {
                 try {
@@ -1239,24 +1430,19 @@
         };
 
         function fetchUsers() {
-            const cachedUsers = localStorage.getItem('myday_users');
-            if (cachedUsers) renderUserGrid(JSON.parse(cachedUsers));
-
+            // Fetch user list from backend (used for server-side validation; not displayed as buttons)
             fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(res => res.json()).then(data => {
                 localStorage.setItem('myday_users', JSON.stringify(data));
-                renderUserGrid(data);
-            });
+            }).catch(() => {});
         }
 
-        function renderUserGrid(data) {
-            const grid = document.getElementById('userListGrid'); grid.innerHTML = '';
-            data.forEach(name => {
-                const btn = document.createElement('button'); btn.className = 'user-btn'; btn.innerText = name;
-                btn.onclick = () => selectUser(name); grid.appendChild(btn);
-            });
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            cancelLogin();
+            toggleSettings(false);
+            // Auto-focus the username field after the animation settles
+            setTimeout(() => { const inp = document.getElementById('usernameInput'); if (inp) inp.focus(); }, 120);
         }
-
-        function showLogin() { document.getElementById('loginScreen').classList.remove('hidden'); cancelLogin(); toggleSettings(false); }
 
         function showClearDataSheet() { document.getElementById('clearDataSheet').classList.add('open'); }
         function hideClearDataSheet() { document.getElementById('clearDataSheet').classList.remove('open'); }
@@ -1268,16 +1454,34 @@
             try { if ('indexedDB' in window && indexedDB.databases) { const dbs = await indexedDB.databases(); await Promise.all(dbs.map(db => new Promise(res => { const r = indexedDB.deleteDatabase(db.name); r.onsuccess = r.onerror = res; }))); } } catch(e) {}
             window.location.reload();
         }
-        function selectUser(name) {
+
+        // Called when user submits the username text field and presses Continue
+        function proceedToAuth() {
+            const input = document.getElementById('usernameInput');
+            const name = input ? input.value.trim() : '';
+            if (!name) { if (input) input.focus(); return; }
+
             tempSelectedUser = name; currentPin = ""; updatePinDisplay();
-            const grid = document.getElementById('userListGrid');
-            const pin = document.getElementById('pinContainer');
-            grid.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
-            grid.style.opacity = '0'; grid.style.transform = 'translateY(-14px)';
+            const step = document.getElementById('usernameStep');
+            const pin  = document.getElementById('pinContainer');
+
+            // Animate username step out
+            step.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+            step.style.opacity = '0'; step.style.transform = 'translateY(-14px)';
             setTimeout(() => {
-                grid.style.display = 'none'; grid.style.transition = ''; grid.style.opacity = ''; grid.style.transform = '';
+                step.style.display = 'none'; step.style.transition = ''; step.style.opacity = ''; step.style.transform = '';
                 document.getElementById('updateRefreshBtn').style.display = 'none';
                 document.getElementById('loginTitle').innerText = name;
+
+                // Show Face ID button if credential is stored locally for this username
+                const credId   = localStorage.getItem('myday_faceid_cred_' + name);
+                const fidOn    = localStorage.getItem('myday_faceid_enabled_' + name) === 'true';
+                const faceBtn  = document.getElementById('faceIdLoginBtn');
+                const orLabel  = document.getElementById('pinOrLabel');
+                if (credId && fidOn) { faceBtn.classList.add('show'); orLabel.classList.add('show'); }
+                else                 { faceBtn.classList.remove('show'); orLabel.classList.remove('show'); }
+
+                // Animate PIN container in
                 pin.style.opacity = '0'; pin.style.transform = 'translateY(18px)'; pin.style.transition = 'none'; pin.style.display = 'flex';
                 requestAnimationFrame(() => requestAnimationFrame(() => {
                     pin.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
@@ -1286,26 +1490,32 @@
             }, 200);
         }
 
+        // Reset login screen back to username entry (used by BACK button and showLogin)
         function cancelLogin() {
-            const grid = document.getElementById('userListGrid');
-            const pin = document.getElementById('pinContainer');
+            const step = document.getElementById('usernameStep');
+            const pin  = document.getElementById('pinContainer');
             if (pin.style.display === 'flex') {
                 pin.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
                 pin.style.opacity = '0'; pin.style.transform = 'translateY(14px)';
                 setTimeout(() => {
                     pin.style.display = 'none'; pin.style.transition = ''; pin.style.opacity = ''; pin.style.transform = '';
-                    grid.style.opacity = '0'; grid.style.transform = 'translateY(-14px)'; grid.style.transition = 'none'; grid.style.display = 'flex';
+                    step.style.opacity = '0'; step.style.transform = 'translateY(-14px)'; step.style.transition = 'none'; step.style.display = 'flex';
                     requestAnimationFrame(() => requestAnimationFrame(() => {
-                        grid.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
-                        grid.style.opacity = '1'; grid.style.transform = 'translateY(0)';
+                        step.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
+                        step.style.opacity = '1'; step.style.transform = 'translateY(0)';
                     }));
                 }, 200);
             } else {
-                grid.style.display = 'flex';
+                step.style.display = 'flex';
             }
             tempSelectedUser = null; currentPin = "";
-            document.getElementById('loginTitle').innerText = "It's loading, wait abit";
+            document.getElementById('loginTitle').innerText = 'Sign In';
             document.getElementById('updateRefreshBtn').style.display = '';
+            // Reset Face ID button visibility
+            document.getElementById('faceIdLoginBtn').classList.remove('show');
+            document.getElementById('pinOrLabel').classList.remove('show');
+            // Clear the username input for next attempt
+            const inp = document.getElementById('usernameInput'); if (inp) inp.value = '';
         }
 
         function numBtnPress(btn) { btn.classList.add('pressing'); setTimeout(() => btn.classList.remove('pressing'), 150); }
@@ -1342,12 +1552,13 @@
                     if (deskUDE) deskUDE.innerText = deviceName;
 
                     document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('active', 'success'));
+                    checkFaceIdAvailable(); // refresh Face ID toggle in settings after login
                     setTimeout(() => {
                         document.getElementById('loginScreen').classList.add('hidden');
                         _backgroundSync();
                     }, 650);
-                } else { 
-                    alert("Login Failed: " + (data.message || "Incorrect PIN. Check your Google Sheet."));
+                } else {
+                    alert("Login Failed: " + (data.message || "Invalid username or PIN."));
                     const display = document.getElementById('pinDisplay'); display.classList.add('shake'); 
                     setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400); 
                 }
@@ -2575,7 +2786,7 @@
             if (btn) btn.classList.add('syncing');
             const mk = fmtMonthKey(new Date());
             Promise.all([
-                fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(r => r.json()).then(d => { localStorage.setItem('myday_users', JSON.stringify(d)); renderUserGrid(d); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(r => r.json()).then(d => { localStorage.setItem('myday_users', JSON.stringify(d)); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(r => r.json()).then(d => { localStorage.setItem('myday_menu', JSON.stringify(d)); processMenuData(d); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_inv_' + mk, JSON.stringify(d)); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_history_' + mk, JSON.stringify(d)); })
@@ -2596,7 +2807,7 @@
 
             const toast = document.getElementById('toast');
             Promise.all([
-                fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(r => r.json()).then(d => { localStorage.setItem('myday_users', JSON.stringify(d)); renderUserGrid(d); }),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(r => r.json()).then(d => { localStorage.setItem('myday_users', JSON.stringify(d)); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_menu').then(r => r.json()).then(d => { localStorage.setItem('myday_menu', JSON.stringify(d)); processMenuData(d); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_inv_' + mk, JSON.stringify(d)); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_history_' + mk, JSON.stringify(d)); })
