@@ -709,7 +709,7 @@
                 <button class="num-btn" onclick="handleNumpad(1,this)">1</button><button class="num-btn" onclick="handleNumpad(2,this)">2</button><button class="num-btn" onclick="handleNumpad(3,this)">3</button>
                 <button class="num-btn" onclick="handleNumpad(4,this)">4</button><button class="num-btn" onclick="handleNumpad(5,this)">5</button><button class="num-btn" onclick="handleNumpad(6,this)">6</button>
                 <button class="num-btn" onclick="handleNumpad(7,this)">7</button><button class="num-btn" onclick="handleNumpad(8,this)">8</button><button class="num-btn" onclick="handleNumpad(9,this)">9</button>
-                <button class="num-btn clear" onclick="numBtnPress(this);cancelLogin()">BACK</button><button class="num-btn" onclick="handleNumpad(0,this)">0</button><button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
+                <button class="num-btn clear" id="backToUsernameBtn" onclick="numBtnPress(this);cancelLogin()">BACK</button><button class="num-btn" onclick="handleNumpad(0,this)">0</button><button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
             </div>
         </div>
         <button id="clearDataBtn" onclick="showClearDataSheet()">Clear Browser Data</button>
@@ -1183,7 +1183,8 @@
 
         let MENU_DATA = [];
         let currentOrder = [], todayRecords = [], deviceName = "Unknown", tempSelectedUser = null;
-        let currentPin = ""; 
+        let currentPin = "";
+        let isAutoLocked = false; // true while the app is auto-locked (screen hidden by OS/tab switch)
         let dailyOrderCount = parseInt(localStorage.getItem('myday_counter_' + new Date().toDateString())) || 0;
         let historyData = {};
         let _currentEditOrderId = null;
@@ -1211,6 +1212,11 @@
             if(e.key === 'Backspace') handleNumpad('del');
             if(e.key === 'Enter') checkPin();
         });
+
+        // Auto-lock: trigger lockApp whenever the tab/app goes to background or is hidden
+        document.addEventListener('visibilitychange', () => { if (document.hidden) lockApp(); });
+        // iOS Safari PWA fallback — fires when user leaves the app via home button
+        window.addEventListener('pagehide', lockApp);
 
         function hardRefreshApp() {
             const btn = document.getElementById('updateRefreshBtn');
@@ -1388,6 +1394,7 @@
                     const dude = document.getElementById('deskUserDisplay');   if (dude) dude.innerText = deviceName;
                     document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('active', 'success'));
                     checkFaceIdAvailable();
+                    _onUnlocked(); // clear auto-lock state and restore BACK button
                     setTimeout(() => { document.getElementById('loginScreen').classList.add('hidden'); _backgroundSync(); }, 650);
                 } else {
                     alert('Face ID login failed. Please enter your PIN instead.');
@@ -1490,8 +1497,53 @@
             }, 200);
         }
 
+        // Lock the app immediately — jump straight to the PIN/Face ID screen for the known user
+        function lockApp() {
+            const loginScreen = document.getElementById('loginScreen');
+            // Only lock if a user is logged in and the screen is currently accessible
+            if (!loginScreen.classList.contains('hidden')) return;
+            if (!deviceName || deviceName === 'Unknown') return;
+
+            isAutoLocked = true;
+            tempSelectedUser = deviceName;
+            currentPin = ''; updatePinDisplay();
+
+            // Skip username step — go straight to PIN/Face ID for the known user
+            const step   = document.getElementById('usernameStep');
+            const pin    = document.getElementById('pinContainer');
+            const updBtn = document.getElementById('updateRefreshBtn');
+            const backBtn = document.getElementById('backToUsernameBtn');
+
+            if (step)    { step.style.display = 'none'; }
+            if (updBtn)  { updBtn.style.display = 'none'; }
+            // Hide BACK button — user can't change who they are during a lock
+            if (backBtn) { backBtn.style.opacity = '0'; backBtn.style.pointerEvents = 'none'; }
+
+            document.getElementById('loginTitle').innerText = 'Welcome back, ' + deviceName;
+
+            // Show Face ID button if registered on this device for this user
+            const credId  = localStorage.getItem('myday_faceid_cred_' + deviceName);
+            const fidOn   = localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
+            const faceBtn = document.getElementById('faceIdLoginBtn');
+            const orLabel = document.getElementById('pinOrLabel');
+            if (credId && fidOn) { faceBtn.classList.add('show'); orLabel.classList.add('show'); }
+            else                 { faceBtn.classList.remove('show'); orLabel.classList.remove('show'); }
+
+            pin.style.display = 'flex'; pin.style.opacity = '1'; pin.style.transform = 'none'; pin.style.transition = 'none';
+            toggleSettings(false);
+            loginScreen.classList.remove('hidden');
+        }
+
+        // Called after a successful PIN or Face ID re-authentication from the locked state
+        function _onUnlocked() {
+            isAutoLocked = false;
+            const backBtn = document.getElementById('backToUsernameBtn');
+            if (backBtn) { backBtn.style.opacity = ''; backBtn.style.pointerEvents = ''; }
+        }
+
         // Reset login screen back to username entry (used by BACK button and showLogin)
         function cancelLogin() {
+            if (isAutoLocked) return; // can't navigate back while locked — user must authenticate
             const step = document.getElementById('usernameStep');
             const pin  = document.getElementById('pinContainer');
             if (pin.style.display === 'flex') {
@@ -1552,7 +1604,8 @@
                     if (deskUDE) deskUDE.innerText = deviceName;
 
                     document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('active', 'success'));
-                    checkFaceIdAvailable(); // refresh Face ID toggle in settings after login
+                    checkFaceIdAvailable();
+                    _onUnlocked(); // clear auto-lock state and restore BACK button
                     setTimeout(() => {
                         document.getElementById('loginScreen').classList.add('hidden');
                         _backgroundSync();
