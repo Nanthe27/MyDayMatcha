@@ -1,5 +1,7 @@
 var SHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
 function doGet(e) {
+  // Guard for manual test-runs from the Apps Script editor (no HTTP event object)
+  if (!e || !e.parameter) return ContentService.createTextOutput('My Day Matcha API — OK').setMimeType(ContentService.MimeType.TEXT);
   var action = e.parameter.action;
   if (action == 'get_users') {
     var sheet = getOrCreateSheet("Users", ["Name", "Pin"]);
