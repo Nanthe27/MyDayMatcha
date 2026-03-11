@@ -12,8 +12,8 @@
 
     <title>My Day Matcha</title>
 
-    <link rel="icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png">
+    <link rel="icon" href="./Logo.png">
+    <link rel="apple-touch-icon" href="./Logo.png">
     <link rel="manifest" href="manifest.json">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -829,7 +829,7 @@
         <div class="login-hero">
             <!-- Logo state shown when no remembered user (username entry) -->
             <div id="loginHeroLogo">
-                <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="login-logo-hero" alt="My Day Matcha">
+                <img src="./Logo.png" class="login-logo-hero" alt="My Day Matcha">
                 <div class="login-hero-brand">My Day Matcha</div>
                 <div class="login-hero-tagline">Your daily matcha companion</div>
             </div>
@@ -937,7 +937,7 @@
 
     <header class="app-header">
         <div class="brand">
-            <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="app-logo">
+            <img src="./Logo.png" class="app-logo">
             MY DAY MATCHA
         </div>
         <div style="display:flex; align-items:center; gap:4px;">
@@ -956,7 +956,7 @@
 
     <aside class="desk-sidebar" id="deskSidebar">
         <div class="desk-brand">
-            <img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="desk-brand-logo" alt="My Day Matcha">
+            <img src="./Logo.png" class="desk-brand-logo" alt="My Day Matcha">
             <div>
                 <div class="desk-brand-name">My Day Matcha</div>
                 <div class="desk-brand-user" id="deskUserDisplay"></div>
@@ -2278,7 +2278,7 @@
             let finalTotal = total - (total * (d.globalDiscount || 0) / 100);
             let discHTML = d.globalDiscount > 0 ? `<div class="rp-row" style="color:#666; border-top:1px dashed #ccc; padding-top:5px; margin-top:5px;"><div>ORDER DISCOUNT</div><div>-${d.globalDiscount}%</div></div>` : '';
             
-            return `<div class="rp-header"><img src="https://raw.githubusercontent.com/Nanthe27/MyDayMatcha/a10b4d4f580a0e014e57221c0b136abf501a8d1f/Logo.png" class="rp-logo"><div class="rp-title">My Day Matcha</div></div>
+            return `<div class="rp-header"><img src="./Logo.png" class="rp-logo"><div class="rp-title">My Day Matcha</div></div>
                 <div style="font-size:9px;margin-bottom:15px;">${d.date} ${d.time} | #${d.id}</div><div class="rp-items">${rows}</div>
                 ${discHTML}
                 <div class="rp-total">TOTAL: ${finalTotal.toLocaleString()} KHR</div>
@@ -3416,7 +3416,7 @@
 
         /* ── What's New popup ── */
         function showWhatsNew() {
-            if (localStorage.getItem('myday_seen_whats_new_' + APP_VERSION) === '1') return;
+            if (localStorage.getItem('myday_seen_whats_new_' + APP_VERSION + 'r2') === '1') return;
             const sheet = document.getElementById('whatsNewSheet');
             const box   = document.getElementById('whatsNewBox');
             if (!sheet || !box) return;
@@ -3424,7 +3424,7 @@
             requestAnimationFrame(() => requestAnimationFrame(() => { box.style.transform = 'translateY(0)'; }));
         }
         function closeWhatsNew() {
-            localStorage.setItem('myday_seen_whats_new_' + APP_VERSION, '1');
+            localStorage.setItem('myday_seen_whats_new_' + APP_VERSION + 'r2', '1');
             const sheet = document.getElementById('whatsNewSheet');
             const box   = document.getElementById('whatsNewBox');
             if (!sheet || !box) return;
