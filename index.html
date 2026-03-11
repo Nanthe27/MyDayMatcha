@@ -1329,8 +1329,13 @@
                                 <button class="fin-collapse-btn" id="recentPurchasesArrow">▾</button>
                             </div>
                             <div class="fin-collapsible" id="recentPurchasesBody">
-                                <div class="fin-card-body" style="padding-top:12px;">
-                                    <div id="invLastRecord"></div>
+                                <div class="fin-card-body" style="padding-top:10px;">
+                                    <!-- Date pills — browse purchases by day -->
+                                    <div class="day-date-scroll-wrap" id="invDateScrollWrap" style="margin-bottom:10px; display:none;">
+                                        <div id="invDateScroll" class="day-date-scroll"></div>
+                                    </div>
+                                    <!-- Daily total badge -->
+                                    <div id="invDailyTotal" style="display:none; text-align:right; font-size:11px; font-weight:700; color:#FF3B30; margin-bottom:10px; letter-spacing:0.3px;"></div>
                                     <div id="inventoryList"></div>
                                 </div>
                             </div>
@@ -2834,7 +2839,6 @@
 
             const list = document.getElementById('inventoryList');
             const dash = document.getElementById('invDashboard');
-            const lastInvRec = document.getElementById('invLastRecord');
 
             const cachedInv = localStorage.getItem('myday_inv_' + mk);
             const cachedHist = localStorage.getItem('myday_history_' + mk);
@@ -2843,7 +2847,6 @@
                 fetchAndRenderTrendChart();
             } else {
                 list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">Loading...</div>';
-                lastInvRec.innerHTML = '';
                 dash.style.opacity = '0.5';
             }
 
@@ -2865,58 +2868,9 @@
         }
 
         function _renderFinView(invData, histData) {
-            const list = document.getElementById('inventoryList');
             const dash = document.getElementById('invDashboard');
-            const lastInvRec = document.getElementById('invLastRecord');
-            list.innerHTML = '';
-            lastInvRec.innerHTML = '';
             let totalInvCost = 0;
-
-            if (invData.length > 0) {
-                const last = invData[0];
-                lastInvRec.innerHTML = `
-                    <div class="fin-inv-card" style="margin-bottom:10px; border-color:var(--primary); background:color-mix(in srgb, var(--primary) 4%, var(--surface));">
-                        <div class="fin-inv-meta" style="border-bottom-color:color-mix(in srgb, var(--primary) 25%, var(--border));">
-                            <span style="font-size:9px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--primary);">Last Purchase</span>
-                            <span>${last.date} · ${last.user}</span>
-                        </div>
-                        <div class="fin-inv-body">
-                            <div>
-                                <div class="fin-inv-name">${last.item}</div>
-                                <div class="fin-inv-qty">${last.qty}</div>
-                            </div>
-                            <div class="fin-inv-cost">-${Number(last.cost).toLocaleString()} KHR</div>
-                        </div>
-                    </div>`;
-            }
-
-            if (invData.length === 0) {
-                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">No records this month.</div>';
-            } else {
-                invData.forEach(log => {
-                    totalInvCost += Number(log.cost);
-                    const div = document.createElement('div');
-                    div.className = 'fin-inv-card';
-                    const logStr = encodeURIComponent(JSON.stringify(log));
-                    div.innerHTML = `
-                        <div class="fin-inv-meta">
-                            <span>${log.date} · ${log.time} · ${log.user}</span>
-                            <div class="fin-inv-actions">
-                                <button class="fin-action-btn" onclick="openInvEditor('${logStr}')">Edit</button>
-                                <button class="fin-action-btn delete" onclick="confirmDeleteInv('${logStr}')">Delete</button>
-                            </div>
-                        </div>
-                        <div class="fin-inv-body">
-                            <div>
-                                <div class="fin-inv-name">${log.item}</div>
-                                <div class="fin-inv-qty">${log.qty}</div>
-                            </div>
-                            <div class="fin-inv-cost">-${Number(log.cost).toLocaleString()} KHR</div>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                });
-            }
+            if (invData.length > 0) invData.forEach(log => { totalInvCost += Number(log.cost); });
 
             let totalSales = 0;
             if (histData.length > 0) histData.forEach(item => { totalSales += Number(item.price); });
@@ -2938,7 +2892,106 @@
             document.getElementById('dashExpPct').innerText = expPct;
             dash.style.opacity = '1';
 
+            _renderInvByDate(invData);
             _renderDailyBreakdown(invData, histData);
+        }
+
+        /* ── Inventory date-grouped view (Recent Purchases) ── */
+        window._invByDate = {};
+
+        function _renderInvByDate(invData) {
+            const scrollWrap = document.getElementById('invDateScrollWrap');
+            const scrollEl   = document.getElementById('invDateScroll');
+            const listEl     = document.getElementById('inventoryList');
+            const totalEl    = document.getElementById('invDailyTotal');
+            if (!listEl) return;
+
+            if (!invData || invData.length === 0) {
+                if (scrollWrap) scrollWrap.style.display = 'none';
+                if (totalEl) totalEl.style.display = 'none';
+                listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">No records this month.</div>';
+                return;
+            }
+
+            // Group by date (records come newest-first from GAS)
+            const byDate = {};
+            invData.forEach(log => {
+                const d = log.date;
+                if (!byDate[d]) byDate[d] = [];
+                byDate[d].push(log);
+            });
+            window._invByDate = byDate;
+
+            const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
+            // Render date pills
+            if (scrollEl) {
+                scrollEl.innerHTML = dates.map((d, i) =>
+                    `<div class="day-date-pill${i === 0 ? ' selected' : ''}" onclick="_onInvDatePillClick('${d}')">${d}</div>`
+                ).join('');
+                // Scroll first pill into view
+                const first = scrollEl.querySelector('.selected');
+                if (first) first.scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'instant' });
+            }
+            if (scrollWrap) scrollWrap.style.display = 'block';
+
+            // Show records for the latest date by default
+            _renderInvForDate(dates[0]);
+        }
+
+        function _onInvDatePillClick(date) {
+            const scrollEl = document.getElementById('invDateScroll');
+            if (scrollEl) {
+                scrollEl.querySelectorAll('.day-date-pill').forEach(p => {
+                    p.classList.toggle('selected', p.getAttribute('onclick') === `_onInvDatePillClick('${date}')`);
+                });
+            }
+            _renderInvForDate(date);
+        }
+
+        function _renderInvForDate(date) {
+            const listEl  = document.getElementById('inventoryList');
+            const totalEl = document.getElementById('invDailyTotal');
+            if (!listEl) return;
+            const records = window._invByDate[date];
+            if (!records || records.length === 0) {
+                listEl.innerHTML = '';
+                if (totalEl) totalEl.style.display = 'none';
+                return;
+            }
+
+            let dailyCost = 0;
+            const frag = document.createDocumentFragment();
+            records.forEach(log => {
+                dailyCost += Number(log.cost);
+                const div = document.createElement('div');
+                div.className = 'fin-inv-card';
+                const logStr = encodeURIComponent(JSON.stringify(log));
+                div.innerHTML = `
+                    <div class="fin-inv-meta">
+                        <span>${log.time} · <span style="opacity:0.75;">${log.user}</span></span>
+                        <div class="fin-inv-actions">
+                            <button class="fin-action-btn" onclick="openInvEditor('${logStr}')">Edit</button>
+                            <button class="fin-action-btn delete" onclick="confirmDeleteInv('${logStr}')">Del</button>
+                        </div>
+                    </div>
+                    <div class="fin-inv-body">
+                        <div>
+                            <div class="fin-inv-name">${log.item}</div>
+                            <div class="fin-inv-qty">${log.qty}</div>
+                        </div>
+                        <div class="fin-inv-cost">-${Number(log.cost).toLocaleString()} KHR</div>
+                    </div>`;
+                frag.appendChild(div);
+            });
+
+            listEl.innerHTML = '';
+            listEl.appendChild(frag);
+
+            if (totalEl) {
+                totalEl.innerText = `Day total: -${dailyCost.toLocaleString()} KHR`;
+                totalEl.style.display = 'block';
+            }
         }
 
         function toggleFinSection(bodyId, arrowId) {
