@@ -458,9 +458,9 @@
         /* ── Hero (top gradient area) ── */
         .login-hero {
             flex: 0 0 auto;
-            min-height: 240px;
+            min-height: 160px;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            padding: max(env(safe-area-inset-top), 36px) 24px 32px;
+            padding: max(env(safe-area-inset-top), 14px) 24px 18px;
             background: linear-gradient(155deg, #1b5e20 0%, var(--primary-dim) 40%, var(--primary) 100%);
             position: relative; overflow: hidden;
         }
@@ -470,22 +470,22 @@
             pointer-events: none;
         }
         /* logo state (username step) */
-        #loginHeroLogo { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .login-logo-hero { width: 72px; height: 72px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.6); box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
-        .login-hero-brand { font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
-        .login-hero-tagline { font-size: 12px; color: rgba(255,255,255,0.72); font-weight: 500; letter-spacing: 0.3px; margin-top: 2px; }
+        #loginHeroLogo { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+        .login-logo-hero { width: 52px; height: 52px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.6); box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
+        .login-hero-brand { font-family: 'Quicksand', sans-serif; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
+        .login-hero-tagline { font-size: 11px; color: rgba(255,255,255,0.72); font-weight: 500; letter-spacing: 0.3px; margin-top: 1px; }
         /* avatar state (PIN / biometric step) */
-        #loginHeroAvatar { display: none; flex-direction: column; align-items: center; gap: 10px; }
+        #loginHeroAvatar { display: none; flex-direction: column; align-items: center; gap: 7px; }
         .login-avatar-circle {
-            width: 72px; height: 72px; border-radius: 50%;
+            width: 52px; height: 52px; border-radius: 50%;
             background: rgba(255,255,255,0.22); border: 2.5px solid rgba(255,255,255,0.55);
             display: flex; align-items: center; justify-content: center;
-            font-family: 'Quicksand', sans-serif; font-size: 28px; font-weight: 800; color: #fff;
+            font-family: 'Quicksand', sans-serif; font-size: 22px; font-weight: 800; color: #fff;
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
-        .login-avatar-name { font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 800; color: #fff; }
-        .login-avatar-sub { font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 500; }
+        .login-avatar-name { font-family: 'Quicksand', sans-serif; font-size: 17px; font-weight: 800; color: #fff; }
+        .login-avatar-sub { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500; }
 
         /* ── Card (bottom white panel) ── */
         .login-card {
@@ -999,7 +999,7 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </button>
-            <div class="desk-version">v5.0.0</div>
+            <div class="desk-version" id="deskVersionDisplay">v5.0.6</div>
         </div>
     </aside>
 
@@ -1122,7 +1122,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer" id="settingsVersionDisplay">v5.0.5</div>
+            <div class="settings-footer" id="settingsVersionDisplay">v5.0.6</div>
         </div>
     </div>
 
@@ -1156,7 +1156,7 @@
             <button class="month-nav-btn" id="historyNextBtn" onclick="changeHistoryMonth(1)">›</button>
         </div>
         <div id="historyLastRecord" style="width:100%; max-width:600px; margin:0 auto; padding:10px 10px 0 10px; flex-shrink:0;"></div>
-        <div id="historyList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom: calc(130px + env(safe-area-inset-bottom));"></div>
+        <div id="historyList" style="width: 100%; max-width: 600px; margin: 0 auto; overflow-y: auto; flex:1; padding: 10px; padding-bottom: calc(32px + env(safe-area-inset-bottom));"></div>
     </div>
 
     <div id="managerPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
@@ -1287,20 +1287,36 @@
                     <div class="fin-stock-add">
                         <div class="dashboard-card" style="padding:0; overflow:hidden;">
                             <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('addExpenseBody','addExpenseArrow')">
-                                <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Add Expense</div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Add Expense</div>
+                                </div>
                                 <button class="fin-collapse-btn" id="addExpenseArrow">▾</button>
                             </div>
                             <div class="fin-collapsible" id="addExpenseBody">
                                 <div class="fin-card-body">
-                                    <div class="form-group"><label class="form-label">Ingredient Name</label><input id="invItem" class="form-input" placeholder="e.g., Matcha Powder"></div>
-                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                                        <div class="form-group"><label class="form-label">Unit Size</label><input id="invUnit" class="form-input" placeholder="e.g., 1 kg"></div>
-                                        <div class="form-group"><label class="form-label">Amount Bought</label><input id="invAmount" type="number" class="form-input" placeholder="e.g., 2"></div>
+                                    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--primary); margin-bottom:12px; opacity:0.85;">Fill in item details then tap + Add</div>
+                                    <div class="form-group">
+                                        <label class="form-label">Item / Ingredient Name</label>
+                                        <input id="invItem" class="form-input" placeholder="e.g., Matcha Powder, Milk, Cups…" autocomplete="off">
                                     </div>
-                                    <div class="form-group"><label class="form-label">Total Cost (KHR)</label><input id="invCost" type="number" class="form-input" placeholder="0"></div>
-                                    <button class="btn" style="width:100%; margin-top:4px; background:var(--bg); border-color:var(--border); color:var(--text); font-size:12px; letter-spacing:0.5px;" onclick="addPendingInventory()">+ Add to List</button>
-                                    <div id="pendingInvList" style="margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto; padding-right:5px;"></div>
-                                    <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:12px; display:none;" onclick="saveInventory()">Save All Records</button>
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                        <div class="form-group">
+                                            <label class="form-label">Unit / Size</label>
+                                            <input id="invUnit" class="form-input" placeholder="e.g., 1 kg" autocomplete="off">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Qty Bought</label>
+                                            <input id="invAmount" type="number" inputmode="numeric" class="form-input" placeholder="e.g., 2">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Total Cost (KHR)</label>
+                                        <input id="invCost" type="number" inputmode="numeric" class="form-input" placeholder="0">
+                                    </div>
+                                    <button class="btn btn-confirm" style="width:100%; margin-top:4px; font-size:13px;" onclick="addPendingInventory()">+ Add to List</button>
+                                    <div id="pendingInvList" style="margin-top:14px; display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px;"></div>
+                                    <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:12px; display:none; background:#2E7D32;" onclick="saveInventory()">✓ Save All Records</button>
                                 </div>
                             </div>
                         </div>
@@ -1370,7 +1386,17 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v5.0.5';
+        const APP_VERSION = 'v5.0.6';
+
+        // Force all users to re-login on this version update
+        (function() {
+            const FL_VER = 'v5.0.6';
+            if (localStorage.getItem('myday_force_logout_ver') !== FL_VER) {
+                localStorage.removeItem('myday_session');
+                localStorage.setItem('myday_force_logout_ver', FL_VER);
+            }
+        })();
+
         const IS_TEST_MODE = false;
         const LIVE_URL = 'https://script.google.com/macros/s/AKfycbzImNht-d6MzUvqNyE7eClI1QocEHmhSmLNFRYwdz4Svih06GoFer1zXRlI-SJH4YCl/exec'; 
         const TEST_URL = 'https://script.google.com/macros/s/AKfycbxjC8wSAVa6bgsm0Jhio0RJX3pMm8TeT3gLZI69obq82GYT3vt_PqET7AMhSlm6znPuPQ/exec';
@@ -1617,7 +1643,7 @@
                     document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('active', 'success'));
                     checkFaceIdAvailable();
                     _onUnlocked(); // clear auto-lock state and restore Switch button
-                    setTimeout(() => { document.getElementById('loginScreen').classList.add('hidden'); _backgroundSync(); }, 650);
+                    setTimeout(() => { document.getElementById('loginScreen').classList.add('hidden'); _backgroundSync(); setTimeout(showWhatsNew, 600); }, 650);
                 } else {
                     alert('Face ID login failed. Please enter your PIN instead.');
                     showNumpad();
@@ -1660,6 +1686,14 @@
             // Always require authentication on fresh page load.
             // This ensures the app auto-locks whenever it is closed or the browser is refreshed.
             showLogin();
+
+            // Auto-select remembered user with Face ID so the prompt fires automatically on open
+            const _rm = localStorage.getItem('myday_remembered_user');
+            if (_rm) {
+                const _cid = localStorage.getItem('myday_faceid_cred_' + _rm);
+                const _fon = localStorage.getItem('myday_faceid_enabled_' + _rm) === 'true';
+                if (_cid && _fon) setTimeout(() => selectUser(_rm), 600);
+            }
         };
 
         function fetchUsers() {
@@ -1805,6 +1839,8 @@
             pin.style.opacity = '1'; pin.style.transform = 'none'; pin.style.transition = 'none';
             toggleSettings(false);
             loginScreen.classList.remove('hidden');
+            // Auto-prompt Face ID / Touch ID so user doesn't have to tap the button
+            if (credId && fidOn) setTimeout(() => doFaceIdLogin(), 400);
         }
 
         // Called after a successful PIN or Face ID re-authentication from the locked state
@@ -1884,6 +1920,7 @@
                     setTimeout(() => {
                         document.getElementById('loginScreen').classList.add('hidden');
                         _backgroundSync();
+                        setTimeout(showWhatsNew, 600);
                     }, 650);
                 } else {
                     alert("Login Failed: " + (data.message || "Invalid username or PIN."));
@@ -2928,11 +2965,9 @@
                 sP.style.display = 'flex';
                 bS.classList.add('active');
                 bA.classList.remove('active');
-                var addBody = document.getElementById('addExpenseBody');
-                var addArrow = document.getElementById('addExpenseArrow');
                 var recBody = document.getElementById('recentPurchasesBody');
                 var recArrow = document.getElementById('recentPurchasesArrow');
-                if (addBody && !addBody.classList.contains('open')) { addBody.classList.add('open'); if (addArrow) addArrow.classList.add('open'); }
+                // Add Expense stays minimised — user opens it when ready to add
                 if (recBody && !recBody.classList.contains('open')) { recBody.classList.add('open'); if (recArrow) recArrow.classList.add('open'); }
             }
         }
@@ -3326,6 +3361,25 @@
             document.body.appendChild(overlay);
         }
 
+        /* ── What's New popup ── */
+        function showWhatsNew() {
+            if (localStorage.getItem('myday_seen_whats_new_' + APP_VERSION) === '1') return;
+            const sheet = document.getElementById('whatsNewSheet');
+            const box   = document.getElementById('whatsNewBox');
+            if (!sheet || !box) return;
+            sheet.style.visibility = 'visible'; sheet.style.opacity = '1';
+            requestAnimationFrame(() => requestAnimationFrame(() => { box.style.transform = 'translateY(0)'; }));
+        }
+        function closeWhatsNew() {
+            localStorage.setItem('myday_seen_whats_new_' + APP_VERSION, '1');
+            const sheet = document.getElementById('whatsNewSheet');
+            const box   = document.getElementById('whatsNewBox');
+            if (!sheet || !box) return;
+            box.style.transform = 'translateY(100%)';
+            sheet.style.opacity = '0';
+            setTimeout(() => { sheet.style.visibility = 'hidden'; }, 380);
+        }
+
     /* ── PWA: Register Service Worker ── */
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -3334,6 +3388,43 @@
         });
     }
     </script>
+    <!-- What's New Sheet (v5.0.6) -->
+    <div id="whatsNewSheet" onclick="if(event.target===this)closeWhatsNew()" style="position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.3s,visibility 0.3s;">
+        <div id="whatsNewBox" style="background:var(--surface);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:8px 22px 0;transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.2,0,0,1);">
+            <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                <div style="width:36px;height:36px;background:color-mix(in srgb,var(--primary) 15%,var(--bg));border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <div>
+                    <div style="font-family:'Quicksand',sans-serif;font-size:19px;font-weight:800;color:var(--text);">What's New — v5.0.6</div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">My Day Matcha has been updated</div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin:18px 0 20px;">
+                <div style="display:flex;gap:12px;align-items:flex-start;">
+                    <div style="width:40px;height:40px;background:color-mix(in srgb,var(--primary) 12%,var(--bg));border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/><path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/><circle cx="9" cy="11" r="1.5" fill="var(--primary)" stroke="none"/><circle cx="15" cy="11" r="1.5" fill="var(--primary)" stroke="none"/><path d="M8 15.5c1.33 1.2 6.67 1.2 8 0"/></svg>
+                    </div>
+                    <div style="padding-top:2px;">
+                        <div style="font-weight:700;font-size:14px;color:var(--text);">Face / Touch ID for Faster Login</div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.55;">Sign in instantly with your device biometrics — Face ID or fingerprint. Enable it in Settings → Security.</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;">
+                    <div style="width:40px;height:40px;background:color-mix(in srgb,#FF9500 12%,var(--bg));border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <div style="padding-top:2px;">
+                        <div style="font-weight:700;font-size:14px;color:var(--text);">Bug Fixes &amp; Improvements</div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.55;">Various fixes for smoother experience across login, history, and stock management.</div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeWhatsNew()" style="width:100%;padding:16px;background:var(--primary);border:none;border-radius:14px;color:white;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;margin-bottom:calc(16px + env(safe-area-inset-bottom));transition:opacity 0.15s;">Got it!</button>
+        </div>
+    </div>
+
     <!-- Order Edit Modal -->
     <div id="orderEditModal" style="display:none; position:fixed; inset:0; z-index:350; background:rgba(0,0,0,0.55); backdrop-filter:blur(4px); align-items:center; justify-content:center;">
         <div style="background:var(--surface); width:92%; max-width:440px; border-radius:var(--radius); border:1px solid var(--border); box-shadow:0 20px 60px rgba(0,0,0,0.2); overflow:hidden; max-height:85vh; display:flex; flex-direction:column; animation:fadeScale 0.2s var(--anim-curve);">
