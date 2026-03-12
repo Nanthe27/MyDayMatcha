@@ -447,66 +447,91 @@
         .text-btn:active { background: var(--surface-hover); }
 
         /* ═══════════════ LOGIN SCREEN — SPLIT HERO/CARD LAYOUT ═══════════════ */
+        /* ══════════════════════════════════════════════════════════
+           LOGIN SCREEN — CLEAN WHITE REDESIGN
+           ══════════════════════════════════════════════════════════ */
+
         #loginScreen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2000; display: flex; flex-direction: column;
-            transition: opacity 0.4s, transform 0.4s; will-change: transform, opacity;
-            background: var(--surface);   /* matches card — eliminates green bleed at rounded corners */
+            z-index: 2000;
+            background: var(--surface);
+            display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto; overflow-x: hidden;
+            padding: 0 24px;
+            box-sizing: border-box;
+            transition: opacity 0.4s, transform 0.4s;
+            will-change: transform, opacity;
         }
         #loginScreen.hidden { opacity: 0; pointer-events: none; transform: scale(1.04); }
 
-        /* ── Hero (top gradient area) ── */
-        .login-hero {
-            flex: 0 0 auto;
-            min-height: 160px;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            padding: max(env(safe-area-inset-top), 14px) 24px 18px;
-            background: linear-gradient(155deg, #1b5e20 0%, var(--primary-dim) 40%, var(--primary) 100%);
-            position: relative; overflow: hidden;
+        /* ── Spacers: animate to shift content from center → top ── */
+        #loginTopSpacer {
+            flex: 1 1 0; min-height: max(env(safe-area-inset-top), 16px);
+            transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        min-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
         }
-        .login-hero::before {
-            content: ''; position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.08) 0%, transparent 60%);
-            pointer-events: none;
+        #loginScreen.pin-phase #loginTopSpacer {
+            flex: 0 0 max(env(safe-area-inset-top), 36px);
+            min-height: max(env(safe-area-inset-top), 36px);
         }
-        /* logo state (username step) */
-        #loginHeroLogo { display: flex; flex-direction: column; align-items: center; gap: 7px; }
-        .login-logo-hero { width: 52px; height: 52px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.6); box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
-        .login-hero-brand { font-family: 'Quicksand', sans-serif; font-size: 17px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
-        .login-hero-tagline { font-size: 11px; color: rgba(255,255,255,0.72); font-weight: 500; letter-spacing: 0.3px; margin-top: 1px; }
-        /* avatar state (PIN / biometric step) */
-        #loginHeroAvatar { display: none; flex-direction: column; align-items: center; gap: 7px; }
-        .login-avatar-circle {
-            width: 52px; height: 52px; border-radius: 50%;
-            background: rgba(255,255,255,0.22); border: 2.5px solid rgba(255,255,255,0.55);
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Quicksand', sans-serif; font-size: 22px; font-weight: 800; color: #fff;
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        #loginBottomSpacer {
+            flex: 1 1 0; min-height: 0;
+            transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
         }
-        .login-avatar-name { font-family: 'Quicksand', sans-serif; font-size: 17px; font-weight: 800; color: #fff; }
-        .login-avatar-sub { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 500; }
+        #loginScreen.pin-phase #loginBottomSpacer { flex: 0 0 0; }
 
-        /* ── Card (bottom white panel) ── */
-        .login-card {
-            flex: 1; background: var(--surface);
-            border-radius: 26px 26px 0 0;
+        /* ── Logo section (transitions from center to top) ── */
+        #loginLogoSection {
             display: flex; flex-direction: column; align-items: center;
-            padding: 28px 24px max(env(safe-area-inset-bottom), 20px);
-            overflow-y: auto; position: relative;
+            gap: 8px; width: 100%; flex-shrink: 0;
         }
-        [data-theme="dark"] .login-card { background: #0e0e0e; }
-
-        /* version badge inside card */
-        .login-version-badge {
-            font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-muted);
-            background: var(--bg); border-radius: 20px; padding: 3px 10px;
-            margin-bottom: 22px; text-transform: uppercase; opacity: 0.7;
+        /* Logo image */
+        .login-logo-img {
+            width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+            transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                        height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.45s ease;
         }
+        #loginScreen.pin-phase .login-logo-img {
+            width: 52px; height: 52px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        /* Brand name + tagline (Phase 1 only) */
+        #loginBrandBlock {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            max-height: 60px; opacity: 1; overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.28s ease,
+                        margin 0.4s ease;
+        }
+        #loginScreen.pin-phase #loginBrandBlock { max-height: 0; opacity: 0; margin: 0; }
+        .login-brand-name {
+            font-family: 'Quicksand', sans-serif; font-size: 18px; font-weight: 800;
+            color: var(--text); letter-spacing: 0.4px;
+        }
+        .login-brand-tagline { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.3px; }
 
-        /* user-selection step */
-        #usernameStep { display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .login-who-title { font-family: 'Quicksand', sans-serif; font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 18px; text-align: center; }
+        /* Selected user name (Phase 2 only) */
+        #loginAvatarBlock {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            max-height: 0; opacity: 0; overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.12s,
+                        opacity 0.3s ease 0.18s;
+        }
+        #loginScreen.pin-phase #loginAvatarBlock { max-height: 60px; opacity: 1; }
+        .login-selected-name {
+            font-family: 'Quicksand', sans-serif; font-size: 18px; font-weight: 800; color: var(--text);
+        }
+        .login-selected-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+        /* ── User selection step ── */
+        #usernameStep { display: flex; flex-direction: column; align-items: center; width: 100%; flex-shrink: 0; }
+        .login-who-title {
+            font-family: 'Quicksand', sans-serif; font-size: 19px; font-weight: 800;
+            color: var(--text); margin: 24px 0 18px; text-align: center;
+        }
         .login-user-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; }
         .login-user-btn {
             display: flex; flex-direction: column; align-items: center; gap: 7px;
@@ -526,11 +551,11 @@
         }
         .login-user-faceid-badge {
             position: absolute; bottom: -2px; right: -2px;
-            width: 17px; height: 17px; background: white; border-radius: 50%; border: 1.5px solid var(--border);
+            width: 17px; height: 17px; background: var(--surface); border-radius: 50%;
+            border: 1.5px solid var(--border);
             display: flex; align-items: center; justify-content: center; color: var(--primary);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.10);
         }
-        [data-theme="dark"] .login-user-faceid-badge { background: var(--surface); }
         .login-user-name { font-size: 11px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.2; word-break: break-word; }
         .login-user-loading { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0; grid-column: 1/-1; }
         .num-spacer { display: block; }
@@ -542,37 +567,56 @@
         }
         #updateRefreshBtn:active { background: var(--bg); color: var(--primary); border-color: var(--primary); }
 
-        /* PIN container */
-        #pinContainer { display: none; flex-direction: column; align-items: center; width: 100%; }
-        #numpadSection { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        /* ── PIN container ── */
+        #pinContainer {
+            display: none; flex-direction: column; align-items: center;
+            width: 100%; padding-top: 20px; flex-shrink: 0;
+        }
 
-        /* Face ID / Touch ID button */
+        /* Face ID / Touch ID button — visible above numpad, always shown when registered */
         #faceIdLoginBtn {
             display: none; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; max-width: 300px; padding: 16px; background: var(--primary); color: white;
-            border: none; border-radius: var(--radius); font-size: 15px; font-weight: 700; cursor: pointer;
-            margin-bottom: 16px; box-shadow: 0 4px 18px rgba(76,175,80,0.35);
+            width: 100%; max-width: 300px; padding: 15px;
+            background: var(--primary); color: white;
+            border: none; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 18px rgba(76,175,80,0.28);
             transition: opacity 0.18s, transform 0.15s, box-shadow 0.18s;
             letter-spacing: 0.3px; font-family: 'Inter', sans-serif;
+            margin-bottom: 0;
         }
         #faceIdLoginBtn.show { display: flex; }
-        #faceIdLoginBtn:active { opacity: 0.82; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.2); }
+        #faceIdLoginBtn:active { opacity: 0.82; transform: scale(0.97); box-shadow: 0 2px 8px rgba(76,175,80,0.15); }
+        #faceIdLoginBtn:disabled { opacity: 0.6; }
 
-        .pin-or-label { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1.2px; margin-bottom: 18px; text-transform: uppercase; }
+        .pin-or-label {
+            font-size: 11px; color: var(--text-muted); font-weight: 700;
+            letter-spacing: 1.2px; text-transform: uppercase; margin: 16px 0 0;
+        }
 
+        /* Numpad section — always visible in PIN phase */
+        #numpadSection {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; margin-top: 20px;
+        }
         .pin-display { display: flex; gap: 15px; margin-bottom: 28px; width: 200px; justify-content: center; height: 20px; }
-        .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--border); transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .pin-dot {
+            width: 14px; height: 14px; border-radius: 50%; background: var(--border);
+            transition: background 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
         .pin-dot.active { background: var(--primary); transform: scale(1.25); }
         @keyframes pinSuccess { 0% { transform: scale(1.25); } 40% { transform: scale(1.65); } 70% { transform: scale(1.35); } 100% { transform: scale(1.45); } }
         .pin-dot.success { background: #34c759 !important; animation: pinSuccess 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
-        .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 300px; margin: 0 auto; }
+        .numpad-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 12px; width: 100%; max-width: 300px; margin: 0 auto;
+        }
         .num-btn {
             background: var(--bg); border: 1px solid var(--border); color: var(--text);
             font-size: 22px; font-weight: 600; height: 62px; border-radius: 14px; cursor: pointer;
             transition: transform 0.12s cubic-bezier(0.2, 0, 0.3, 1), box-shadow 0.12s ease, background 0.1s ease;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 0 var(--border), 0 3px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 0 var(--border), 0 3px 8px rgba(0,0,0,0.04);
             will-change: transform; -webkit-tap-highlight-color: transparent;
         }
         .num-btn:active { transform: scale(0.88) translateY(2px); box-shadow: 0 0 0 var(--border); background: var(--surface-hover); }
@@ -581,29 +625,65 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         .shake { animation: shake 0.3s ease-in-out; }
 
-        /* "Switch account" link shown below numpad */
+        /* ← Back button */
         .login-switch-btn {
             background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600;
-            cursor: pointer; padding: 10px 20px; margin-top: 6px; border-radius: 20px;
-            letter-spacing: 0.3px; font-family: 'Inter', sans-serif; transition: color 0.18s, background 0.18s;
-            touch-action: manipulation;
+            cursor: pointer; padding: 12px 20px; margin-top: 8px; border-radius: 20px;
+            letter-spacing: 0.3px; font-family: 'Inter', sans-serif;
+            transition: color 0.18s, background 0.18s; touch-action: manipulation;
         }
         .login-switch-btn:hover { color: var(--primary); background: var(--bg); }
         .login-switch-btn.hidden-btn { opacity: 0; pointer-events: none; }
 
-        /* Clear browser data button — pinned to bottom of card */
+        /* ── Login footer (version badge + clear data) ── */
+        #loginFooter {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            width: 100%; padding: 16px 0 max(env(safe-area-inset-bottom), 20px);
+            flex-shrink: 0;
+        }
+        .login-version-badge {
+            font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: var(--text-muted);
+            background: var(--bg); border-radius: 20px; padding: 3px 10px;
+            text-transform: uppercase; opacity: 0.8;
+        }
         #clearDataBtn {
             background: none; border: none; color: var(--text-muted); font-size: 11px; font-weight: 600;
-            letter-spacing: 0.3px; cursor: pointer; padding: 8px 16px; border-radius: 20px;
-            opacity: 0.5; transition: opacity 0.2s, background 0.2s; white-space: nowrap;
-            font-family: inherit; margin-top: auto; padding-top: 20px; touch-action: manipulation;
+            letter-spacing: 0.3px; cursor: pointer; padding: 6px 16px; border-radius: 20px;
+            opacity: 0.6; transition: opacity 0.2s, background 0.2s; white-space: nowrap;
+            font-family: inherit; touch-action: manipulation;
         }
         #clearDataBtn:hover { opacity: 1; background: var(--bg); }
 
-        /* legacy alias kept so existing JS still works */
+        /* ── PIN verification loading overlay ── */
+        #pinLoadingOverlay {
+            position: fixed; inset: 0; z-index: 2050;
+            background: rgba(255,255,255,0.90);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 18px; opacity: 0; visibility: hidden;
+            transition: opacity 0.22s ease, visibility 0.22s;
+            pointer-events: none;
+        }
+        [data-theme="dark"] #pinLoadingOverlay { background: rgba(17,17,17,0.90); }
+        #pinLoadingOverlay.show { opacity: 1; visibility: visible; pointer-events: all; }
+        .pin-loading-spinner {
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 3.5px solid var(--border);
+            border-top-color: var(--primary);
+            animation: loginSpin 0.75s linear infinite;
+        }
+        @keyframes loginSpin { to { transform: rotate(360deg); } }
+        .pin-loading-text {
+            font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: 0.3px;
+        }
+
+        /* Legacy aliases — keep so existing JS/CSS references don't break */
         .login-logo { display: none; }
         .login-title { display: none; }
         .user-btn { display: none; }
+        /* Keep .login-hero and .login-card selectors harmless */
+        .login-hero { display: none !important; }
+        .login-card { display: contents; }
 
         #clearDataSheet { position: fixed; inset: 0; z-index: 2100; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
         #clearDataSheet.open { opacity: 1; visibility: visible; }
@@ -825,76 +905,90 @@
     <div id="toast" class="toast-msg">Item Added</div>
 
     <div id="loginScreen">
-        <!-- ── Hero: green gradient top area ── -->
-        <div class="login-hero">
-            <!-- Logo state shown when no remembered user (username entry) -->
-            <div id="loginHeroLogo">
-                <img src="./Logo.png" class="login-logo-hero" alt="My Day Matcha">
-                <div class="login-hero-brand">My Day Matcha</div>
-                <div class="login-hero-tagline">Your daily matcha companion</div>
+
+        <!-- ── Top spacer: large in Phase 1 (centers content), collapses in Phase 2 ── -->
+        <div id="loginTopSpacer"></div>
+
+        <!-- ── Logo section: transitions from center (Phase 1) to top (Phase 2) ── -->
+        <div id="loginLogoSection">
+            <img src="./Logo.png" class="login-logo-img" alt="My Day Matcha">
+            <!-- Brand text — visible in Phase 1 (user selection) -->
+            <div id="loginBrandBlock">
+                <div class="login-brand-name">My Day Matcha</div>
+                <div class="login-brand-tagline">Your daily matcha companion</div>
             </div>
-            <!-- Avatar state shown when user is known (PIN / biometric) -->
-            <div id="loginHeroAvatar">
-                <div class="login-avatar-circle" id="loginAvatarInitial">?</div>
-                <div class="login-avatar-name" id="loginAvatarName"></div>
-                <div class="login-avatar-sub" id="loginAvatarSub">Welcome back</div>
+            <!-- User name — visible in Phase 2 (PIN entry) -->
+            <div id="loginAvatarBlock">
+                <div class="login-selected-name" id="loginAvatarName"></div>
+                <div class="login-selected-sub">Welcome back</div>
             </div>
         </div>
 
-        <!-- ── Card: white panel with inputs ── -->
-        <div class="login-card">
-            <!-- version badge -->
+        <!-- ── User-selection step (Phase 1) ── -->
+        <div id="usernameStep">
+            <div class="login-who-title">Who's signing in?</div>
+            <div id="userGrid" class="login-user-grid">
+                <div class="login-user-loading">Loading…</div>
+            </div>
+        </div>
+        <button id="updateRefreshBtn" onclick="hardRefreshApp()" title="Check for app updates">↻ Check for Update</button>
+
+        <!-- ── PIN / biometric step (Phase 2) ── -->
+        <div id="pinContainer">
+            <!-- Face ID / Touch ID button — always shown above numpad when registered -->
+            <button id="faceIdLoginBtn" onclick="doFaceIdLogin()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/>
+                    <path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/>
+                    <circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none"/>
+                    <circle cx="15" cy="11" r="1.5" fill="currentColor" stroke="none"/>
+                    <path d="M8 15.5c1.33 1.2 6.67 1.2 8 0"/>
+                </svg>
+                Use Face ID / Touch ID
+            </button>
+            <!-- "or enter PIN" divider — only shown when Face ID button is also visible -->
+            <div class="pin-or-label" id="pinOrLabel" style="display:none;">— or enter PIN —</div>
+
+            <!-- Numpad section — always visible in PIN phase -->
+            <div id="numpadSection">
+                <div id="pinDisplay" class="pin-display">
+                    <div class="pin-dot"></div><div class="pin-dot"></div>
+                    <div class="pin-dot"></div><div class="pin-dot"></div>
+                </div>
+                <div class="numpad-grid">
+                    <button class="num-btn" onclick="handleNumpad(1,this)">1</button>
+                    <button class="num-btn" onclick="handleNumpad(2,this)">2</button>
+                    <button class="num-btn" onclick="handleNumpad(3,this)">3</button>
+                    <button class="num-btn" onclick="handleNumpad(4,this)">4</button>
+                    <button class="num-btn" onclick="handleNumpad(5,this)">5</button>
+                    <button class="num-btn" onclick="handleNumpad(6,this)">6</button>
+                    <button class="num-btn" onclick="handleNumpad(7,this)">7</button>
+                    <button class="num-btn" onclick="handleNumpad(8,this)">8</button>
+                    <button class="num-btn" onclick="handleNumpad(9,this)">9</button>
+                    <span class="num-spacer"></span>
+                    <button class="num-btn" onclick="handleNumpad(0,this)">0</button>
+                    <button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
+                </div>
+            </div>
+            <!-- Back to user list -->
+            <button class="login-switch-btn" id="backToUsernameBtn" onclick="cancelLogin()">← Back</button>
+        </div>
+
+        <!-- ── Bottom spacer: balances Phase 1 centering ── -->
+        <div id="loginBottomSpacer"></div>
+
+        <!-- ── Footer: version badge + clear data ── -->
+        <div id="loginFooter">
             <div class="login-version-badge" id="appVersionDisplay"></div>
-
-            <!-- User-selection step -->
-            <div id="usernameStep">
-                <div class="login-who-title">Who's signing in?</div>
-                <div id="userGrid" class="login-user-grid">
-                    <div class="login-user-loading">Loading…</div>
-                </div>
-            </div>
-            <button id="updateRefreshBtn" onclick="hardRefreshApp()" title="Check for app updates">↻ Check for Update</button>
-
-            <!-- PIN / biometric step -->
-            <div id="pinContainer">
-                <!-- Face ID / Touch ID button — shown only when credential registered on this device -->
-                <button id="faceIdLoginBtn" onclick="doFaceIdLogin()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/>
-                        <path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/>
-                        <circle cx="9" cy="11" r="1.5" fill="currentColor" stroke="none"/>
-                        <circle cx="15" cy="11" r="1.5" fill="currentColor" stroke="none"/>
-                        <path d="M8 15.5c1.33 1.2 6.67 1.2 8 0"/>
-                    </svg>
-                    Use Face ID / Touch ID
-                </button>
-                <div id="numpadSection" style="display:none;">
-                    <div class="pin-or-label" id="pinOrLabel">— or enter PIN —</div>
-                    <div id="pinDisplay" class="pin-display">
-                        <div class="pin-dot"></div><div class="pin-dot"></div>
-                        <div class="pin-dot"></div><div class="pin-dot"></div>
-                    </div>
-                    <div class="numpad-grid">
-                        <button class="num-btn" onclick="handleNumpad(1,this)">1</button>
-                        <button class="num-btn" onclick="handleNumpad(2,this)">2</button>
-                        <button class="num-btn" onclick="handleNumpad(3,this)">3</button>
-                        <button class="num-btn" onclick="handleNumpad(4,this)">4</button>
-                        <button class="num-btn" onclick="handleNumpad(5,this)">5</button>
-                        <button class="num-btn" onclick="handleNumpad(6,this)">6</button>
-                        <button class="num-btn" onclick="handleNumpad(7,this)">7</button>
-                        <button class="num-btn" onclick="handleNumpad(8,this)">8</button>
-                        <button class="num-btn" onclick="handleNumpad(9,this)">9</button>
-                        <span class="num-spacer"></span>
-                        <button class="num-btn" onclick="handleNumpad(0,this)">0</button>
-                        <button class="num-btn clear" onclick="handleNumpad('del',this)">⌫</button>
-                    </div>
-                </div>
-                <!-- Back to user list — always visible outside numpadSection -->
-                <button class="login-switch-btn" id="backToUsernameBtn" onclick="cancelLogin()">← Back</button>
-            </div>
-
             <button id="clearDataBtn" onclick="showClearDataSheet()">Clear Browser Data</button>
         </div>
+
+    </div>
+
+    <!-- PIN verification loading overlay (outside loginScreen so it covers everything) -->
+    <div id="pinLoadingOverlay">
+        <div class="pin-loading-spinner"></div>
+        <div class="pin-loading-text">Signing in…</div>
     </div>
 
     <!-- Clear Browser Data confirmation sheet (login screen only, z-index above loginScreen) -->
@@ -1663,17 +1757,10 @@
         }
 
         function showNumpad() {
+            // Numpad is always visible in PIN phase — nothing to do here
+            // Kept for compatibility (called from doFaceIdLogin on fallback)
             const ns = document.getElementById('numpadSection');
-            if (!ns || ns.style.display !== 'none') return;
-            ns.style.opacity = '0';
-            ns.style.transform = 'translateY(14px)';
-            ns.style.transition = 'none';
-            ns.style.display = 'flex';
-            requestAnimationFrame(() => requestAnimationFrame(() => {
-                ns.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
-                ns.style.opacity = '1';
-                ns.style.transform = 'translateY(0)';
-            }));
+            if (ns) ns.style.display = 'flex';
         }
 
         // ─── App startup ──────────────────────────────────────────────────────────
@@ -1744,38 +1831,49 @@
             grid.appendChild(frag);
         }
 
-        /* ── Hero helpers ── */
+        /* ── Logo / avatar helpers ── */
         function _showHeroLogo() {
-            document.getElementById('loginHeroLogo').style.display = 'flex';
-            document.getElementById('loginHeroAvatar').style.display = 'none';
+            // Phase 1: show brand text, hide user name, remove pin-phase class
+            document.getElementById('loginScreen').classList.remove('pin-phase');
         }
-        function _showHeroAvatar(name, sub) {
-            document.getElementById('loginHeroLogo').style.display = 'none';
-            const av = document.getElementById('loginHeroAvatar');
-            av.style.display = 'flex';
-            document.getElementById('loginAvatarInitial').textContent = name ? name.charAt(0).toUpperCase() : '?';
-            document.getElementById('loginAvatarName').textContent = name || '';
-            if (sub) document.getElementById('loginAvatarSub').textContent = sub;
+        function _showHeroAvatar(name) {
+            // Phase 2: hide brand text, show user name, add pin-phase class
+            const nameEl = document.getElementById('loginAvatarName');
+            if (nameEl) nameEl.textContent = name || '';
+            document.getElementById('loginScreen').classList.add('pin-phase');
         }
         function _switchToPinView(name, hasBiometric, allowBack) {
-            const step = document.getElementById('usernameStep');
-            const pin  = document.getElementById('pinContainer');
-            const updBtn = document.getElementById('updateRefreshBtn');
+            const step    = document.getElementById('usernameStep');
+            const pin     = document.getElementById('pinContainer');
+            const updBtn  = document.getElementById('updateRefreshBtn');
             const switchBtn = document.getElementById('backToUsernameBtn');
+            const faceBtn = document.getElementById('faceIdLoginBtn');
+            const orLabel = document.getElementById('pinOrLabel');
+            const numpadSection = document.getElementById('numpadSection');
+
             step.style.display = 'none';
             if (updBtn) updBtn.style.display = 'none';
-            _showHeroAvatar(name, 'Welcome back');
-            const faceBtn = document.getElementById('faceIdLoginBtn');
-            const numpadSection = document.getElementById('numpadSection');
+
+            // Show selected user name and animate logo to top
+            _showHeroAvatar(name);
+
+            // Face ID / Touch ID button — always shown if registered; numpad always visible
             if (hasBiometric) {
                 faceBtn.classList.add('show');
-                // Hide numpad — will only appear if biometric fails
-                if (numpadSection) { numpadSection.style.display = 'none'; numpadSection.style.opacity = ''; numpadSection.style.transform = ''; numpadSection.style.transition = ''; }
+                if (orLabel) orLabel.style.display = 'block';
             } else {
                 faceBtn.classList.remove('show');
-                // No biometric — show numpad immediately
-                if (numpadSection) { numpadSection.style.display = 'flex'; numpadSection.style.opacity = ''; numpadSection.style.transform = ''; numpadSection.style.transition = ''; }
+                if (orLabel) orLabel.style.display = 'none';
             }
+
+            // Numpad is always visible in PIN phase (no hiding even when Face ID prompts)
+            if (numpadSection) {
+                numpadSection.style.display = 'flex';
+                numpadSection.style.opacity = '';
+                numpadSection.style.transform = '';
+                numpadSection.style.transition = '';
+            }
+
             if (switchBtn) {
                 if (allowBack) switchBtn.classList.remove('hidden-btn');
                 else           switchBtn.classList.add('hidden-btn');
@@ -1808,22 +1906,34 @@
             const hasBio = !!(credId && fidOn);
 
             const step = document.getElementById('usernameStep');
+            const updBtn = document.getElementById('updateRefreshBtn');
             const pin  = document.getElementById('pinContainer');
 
-            // Animate user grid out
+            // Fade out user grid + update button
             step.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
             step.style.opacity = '0'; step.style.transform = 'translateY(-12px)';
+            if (updBtn) { updBtn.style.transition = 'opacity 0.18s ease'; updBtn.style.opacity = '0'; }
+
             setTimeout(() => {
-                step.style.display = 'none'; step.style.transition = ''; step.style.opacity = ''; step.style.transform = '';
+                step.style.display = 'none';
+                step.style.transition = ''; step.style.opacity = ''; step.style.transform = '';
+                if (updBtn) { updBtn.style.display = 'none'; updBtn.style.transition = ''; updBtn.style.opacity = ''; }
+
+                // Switch to PIN view — this also adds .pin-phase to #loginScreen
+                // which triggers CSS transitions: logo shrinks and moves to top,
+                // brand text fades out, username fades in, spacers collapse
                 _switchToPinView(name, hasBio, true);
-                // Animate PIN numpad in
+
+                // Fade PIN container in from below
                 pin.style.opacity = '0'; pin.style.transform = 'translateY(16px)'; pin.style.transition = 'none';
                 requestAnimationFrame(() => requestAnimationFrame(() => {
-                    pin.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
+                    pin.style.transition = 'opacity 0.28s ease, transform 0.28s cubic-bezier(0.2,0,0,1)';
                     pin.style.opacity = '1'; pin.style.transform = 'translateY(0)';
                 }));
-                // If Face ID / Touch ID is registered, immediately prompt the OS
-                if (hasBio) setTimeout(() => doFaceIdLogin(), 200);
+
+                // If Face ID / Touch ID is registered, auto-prompt the OS
+                // The numpad stays fully visible while the OS dialog is open
+                if (hasBio) setTimeout(() => doFaceIdLogin(), 300);
             }, 180);
         }
 
@@ -1839,7 +1949,9 @@
 
             const credId = localStorage.getItem('myday_faceid_cred_' + deviceName);
             const fidOn  = localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
-            _switchToPinView(deviceName, credId && fidOn, false); // allowBack = false while locked
+
+            // Show PIN phase immediately (no animation when auto-locking)
+            _switchToPinView(deviceName, !!(credId && fidOn), false); // allowBack = false while locked
             const pin = document.getElementById('pinContainer');
             pin.style.opacity = '1'; pin.style.transform = 'none'; pin.style.transition = 'none';
             toggleSettings(false);
@@ -1861,13 +1973,20 @@
             const step   = document.getElementById('usernameStep');
             const pin    = document.getElementById('pinContainer');
             const updBtn = document.getElementById('updateRefreshBtn');
+            const orLabel = document.getElementById('pinOrLabel');
+
             if (pin.style.display === 'flex') {
+                // Animate PIN container out
                 pin.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
                 pin.style.opacity = '0'; pin.style.transform = 'translateY(14px)';
                 setTimeout(() => {
-                    pin.style.display = 'none'; pin.style.transition = ''; pin.style.opacity = ''; pin.style.transform = '';
+                    pin.style.display = 'none';
+                    pin.style.transition = ''; pin.style.opacity = ''; pin.style.transform = '';
+                    // Remove pin-phase (logo moves back to center, brand text fades in)
                     _showHeroLogo();
-                    step.style.opacity = '0'; step.style.transform = 'translateY(-14px)'; step.style.transition = 'none'; step.style.display = 'flex';
+                    // Animate user grid back in
+                    step.style.opacity = '0'; step.style.transform = 'translateY(-14px)';
+                    step.style.transition = 'none'; step.style.display = 'flex';
                     if (updBtn) updBtn.style.display = '';
                     requestAnimationFrame(() => requestAnimationFrame(() => {
                         step.style.transition = 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.2,0,0,1)';
@@ -1881,8 +2000,10 @@
             }
             tempSelectedUser = null; currentPin = '';
             document.getElementById('faceIdLoginBtn').classList.remove('show');
+            if (orLabel) orLabel.style.display = 'none';
+            // Numpad stays in DOM but pinContainer is hidden — just reset its inline styles
             const ns = document.getElementById('numpadSection');
-            if (ns) { ns.style.display = 'none'; ns.style.opacity = ''; ns.style.transform = ''; ns.style.transition = ''; }
+            if (ns) { ns.style.opacity = ''; ns.style.transform = ''; ns.style.transition = ''; }
         }
 
         function numBtnPress(btn) { btn.classList.add('pressing'); setTimeout(() => btn.classList.remove('pressing'), 150); }
@@ -1897,18 +2018,25 @@
 
         function updatePinDisplay() { const dots = document.querySelectorAll('.pin-dot'); dots.forEach((dot, idx) => { if(idx < currentPin.length) dot.classList.add('active'); else dot.classList.remove('active'); }); }
         
+        function _showPinLoading(show) {
+            const ov = document.getElementById('pinLoadingOverlay');
+            if (!ov) return;
+            if (show) ov.classList.add('show'); else ov.classList.remove('show');
+        }
+
         function checkPin() {
             if(currentPin.length !== 4) return;
-            
-            document.getElementById('pinDisplay').style.opacity = '0.5';
 
-            fetch(GOOGLE_SCRIPT_URL, { 
-                method: 'POST', 
+            // Show loading overlay — user sees a spinner while we hit the server
+            _showPinLoading(true);
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'login', user: tempSelectedUser, pin: currentPin }) 
+                body: JSON.stringify({ action: 'login', user: tempSelectedUser, pin: currentPin })
             })
             .then(res => res.json()).then(data => {
-                document.getElementById('pinDisplay').style.opacity = '1';
+                _showPinLoading(false);
                 if(data.status === 'success') {
                     deviceName = tempSelectedUser;
                     localStorage.setItem('myday_session', JSON.stringify({ user: deviceName, loginTime: Date.now() }));
@@ -1929,13 +2057,15 @@
                     }, 650);
                 } else {
                     alert("Login Failed: " + (data.message || "Invalid username or PIN."));
-                    const display = document.getElementById('pinDisplay'); display.classList.add('shake'); 
-                    setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400); 
+                    const display = document.getElementById('pinDisplay');
+                    display.classList.add('shake');
+                    setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400);
                 }
             }).catch(err => {
-                document.getElementById('pinDisplay').style.opacity = '1';
+                _showPinLoading(false);
                 alert("Connection Blocked! Please ensure your Google Script URL is correct and deployed as 'Anyone'. Error: " + err.message);
-                const display = document.getElementById('pinDisplay'); display.classList.add('shake'); 
+                const display = document.getElementById('pinDisplay');
+                display.classList.add('shake');
                 setTimeout(() => { display.classList.remove('shake'); currentPin = ""; updatePinDisplay(); }, 400);
             });
         }
