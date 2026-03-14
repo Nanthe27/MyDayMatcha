@@ -430,13 +430,23 @@ var REPORT_TZ        = 'Asia/Bangkok'; // UTC+7 — same as Phnom Penh / Cambodi
 
 // Send an HTML-formatted message to Telegram
 function sendTelegram_(msg) {
+  if (!TELEGRAM_TOKEN || !TELEGRAM_CHAT_ID) {
+    Logger.log('[Telegram] ERROR: TELEGRAM_TOKEN or TELEGRAM_CHAT_ID is not set in Script Properties.');
+    return;
+  }
   var url = 'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage';
-  UrlFetchApp.fetch(url, {
+  var response = UrlFetchApp.fetch(url, {
     method: 'post',
     contentType: 'application/json',
     muteHttpExceptions: true,
     payload: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'HTML' })
   });
+  var code = response.getResponseCode();
+  if (code !== 200) {
+    Logger.log('[Telegram] ERROR ' + code + ': ' + response.getContentText());
+  } else {
+    Logger.log('[Telegram] Message sent OK.');
+  }
 }
 
 // Format a number as KHR with comma separators (no decimals)
@@ -547,6 +557,21 @@ function sendLateReport() {
           + "✨ <b>Profit:</b> " + fmtKHR_(s.profit) + "\n\n"
           + "<i>⚠️ Note: Day's Net Profit is NOT Monthly Actual Profit</i>";
   sendTelegram_(msg);
+}
+
+// ── Diagnostic: shows all current triggers in the Execution Log ──────────────
+// Run from the editor to verify triggers are installed correctly.
+function checkTriggers() {
+  var triggers = ScriptApp.getProjectTriggers();
+  if (triggers.length === 0) {
+    Logger.log('[Triggers] No triggers found! Run createDailyTriggers() to install them.');
+    return;
+  }
+  triggers.forEach(function(t) {
+    Logger.log('[Trigger] fn=' + t.getHandlerFunction()
+      + '  type=' + t.getEventType()
+      + '  id=' + t.getUniqueId());
+  });
 }
 
 // ── Run ONCE manually from the Apps Script editor ────────────
