@@ -844,6 +844,8 @@
         }
         .sync-btn:hover { color: var(--primary); background: var(--surface-hover); }
         .sync-btn.syncing { color: var(--primary); }
+        #deskSyncBtn.syncing { color: var(--primary); }
+        #deskSyncBtn.syncing .desk-nav-icon { animation: spin 1s linear infinite; }
         .sync-icon { display: inline-block; font-size: 20px; line-height: 1; transition: transform 0.3s; }
         .sync-btn.syncing .sync-icon { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -1483,7 +1485,7 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 Customer Loyalty
             </a>
-            <button class="desk-nav-item" onclick="forceSync()">
+            <button class="desk-nav-item" id="deskSyncBtn" onclick="forceSync()">
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                 Sync Data
             </button>
@@ -1496,7 +1498,7 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </button>
-            <div class="desk-version" id="deskVersionDisplay">v5.0.9</div>
+            <div class="desk-version" id="deskVersionDisplay">v5.1.0</div>
         </div>
     </aside>
 
@@ -1598,6 +1600,17 @@
             </div>
 
             <div class="settings-section">
+                <div class="settings-section-label">Profile</div>
+                <div class="settings-group">
+                    <div class="setting-card" onclick="openProfileEdit()">
+                        <div class="setting-icon" style="background:#007aff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                        <div class="setting-label">Edit Profile Image</div>
+                        <div class="setting-val">›</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
                 <div class="settings-section-label">Account</div>
                 <div class="settings-group">
                     <div class="setting-card" onclick="logout()">
@@ -1624,7 +1637,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer" id="settingsVersionDisplay">v5.0.9</div>
+            <div class="settings-footer" id="settingsVersionDisplay">v5.1.0</div>
         </div>
     </div>
 
@@ -1833,20 +1846,66 @@
         </div>
     </div>
 
-    <div id="invEditorModal" class="modal-overlay">
-        <div class="editor-form">
-            <h3 style="margin-bottom:20px; text-align:center;">Edit Record</h3>
+    <div id="invEditorModal" class="oem-overlay" onclick="if(event.target===this)document.getElementById('invEditorModal').classList.remove('open')">
+        <div class="oem-sheet" style="max-width:480px;">
+            <div class="oem-handle"></div>
+            <div class="oem-header">
+                <div>
+                    <div class="oem-title">Edit Record</div>
+                    <div class="oem-meta" id="eiRecordInfo">—</div>
+                </div>
+                <button class="oem-close" onclick="document.getElementById('invEditorModal').classList.remove('open')">&times;</button>
+            </div>
             <input type="hidden" id="eiOldDate">
             <input type="hidden" id="eiOldTime">
             <input type="hidden" id="eiOldItem">
-            
-            <div class="form-group"><label class="form-label">Ingredient Name</label><input id="eiItem" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Quantity</label><input id="eiQty" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Cost (KHR)</label><input id="eiCost" type="number" class="form-input"></div>
-            
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
-                <button class="btn btn-clear" onclick="document.getElementById('invEditorModal').classList.remove('open')">CANCEL</button>
-                <button class="btn btn-confirm" onclick="saveEditedInventory()">SAVE</button>
+            <div class="oem-body" style="padding:14px 20px 4px;">
+                <div class="form-group">
+                    <label class="form-label">Ingredient Name</label>
+                    <input id="eiItem" class="form-input" autocomplete="off">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label class="form-label">Quantity</label>
+                        <input id="eiQty" class="form-input" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cost (KHR)</label>
+                        <input id="eiCost" type="number" inputmode="numeric" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <div class="oem-footer">
+                <button class="oem-footer-close" onclick="document.getElementById('invEditorModal').classList.remove('open')">Cancel</button>
+                <button class="oem-footer-confirm" style="flex:1; padding:14px; background:var(--primary); border:none; border-radius:14px; color:#fff; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;" onclick="saveEditedInventory()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile edit sheet -->
+    <div id="profileEditModal" class="oem-overlay" onclick="if(event.target===this)closeProfileEdit()">
+        <div class="oem-sheet" style="max-width:480px;">
+            <div class="oem-handle"></div>
+            <div class="oem-header">
+                <div>
+                    <div class="oem-title">Edit Profile</div>
+                    <div class="oem-meta" id="profileEditUserLabel"></div>
+                </div>
+                <button class="oem-close" onclick="closeProfileEdit()">&times;</button>
+            </div>
+            <div class="oem-body" style="padding:14px 20px 4px;">
+                <div class="form-group">
+                    <label class="form-label">Profile Image URL</label>
+                    <input id="profileImgUrl" class="form-input" type="url" inputmode="url" placeholder="https://example.com/photo.jpg" autocomplete="off">
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:5px;">Link to a profile photo (HTTPS). Leave blank to use initials.</div>
+                </div>
+                <div id="profileImgPreview" style="display:none; margin-top:8px; text-align:center;">
+                    <img id="profileImgPreviewImg" src="" alt="" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">
+                </div>
+            </div>
+            <div class="oem-footer">
+                <button class="oem-footer-close" onclick="closeProfileEdit()">Cancel</button>
+                <button style="flex:1; padding:14px; background:var(--primary); border:none; border-radius:14px; color:#fff; font-weight:700; font-size:13px; cursor:pointer; font-family:inherit;" onclick="saveProfileEdit()">Save</button>
             </div>
         </div>
     </div>
@@ -1854,7 +1913,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v5.0.9';
+        const APP_VERSION = 'v5.1.0';
 
         function showToast(msg, duration = 2200) {
             const t = document.getElementById('toast');
@@ -1865,7 +1924,7 @@
 
         // Force all users to re-login on this version update
         (function() {
-            const FL_VER = 'v5.0.9';
+            const FL_VER = 'v5.1.0';
             if (localStorage.getItem('myday_force_logout_ver') !== FL_VER) {
                 localStorage.removeItem('myday_session');
                 localStorage.setItem('myday_force_logout_ver', FL_VER);
@@ -2194,24 +2253,34 @@
         function renderUsers(data) {
             const grid = document.getElementById('userGrid');
             if (!grid) return;
-            // Backend may return array of strings or array of objects with a name/user field
-            const names = Array.isArray(data)
-                ? data.map(u => (typeof u === 'string' ? u : (u.name || u.user || String(u)))).filter(Boolean)
+            // Backend returns [{name, image}] objects or legacy name strings
+            const users = Array.isArray(data)
+                ? data.map(u => {
+                    if (typeof u === 'string') return { name: u, image: localStorage.getItem('myday_profile_img_' + u) || '' };
+                    const n = u.name || u.user || String(u);
+                    // Prefer sheet image, fall back to localStorage cache
+                    const img = u.image || localStorage.getItem('myday_profile_img_' + n) || '';
+                    if (u.image) localStorage.setItem('myday_profile_img_' + n, u.image);
+                    return { name: n, image: img };
+                  }).filter(u => u.name)
                 : [];
-            if (names.length === 0) {
+            if (users.length === 0) {
                 grid.innerHTML = '<div class="login-user-loading">No users found.<br>Check connection.</div>';
                 return;
             }
             const frag = document.createDocumentFragment();
-            names.forEach(name => {
+            users.forEach(({ name, image }) => {
                 const credId = localStorage.getItem('myday_faceid_cred_' + name);
                 const fidOn  = localStorage.getItem('myday_faceid_enabled_' + name) === 'true';
                 const hasBio = !!(credId && fidOn);
                 const btn = document.createElement('button');
                 btn.className = 'login-user-btn' + (hasBio ? ' has-faceid' : '');
                 btn.onclick = () => selectUser(name);
+                const avatarInner = image
+                    ? `<img src="${image}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">${name.charAt(0).toUpperCase()}</span>`
+                    : name.charAt(0).toUpperCase();
                 btn.innerHTML =
-                    `<div class="login-user-avatar-circle">${name.charAt(0).toUpperCase()}` +
+                    `<div class="login-user-avatar-circle">${avatarInner}` +
                     (hasBio
                         ? `<div class="login-user-faceid-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 8V4a2 2 0 0 1 2-2h4"/><path d="M22 8V4a2 2 0 0 0-2-2h-4"/><path d="M2 16v4a2 2 0 0 0 2 2h4"/><path d="M22 16v4a2 2 0 0 1-2 2h-4"/></svg></div>`
                         : '') +
@@ -2265,10 +2334,7 @@
                 numpadSection.style.transition = '';
             }
 
-            if (switchBtn) {
-                if (allowBack) switchBtn.classList.remove('hidden-btn');
-                else           switchBtn.classList.add('hidden-btn');
-            }
+            if (switchBtn) switchBtn.classList.remove('hidden-btn');
             pin.style.display = 'flex';
         }
 
@@ -2619,6 +2685,9 @@
         }
 
         function _loadOrderHistory() {
+            // Auto-expand the section when the cart tab is opened
+            const section = document.getElementById('orderHistorySection');
+            if (section) section.classList.remove('collapsed');
             const mk = fmtMonthKey(new Date());
             const cached = localStorage.getItem('myday_history_' + mk);
             if (cached) _renderOrderHistory(JSON.parse(cached));
@@ -2697,6 +2766,48 @@
             var _bS = document.getElementById('btnStock'); if (_bS) _bS.classList.remove('active');
 
             toggleSettings(false);
+        }
+
+        function openProfileEdit() {
+            const modal = document.getElementById('profileEditModal');
+            const label = document.getElementById('profileEditUserLabel');
+            const urlInput = document.getElementById('profileImgUrl');
+            const preview = document.getElementById('profileImgPreview');
+            const previewImg = document.getElementById('profileImgPreviewImg');
+            if (label) label.textContent = deviceName || '';
+            const saved = localStorage.getItem('myday_profile_img_' + deviceName) || '';
+            if (urlInput) urlInput.value = saved;
+            if (preview && previewImg) {
+                if (saved) { previewImg.src = saved; preview.style.display = 'block'; }
+                else preview.style.display = 'none';
+            }
+            if (urlInput) {
+                urlInput.oninput = function() {
+                    const v = this.value.trim();
+                    if (v && preview && previewImg) { previewImg.src = v; preview.style.display = 'block'; }
+                    else if (preview) preview.style.display = 'none';
+                };
+            }
+            modal.classList.add('open');
+        }
+        function closeProfileEdit() {
+            document.getElementById('profileEditModal').classList.remove('open');
+        }
+        function saveProfileEdit() {
+            const urlInput = document.getElementById('profileImgUrl');
+            const imgUrl = urlInput ? urlInput.value.trim() : '';
+            localStorage.setItem('myday_profile_img_' + deviceName, imgUrl);
+            closeProfileEdit();
+            // Push to sheet in background
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'update_user_profile', user: deviceName, image: imgUrl })
+            }).catch(() => {});
+            // Re-render the user grid so the image shows on next login
+            const cached = localStorage.getItem('myday_users');
+            if (cached) { try { renderUsers(JSON.parse(cached)); } catch(e) {} }
+            showToast('Profile updated');
         }
 
         function toggleSettings(forceState) {
@@ -3905,11 +4016,14 @@
             document.getElementById('eiOldDate').value = log.date;
             document.getElementById('eiOldTime').value = log.time;
             document.getElementById('eiOldItem').value = log.item;
-            
+
             document.getElementById('eiItem').value = log.item;
             document.getElementById('eiQty').value = log.qty;
             document.getElementById('eiCost').value = log.cost;
-            
+
+            const info = document.getElementById('eiRecordInfo');
+            if (info) info.textContent = log.date + ' · ' + log.time;
+
             document.getElementById('invEditorModal').classList.add('open');
         }
 
@@ -3953,9 +4067,15 @@
             });
         }
 
-        function _backgroundSync() {
+        function _setSyncing(on) {
             const btn = document.getElementById('syncBtn');
-            if (btn) btn.classList.add('syncing');
+            const deskBtn = document.getElementById('deskSyncBtn');
+            if (btn) btn.classList.toggle('syncing', on);
+            if (deskBtn) deskBtn.classList.toggle('syncing', on);
+        }
+
+        function _backgroundSync() {
+            _setSyncing(true);
             const mk = fmtMonthKey(new Date());
             Promise.all([
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_users').then(r => r.json()).then(d => { localStorage.setItem('myday_users', JSON.stringify(d)); }),
@@ -3963,16 +4083,16 @@
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_inv_' + mk, JSON.stringify(d)); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_history_' + mk, JSON.stringify(d)); })
             ]).then(() => {
-                if (btn) btn.classList.remove('syncing');
+                _setSyncing(false);
             }).catch(() => {
-                if (btn) btn.classList.remove('syncing');
+                _setSyncing(false);
             });
         }
 
         function forceSync() {
             const btn = document.getElementById('syncBtn');
             if (btn && btn.classList.contains('syncing')) return;
-            if (btn) btn.classList.add('syncing');
+            _setSyncing(true);
 
             const mk = fmtMonthKey(new Date());
             ['myday_users', 'myday_menu', 'myday_inv_' + mk, 'myday_history_' + mk].forEach(k => localStorage.removeItem(k));
@@ -3984,11 +4104,11 @@
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_inv_' + mk, JSON.stringify(d)); }),
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json()).then(d => { localStorage.setItem('myday_history_' + mk, JSON.stringify(d)); })
             ]).then(() => {
-                if (btn) btn.classList.remove('syncing');
+                _setSyncing(false);
                 toast.innerText = '✓ Synced! Reloading...'; toast.classList.add('show');
                 setTimeout(() => location.reload(), 1500);
             }).catch(() => {
-                if (btn) btn.classList.remove('syncing');
+                _setSyncing(false);
                 toast.innerText = 'Sync Failed'; toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 2000);
             });
