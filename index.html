@@ -1202,26 +1202,6 @@
             .drink-icon-box { width: 52px !important; height: 52px !important; min-width: 52px !important; }
             .drink-name { font-size: 14px !important; }
 
-            /* FinView subnav — compact horizontal tabs on desktop */
-            .fin-subnav {
-                padding: 8px 24px 10px !important;
-                grid-template-columns: repeat(2, auto) !important;
-                justify-content: start !important;
-                gap: 8px !important;
-            }
-            .fin-subnav-btn {
-                min-height: 44px !important;
-                padding: 10px 20px !important;
-                flex-direction: row !important;
-                gap: 8px !important;
-                border-radius: 22px !important;
-                min-width: 160px !important;
-            }
-            .fin-subnav-icon { width: 16px !important; height: 16px !important; }
-            .fin-subnav-title { font-size: 12px !important; letter-spacing: 0.5px !important; }
-            .fin-subnav-bar { display: none !important; }
-            .fin-subnav-desc { display: none !important; }
-
             /* FinView — page container */
             .fin-page-wrap {
                 max-width: 1020px !important;
@@ -1476,9 +1456,13 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
                 Menu
             </button>
-            <button class="desk-nav-item" id="deskBtnInventory" onclick="switchTab('inventory')">
+            <button class="desk-nav-item" id="deskBtnAnalysis" onclick="openAnalysis()">
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="13" width="5" height="9" rx="1"/><rect x="9.5" y="8" width="5" height="14" rx="1"/><rect x="17" y="4" width="5" height="18" rx="1"/><line x1="1" y1="22" x2="23" y2="22"/></svg>
-                FinView
+                Analysis
+            </button>
+            <button class="desk-nav-item" id="deskBtnStock" onclick="openStock()">
+                <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+                Stock
             </button>
             <button class="desk-nav-item" id="deskBtnHistory" onclick="openHistory()">
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1622,9 +1606,14 @@
             <div class="desktop-nav-group">
                 <div class="settings-section-label">App Navigation</div>
                 <div class="settings-group">
-                    <div class="setting-card" onclick="switchTab('inventory')">
-                        <div class="setting-icon" style="background:#ff9500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-                        <div class="setting-label">Financial Overview</div>
+                    <div class="setting-card" onclick="openAnalysis()">
+                        <div class="setting-icon" style="background:#ff9500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="13" width="5" height="9" rx="1"/><rect x="9.5" y="8" width="5" height="14" rx="1"/><rect x="17" y="4" width="5" height="18" rx="1"/><line x1="1" y1="22" x2="23" y2="22"/></svg></div>
+                        <div class="setting-label">Analysis</div>
+                        <div class="setting-val">›</div>
+                    </div>
+                    <div class="setting-card" onclick="openStock()">
+                        <div class="setting-icon" style="background:#34aadc"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+                        <div class="setting-label">Stock Management</div>
                         <div class="setting-val">›</div>
                     </div>
                 </div>
@@ -1637,7 +1626,8 @@
     <div class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('menu')" id="btnMenu">MENU</button>
         <button class="nav-item" onclick="switchTab('cart')" id="btnCart">ORDER <span id="navBadge" class="nav-badge">0</span></button>
-        <button class="nav-item" onclick="switchTab('inventory')" id="btnInventory">FinView</button>
+        <button class="nav-item" onclick="openAnalysis()" id="btnAnalysis">ANALYSIS</button>
+        <button class="nav-item" onclick="openStock()" id="btnStock">STOCK</button>
     </div>
 
     <div id="modal" class="modal-overlay">
@@ -1679,25 +1669,11 @@
     <div id="inventoryPage" class="modal-overlay" style="flex-direction:column; justify-content:start; background:var(--bg);">
         <div class="app-header" style="width:100%;">
             <button class="text-btn" style="font-size:28px; line-height:1; padding:0 15px;" onclick="switchTab('menu')">‹</button>
-            <span style="font-weight:700; color:var(--primary); font-size:16px; letter-spacing:-0.3px;">Financial Overview</span>
+            <span id="finPageTitle" style="font-weight:700; color:var(--primary); font-size:16px; letter-spacing:-0.3px;">Analysis</span>
             <div style="width:40px;"></div>
         </div>
 
         <!-- Sub Navigation — outside scroll area so it is always visible -->
-        <div class="fin-subnav">
-            <button class="fin-subnav-btn active" id="btnFinAnalysis" onclick="switchFinView('analysis')">
-                <svg class="fin-subnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="13" width="5" height="9" rx="1"/><rect x="9.5" y="8" width="5" height="14" rx="1"/><rect x="17" y="4" width="5" height="18" rx="1"/><line x1="1" y1="22" x2="23" y2="22"/></svg>
-                <span class="fin-subnav-title">Analysis</span>
-                <span class="fin-subnav-bar"></span>
-                <span class="fin-subnav-desc">Revenue, profit &amp; trends</span>
-            </button>
-            <button class="fin-subnav-btn" id="btnFinStock" onclick="switchFinView('stock')">
-                <svg class="fin-subnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-                <span class="fin-subnav-title">Stock Management</span>
-                <span class="fin-subnav-bar"></span>
-                <span class="fin-subnav-desc">Inventory &amp; expenses</span>
-            </button>
-        </div>
 
         <div class="fin-page-wrap" id="finPageWrap">
 
@@ -2709,7 +2685,7 @@
         }
 
         function _deskNavActive(id) {
-            ['deskBtnMenu','deskBtnInventory','deskBtnHistory','deskBtnManager'].forEach(function(bid) {
+            ['deskBtnMenu','deskBtnAnalysis','deskBtnStock','deskBtnHistory','deskBtnManager'].forEach(function(bid) {
                 const el = document.getElementById(bid);
                 if (el) el.classList.toggle('active', bid === id);
             });
@@ -2724,25 +2700,17 @@
 
             const invPanel = document.getElementById('inventoryPage');
 
-            if (t === 'inventory') {
-                finMonthDate = new Date();
-                invPanel.classList.add('open');
-                const wrap = document.getElementById('finPageWrap');
-                if (wrap) wrap.scrollTop = 0;
-                fetchInventoryAndStats();
-                _deskNavActive('deskBtnInventory');
-            } else {
-                invPanel.classList.remove('open');
-                document.getElementById('menuArea').style.display = t === 'menu' ? 'grid' : 'none';
+            invPanel.classList.remove('open');
+            document.getElementById('menuArea').style.display = t === 'menu' ? 'grid' : 'none';
 
-                const panel = document.getElementById('cartPanel');
-                if (t === 'cart') { panel.classList.add('active'); _loadOrderHistory(); } else panel.classList.remove('active');
-                _deskNavActive(t === 'menu' ? 'deskBtnMenu' : '');
-            }
+            const panel = document.getElementById('cartPanel');
+            if (t === 'cart') { panel.classList.add('active'); _loadOrderHistory(); } else panel.classList.remove('active');
+            _deskNavActive(t === 'menu' ? 'deskBtnMenu' : '');
 
             document.getElementById('btnMenu').classList.toggle('active', t === 'menu');
             document.getElementById('btnCart').classList.toggle('active', t === 'cart');
-            document.getElementById('btnInventory').classList.toggle('active', t === 'inventory');
+            var _bA = document.getElementById('btnAnalysis'); if (_bA) _bA.classList.remove('active');
+            var _bS = document.getElementById('btnStock'); if (_bS) _bS.classList.remove('active');
 
             toggleSettings(false);
         }
@@ -2934,6 +2902,47 @@
             document.getElementById('themeColorMeta').content = isDark ? '#FFFFFF' : '#111111';
             const dtl = document.getElementById('deskThemeLabel');
             if (dtl) dtl.innerText = isDark ? 'Light Mode' : 'Dark Mode';
+        }
+
+        function _setFinMobileNav(activeId) {
+            ['btnMenu','btnCart','btnAnalysis','btnStock'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.classList.toggle('active', id === activeId);
+            });
+        }
+
+        function openAnalysis() {
+            toggleSettings(false);
+            document.getElementById('historyPage').classList.remove('open');
+            document.getElementById('managerPage').classList.remove('open');
+            finMonthDate = new Date();
+            const invPanel = document.getElementById('inventoryPage');
+            invPanel.classList.add('open');
+            const wrap = document.getElementById('finPageWrap');
+            if (wrap) wrap.scrollTop = 0;
+            const title = document.getElementById('finPageTitle');
+            if (title) title.textContent = 'Analysis';
+            switchFinView('analysis');
+            fetchInventoryAndStats();
+            _deskNavActive('deskBtnAnalysis');
+            _setFinMobileNav('btnAnalysis');
+        }
+
+        function openStock() {
+            toggleSettings(false);
+            document.getElementById('historyPage').classList.remove('open');
+            document.getElementById('managerPage').classList.remove('open');
+            finMonthDate = new Date();
+            const invPanel = document.getElementById('inventoryPage');
+            invPanel.classList.add('open');
+            const wrap = document.getElementById('finPageWrap');
+            if (wrap) wrap.scrollTop = 0;
+            const title = document.getElementById('finPageTitle');
+            if (title) title.textContent = 'Stock Management';
+            switchFinView('stock');
+            fetchInventoryAndStats();
+            _deskNavActive('deskBtnStock');
+            _setFinMobileNav('btnStock');
         }
 
         function openHistory() {
@@ -3744,19 +3753,13 @@
         function switchFinView(tab) {
             var aP = document.getElementById('finAnalysisPanel');
             var sP = document.getElementById('finStockPanel');
-            var bA = document.getElementById('btnFinAnalysis');
-            var bS = document.getElementById('btnFinStock');
             if (!aP || !sP) return;
             if (tab === 'analysis') {
                 aP.style.display = 'flex';
                 sP.style.display = 'none';
-                bA.classList.add('active');
-                bS.classList.remove('active');
             } else {
                 aP.style.display = 'none';
                 sP.style.display = 'flex';
-                bS.classList.add('active');
-                bA.classList.remove('active');
                 var recBody = document.getElementById('recentPurchasesBody');
                 var recArrow = document.getElementById('recentPurchasesArrow');
                 var addBody = document.getElementById('addExpenseBody');
