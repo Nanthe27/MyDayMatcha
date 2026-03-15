@@ -1252,20 +1252,49 @@
             .chart-container { padding: 14px !important; margin-top: 14px !important; }
             .pie-chart { width: 80px !important; height: 80px !important; min-width: 80px !important; }
 
-            /* FinView — Stock Management */
+            /* FinView — Stock Management: 2-col desktop layout */
             .fin-stock-grid {
                 display: grid !important;
-                grid-template-columns: 260px 1fr !important;
-                gap: 18px !important;
+                grid-template-columns: 280px 1fr !important;
+                gap: 20px !important;
                 align-items: start !important;
             }
-            .fin-stock-add .form-input { padding: 8px 12px !important; font-size: 13px !important; }
-            .fin-stock-add .form-label { font-size: 10px !important; margin-bottom: 4px !important; }
-            .fin-stock-add .btn { font-size: 12px !important; padding: 10px !important; }
-            .fin-stock-add .form-group { margin-bottom: 10px !important; }
-            .fin-inv-card { padding: 11px 14px !important; }
+            /* Force both sections always open on desktop — collapsing not needed */
+            #addExpenseBody,
+            #recentPurchasesBody {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            /* Disable collapse toggle on desktop */
+            .fin-stock-add .fin-card-header-clickable,
+            .fin-stock-list .fin-card-header-clickable {
+                cursor: default !important;
+                pointer-events: none !important;
+            }
+            #addExpenseArrow,
+            #recentPurchasesArrow { display: none !important; }
+            /* Compact add-expense form */
+            .fin-stock-add .fin-card-body { padding: 10px 14px 14px !important; }
+            .fin-stock-add .form-group { margin-bottom: 8px !important; }
+            .fin-stock-add .form-label {
+                font-size: 10px !important; font-weight: 700 !important;
+                margin-bottom: 3px !important; letter-spacing: 0.3px !important;
+            }
+            .fin-stock-add .form-input {
+                padding: 7px 10px !important; font-size: 12px !important;
+                border-radius: 7px !important;
+            }
+            .fin-stock-add .btn {
+                font-size: 12px !important; padding: 9px 12px !important;
+                border-radius: 9px !important;
+            }
+            /* Purchase list */
+            .fin-stock-list .fin-card-body { padding: 10px 14px !important; }
+            .fin-inv-card { padding: 9px 13px !important; margin-bottom: 6px !important; }
             .fin-inv-name { font-size: 12px !important; }
+            .fin-inv-qty { font-size: 11px !important; }
             .fin-inv-cost { font-size: 13px !important; }
+            .fin-inv-meta { font-size: 10px !important; padding-bottom: 6px !important; margin-bottom: 6px !important; }
         }
 
         @media print {
@@ -3730,8 +3759,11 @@
                 bA.classList.remove('active');
                 var recBody = document.getElementById('recentPurchasesBody');
                 var recArrow = document.getElementById('recentPurchasesArrow');
-                // Add Expense stays minimised — user opens it when ready to add
+                var addBody = document.getElementById('addExpenseBody');
+                var addArrow = document.getElementById('addExpenseArrow');
                 if (recBody && !recBody.classList.contains('open')) { recBody.classList.add('open'); if (recArrow) recArrow.classList.add('open'); }
+                // On desktop open Add Expense too
+                if (window.innerWidth >= 1024 && addBody && !addBody.classList.contains('open')) { addBody.classList.add('open'); if (addArrow) addArrow.classList.add('open'); }
             }
         }
 
