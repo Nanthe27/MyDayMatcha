@@ -6,8 +6,15 @@ function doGet(e) {
   if (action == 'get_users') {
     var sheet = getOrCreateSheet("Users", ["Name", "Pin"]);
     if (sheet.getLastRow() < 2) sheet.getRange(2, 1, 1, 2).setValues([["Admin", "1234"]]);
-    var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues();
-    return ContentService.createTextOutput(JSON.stringify(data.map(r => r[0]).filter(n => n))).setMimeType(ContentService.MimeType.JSON);
+    var numCols = Math.max(sheet.getLastColumn(), 5);
+    var data = sheet.getRange(2, 1, sheet.getLastRow() - 1, numCols).getValues();
+    var users = [];
+    for (var i = 0; i < data.length; i++) {
+      if (data[i][0]) {
+        users.push({ name: String(data[i][0]), image: String(data[i][4] || '') });
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify(users)).setMimeType(ContentService.MimeType.JSON);
   }
   if (action == 'get_menu') {
     var sheet = getOrCreateSheet("Menu", ["Category", "ID", "Name", "Price", "Cost", "Milk_Option", "Oat_Price", "Image_URL"]);
@@ -168,6 +175,24 @@ function doPost(e) {
           // Write FaceID_Enabled (col 3) and CredentialID (col 4)
           sheet.getRange(i + 2, 3).setValue(data.enabled ? 'Yes' : 'No');
           sheet.getRange(i + 2, 4).setValue(data.enabled && data.credentialId ? String(data.credentialId) : '');
+          return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({status:'error', message:'User not found'})).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // --- Update user profile: write Image_URL (col 5) for a user ---
+    if (data.action === 'update_user_profile') {
+      var username = String(data.user || '').trim();
+      if (!username) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Missing user'})).setMimeType(ContentService.MimeType.JSON);
+      var ss = SpreadsheetApp.openById(SHEET_ID);
+      var sheet = ss.getSheetByName("Users");
+      if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Users sheet not found'})).setMimeType(ContentService.MimeType.JSON);
+      var lastRow = sheet.getLastRow();
+      var users = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+      for (var i = 0; i < users.length; i++) {
+        if (String(users[i][0]).trim() === username) {
+          if (data.image !== undefined) sheet.getRange(i + 2, 5).setValue(String(data.image || ''));
           return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
         }
       }
