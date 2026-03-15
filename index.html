@@ -1502,7 +1502,7 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </button>
-            <div class="desk-version" id="deskVersionDisplay">v5.1.0</div>
+            <div class="desk-version" id="deskVersionDisplay">v5.1.1</div>
         </div>
     </aside>
 
@@ -1641,7 +1641,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer" id="settingsVersionDisplay">v5.1.0</div>
+            <div class="settings-footer" id="settingsVersionDisplay">v5.1.1</div>
         </div>
     </div>
 
@@ -1917,7 +1917,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v5.1.0';
+        const APP_VERSION = 'v5.1.1';
 
         function showToast(msg, duration = 2200) {
             const t = document.getElementById('toast');
@@ -1928,7 +1928,7 @@
 
         // Force all users to re-login on this version update
         (function() {
-            const FL_VER = 'v5.1.0';
+            const FL_VER = 'v5.1.1';
             if (localStorage.getItem('myday_force_logout_ver') !== FL_VER) {
                 localStorage.removeItem('myday_session');
                 localStorage.setItem('myday_force_logout_ver', FL_VER);
@@ -2404,19 +2404,19 @@
             if (!deviceName || deviceName === 'Unknown') return;
 
             isAutoLocked = true;
-            tempSelectedUser = deviceName;
+            tempSelectedUser = null;
             currentPin = ''; updatePinDisplay();
 
-            const credId = localStorage.getItem('myday_faceid_cred_' + deviceName);
-            const fidOn  = localStorage.getItem('myday_faceid_enabled_' + deviceName) === 'true';
-
-            // Show PIN phase immediately (no animation when auto-locking)
-            _switchToPinView(deviceName, !!(credId && fidOn), false); // allowBack = false while locked
-            const pin = document.getElementById('pinContainer');
-            pin.style.opacity = '1'; pin.style.transform = 'none'; pin.style.transition = 'none';
+            // Return to user-selection grid — user must pick their own account
+            const pin    = document.getElementById('pinContainer');
+            const step   = document.getElementById('usernameStep');
+            const updBtn = document.getElementById('updateRefreshBtn');
+            pin.style.display = 'none'; pin.style.opacity = ''; pin.style.transform = ''; pin.style.transition = '';
+            step.style.display = 'flex'; step.style.opacity = '1'; step.style.transform = ''; step.style.transition = '';
+            if (updBtn) updBtn.style.display = '';
+            _showHeroLogo();
             toggleSettings(false);
             loginScreen.classList.remove('hidden');
-            // Face ID button is shown; user taps it — no auto-prompt
         }
 
         // Called after a successful PIN or Face ID re-authentication from the locked state
@@ -2428,7 +2428,6 @@
 
         // Reset to user-selection grid (used by ← Back button and showLogin)
         function cancelLogin() {
-            if (isAutoLocked) return; // can't navigate back while locked — user must authenticate
             const step   = document.getElementById('usernameStep');
             const pin    = document.getElementById('pinContainer');
             const updBtn = document.getElementById('updateRefreshBtn');

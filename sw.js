@@ -1,5 +1,5 @@
-/* My Day Matcha — Root Service Worker v5.1.0 */
-const CACHE = 'mdm-root-v5.1.0';
+/* My Day Matcha — Root Service Worker v5.1.1 */
+const CACHE = 'mdm-root-v5.1.1';
 
 const PRECACHE = [
     './',
