@@ -966,23 +966,8 @@
             cursor: pointer; min-width: 0;
         }
         .oem-item-name:hover { color: var(--primary); }
-        .oem-item-price-wrap { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
         .oem-item-price {
-            font-size: 13px; font-weight: 700; color: var(--primary); flex-shrink: 0;
-            cursor: pointer; padding: 3px 6px; border-radius: 6px;
-            transition: background 0.12s;
-        }
-        .oem-item-price:hover { background: rgba(76,175,80,0.10); }
-        .oem-price-edit-input {
-            width: 90px; padding: 4px 8px; border: 1.5px solid var(--primary);
-            border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--text);
-            background: var(--surface); font-family: inherit; outline: none;
-            display: none;
-        }
-        .oem-price-save-btn {
-            background: var(--primary); border: none; border-radius: 7px; color: #fff;
-            font-size: 11px; font-weight: 700; padding: 5px 10px; cursor: pointer;
-            font-family: inherit; display: none;
+            font-size: 12px; font-weight: 700; color: var(--primary); flex-shrink: 0;
         }
         .oem-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
         .oem-action-btn {
@@ -1026,6 +1011,48 @@
             font-family: inherit; transition: background 0.15s;
         }
         .oem-footer-close:hover { background: var(--border); }
+
+        /* Order edit — item row discount expansion */
+        .oem-item-main { flex: 1; min-width: 0; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .oem-item-price-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+        .oem-disc-badge {
+            background: rgba(52,199,89,0.14); color: #1a8c34;
+            border: 1px solid rgba(52,199,89,0.35); border-radius: 5px;
+            padding: 1px 6px; font-size: 10px; font-weight: 800;
+            letter-spacing: 0.3px; flex-shrink: 0; display: none;
+        }
+        .oem-disc-panel {
+            display: none; flex-direction: column; gap: 8px;
+            width: 100%; padding: 10px 0 4px;
+            border-top: 1px solid var(--border); margin-top: 6px;
+            animation: oemFadeIn 0.15s ease;
+        }
+        .oem-item-row.oem-row-open .oem-disc-panel { display: flex; }
+        .oem-disc-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+        .oem-disc-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+        .oem-disc-preset {
+            padding: 5px 13px; border-radius: 20px;
+            border: 1.5px solid var(--border); background: var(--bg);
+            font-size: 11px; font-weight: 700; cursor: pointer;
+            color: var(--text-muted); font-family: inherit;
+            transition: border-color 0.15s, color 0.15s, background 0.15s;
+        }
+        .oem-disc-preset:hover { border-color: var(--primary); color: var(--primary); }
+        .oem-disc-preset.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .oem-disc-preset.oem-disc-free.active { background: #34C759; border-color: #34C759; }
+        .oem-disc-preset:disabled { opacity: 0.5; cursor: default; }
+        .oem-disc-change-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: 10px;
+            border: 1.5px solid var(--border); background: var(--bg);
+            font-size: 12px; font-weight: 700; cursor: pointer;
+            color: var(--text-muted); font-family: inherit;
+            transition: border-color 0.15s, color 0.15s; align-self: flex-start;
+        }
+        .oem-disc-change-btn:hover { border-color: var(--primary); color: var(--primary); }
 
         /* Drink Picker sheet — appears on top of edit modal */
         .dp-overlay {
@@ -1194,6 +1221,51 @@
             .fin-subnav-title { font-size: 12px !important; letter-spacing: 0.5px !important; }
             .fin-subnav-bar { display: none !important; }
             .fin-subnav-desc { display: none !important; }
+
+            /* FinView — page container */
+            .fin-page-wrap {
+                max-width: 1020px !important;
+                margin: 0 auto !important;
+                padding: 20px 28px 40px !important;
+            }
+
+            /* FinView — Analysis: 2-column layout (metrics left, trend/daily right) */
+            #finAnalysisPanel {
+                display: grid !important;
+                grid-template-columns: 320px 1fr !important;
+                gap: 18px !important;
+                align-items: start !important;
+            }
+            #finAnalysisPanel > .dashboard-card:first-child { grid-column: 1; }
+            #dailyBreakdownCard { grid-column: 2; grid-row: 1 / span 2; }
+            #finTrendCard { grid-column: 1; }
+
+            /* FinView — card sizing */
+            .fin-card-header { padding: 10px 16px !important; }
+            .fin-card-body { padding: 14px 16px !important; }
+            .dashboard-card { margin-bottom: 14px !important; }
+            .fin-kpi-row { padding: 9px 13px !important; margin-bottom: 7px !important; }
+            .fin-kpi-row-value { font-size: 15px !important; }
+            .fin-profit-value { font-size: 17px !important; }
+            .fin-kpi-value { font-size: 14px !important; }
+            .fin-profit-block { padding: 11px 14px !important; }
+            .chart-container { padding: 14px !important; margin-top: 14px !important; }
+            .pie-chart { width: 80px !important; height: 80px !important; min-width: 80px !important; }
+
+            /* FinView — Stock Management */
+            .fin-stock-grid {
+                display: grid !important;
+                grid-template-columns: 260px 1fr !important;
+                gap: 18px !important;
+                align-items: start !important;
+            }
+            .fin-stock-add .form-input { padding: 8px 12px !important; font-size: 13px !important; }
+            .fin-stock-add .form-label { font-size: 10px !important; margin-bottom: 4px !important; }
+            .fin-stock-add .btn { font-size: 12px !important; padding: 10px !important; }
+            .fin-stock-add .form-group { margin-bottom: 10px !important; }
+            .fin-inv-card { padding: 11px 14px !important; }
+            .fin-inv-name { font-size: 12px !important; }
+            .fin-inv-cost { font-size: 13px !important; }
         }
 
         @media print {
@@ -1406,7 +1478,7 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </button>
-            <div class="desk-version" id="deskVersionDisplay">v5.0.7</div>
+            <div class="desk-version" id="deskVersionDisplay">v5.0.8</div>
         </div>
     </aside>
 
@@ -1529,7 +1601,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer" id="settingsVersionDisplay">v5.0.7</div>
+            <div class="settings-footer" id="settingsVersionDisplay">v5.0.8</div>
         </div>
     </div>
 
@@ -1798,7 +1870,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v5.0.7';
+        const APP_VERSION = 'v5.0.8';
 
         function showToast(msg, duration = 2200) {
             const t = document.getElementById('toast');
@@ -1809,7 +1881,7 @@
 
         // Force all users to re-login on this version update
         (function() {
-            const FL_VER = 'v5.0.7';
+            const FL_VER = 'v5.0.8';
             if (localStorage.getItem('myday_force_logout_ver') !== FL_VER) {
                 localStorage.removeItem('myday_session');
                 localStorage.setItem('myday_force_logout_ver', FL_VER);
@@ -2066,7 +2138,7 @@
                     setTimeout(() => {
                         _showPinLoading(false);
                         document.getElementById('loginScreen').classList.add('hidden');
-                        _backgroundSync(); setTimeout(showWhatsNew, 600);
+                        _backgroundSync();
                     }, 1600);
                 } else {
                     alert('Face ID login failed. Please enter your PIN instead.');
@@ -2418,7 +2490,7 @@
                         setTimeout(() => {
                             _showPinLoading(false);
                             document.getElementById('loginScreen').classList.add('hidden');
-                            _backgroundSync(); setTimeout(showWhatsNew, 600);
+                            _backgroundSync();
                         }, 1600);
                     }, 350);
                 } else {
@@ -3029,84 +3101,101 @@
             const dot = document.createElement('div');
             dot.className = 'oem-item-dot';
 
-            // Item name — tap to swap drink
+            // Look up menu (original) price for discount math
+            let menuPrice = price;
+            MENU_DATA.forEach(grp => grp.items.forEach(i => { if (i.name === itemName) menuPrice = i.price; }));
+            const discPct = menuPrice > 0 ? Math.max(0, Math.round((1 - price / menuPrice) * 100)) : 0;
+
+            // Main tappable area: name + price row
+            const mainEl = document.createElement('div');
+            mainEl.className = 'oem-item-main';
+
             const nameEl = document.createElement('div');
             nameEl.className = 'oem-item-name';
             nameEl.textContent = itemName;
-            nameEl.title = 'Tap to change drink';
-            nameEl.onclick = () => _showDrinkPicker(row, orderId, itemName);
 
-            // Price wrap — tap price to edit
-            const priceWrap = document.createElement('div');
-            priceWrap.className = 'oem-item-price-wrap';
+            const priceRow = document.createElement('div');
+            priceRow.className = 'oem-item-price-row';
 
             const priceEl = document.createElement('span');
             priceEl.className = 'oem-item-price';
-            priceEl.textContent = price.toLocaleString() + ' KHR';
-            priceEl.title = 'Tap to edit price';
+            priceEl.textContent = price === 0 ? 'FREE' : price.toLocaleString() + ' KHR';
+            if (price === 0) priceEl.style.color = '#34C759';
 
-            const priceInput = document.createElement('input');
-            priceInput.type = 'number';
-            priceInput.className = 'oem-price-edit-input';
-            priceInput.value = price;
-            priceInput.inputMode = 'numeric';
+            const badge = document.createElement('span');
+            badge.className = 'oem-disc-badge';
+            if (discPct > 0) { badge.textContent = discPct + '% OFF'; badge.style.display = 'inline-flex'; }
 
-            const priceSaveBtn = document.createElement('button');
-            priceSaveBtn.className = 'oem-price-save-btn';
-            priceSaveBtn.textContent = 'Save';
+            priceRow.appendChild(priceEl);
+            priceRow.appendChild(badge);
+            mainEl.appendChild(nameEl);
+            mainEl.appendChild(priceRow);
 
-            // Toggle price edit mode
-            priceEl.onclick = (e) => {
-                e.stopPropagation();
-                priceEl.style.display = 'none';
-                priceInput.style.display = 'inline-block';
-                priceSaveBtn.style.display = 'inline-block';
-                priceInput.value = price;
-                priceInput.focus();
-                priceInput.select();
-            };
-            const cancelPriceEdit = () => {
-                priceEl.style.display = '';
-                priceInput.style.display = 'none';
-                priceSaveBtn.style.display = 'none';
-            };
-            priceInput.onkeydown = (e) => {
-                if (e.key === 'Enter') priceSaveBtn.click();
-                if (e.key === 'Escape') cancelPriceEdit();
-            };
-            priceSaveBtn.onclick = () => {
-                const newPrice = parseInt(priceInput.value, 10);
-                if (isNaN(newPrice) || newPrice < 0) { cancelPriceEdit(); return; }
-                if (newPrice === price) { cancelPriceEdit(); return; }
-                priceSaveBtn.disabled = true; priceSaveBtn.textContent = '...';
-                _doEditPrice(orderId, itemName, newPrice, priceSaveBtn, cancelPriceEdit);
+            // Tap main area → toggle inline action panel
+            mainEl.onclick = () => {
+                const isOpen = row.classList.contains('oem-row-open');
+                document.querySelectorAll('.oem-item-row.oem-row-open').forEach(r => r.classList.remove('oem-row-open'));
+                if (!isOpen) row.classList.add('oem-row-open');
             };
 
-            priceWrap.appendChild(priceEl);
-            priceWrap.appendChild(priceInput);
-            priceWrap.appendChild(priceSaveBtn);
+            // Inline discount + change-drink panel
+            const discPanel = document.createElement('div');
+            discPanel.className = 'oem-disc-panel';
 
+            const discLabel = document.createElement('div');
+            discLabel.className = 'oem-disc-label';
+            discLabel.textContent = 'Discount:';
+
+            const presetsWrap = document.createElement('div');
+            presetsWrap.className = 'oem-disc-presets';
+
+            [
+                { label: 'No Discount', pct: 0 },
+                { label: '25% Off',     pct: 25 },
+                { label: '50% Off',     pct: 50 },
+                { label: 'Free',        pct: 100, free: true },
+            ].forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = 'oem-disc-preset' + (p.free ? ' oem-disc-free' : '') + (discPct === p.pct ? ' active' : '');
+                btn.textContent = p.label;
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const newPrice = p.pct === 100 ? 0 : Math.round(menuPrice * (1 - p.pct / 100));
+                    if (newPrice === price) { row.classList.remove('oem-row-open'); return; }
+                    presetsWrap.querySelectorAll('.oem-disc-preset').forEach(b => { b.disabled = true; });
+                    const origLabel = btn.textContent;
+                    btn.textContent = '...';
+                    _doEditPrice(orderId, itemName, newPrice, btn, () => {
+                        btn.textContent = origLabel;
+                        presetsWrap.querySelectorAll('.oem-disc-preset').forEach(b => { b.disabled = false; });
+                    });
+                };
+                presetsWrap.appendChild(btn);
+            });
+
+            const changeDrinkBtn = document.createElement('button');
+            changeDrinkBtn.className = 'oem-disc-change-btn';
+            changeDrinkBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg> Change Drink';
+            changeDrinkBtn.onclick = (e) => { e.stopPropagation(); row.classList.remove('oem-row-open'); _showDrinkPicker(row, orderId, itemName); };
+
+            discPanel.appendChild(discLabel);
+            discPanel.appendChild(presetsWrap);
+            discPanel.appendChild(changeDrinkBtn);
+
+            // Delete button
             const actions = document.createElement('div');
             actions.className = 'oem-item-actions';
-
-            const swapBtn = document.createElement('button');
-            swapBtn.className = 'oem-action-btn oem-btn-swap';
-            swapBtn.title = 'Change drink';
-            swapBtn.innerHTML = _SWAP_BTN_SVG;
-            swapBtn.onclick = () => _showDrinkPicker(row, orderId, itemName);
-
             const delBtn = document.createElement('button');
             delBtn.className = 'oem-action-btn oem-btn-del';
             delBtn.title = 'Remove item';
             delBtn.innerHTML = _DEL_BTN_SVG;
             delBtn.onclick = () => _doDeleteItem(orderId, itemName, delBtn);
-
-            actions.appendChild(swapBtn);
             actions.appendChild(delBtn);
+
             row.appendChild(dot);
-            row.appendChild(nameEl);
-            row.appendChild(priceWrap);
+            row.appendChild(mainEl);
             row.appendChild(actions);
+            row.appendChild(discPanel);
             return row;
         }
 
@@ -3165,7 +3254,7 @@
 
                 const price = document.createElement('div');
                 price.className = 'dp-item-price';
-                price.textContent = item.price.toLocaleString() + ' ₭';
+                price.textContent = item.price.toLocaleString() + ' KHR';
 
                 const check = document.createElement('div');
                 check.className = 'dp-item-check';
@@ -4062,7 +4151,7 @@
         });
     }
     </script>
-    <!-- What's New Sheet (v5.0.7) -->
+    <!-- What's New Sheet (v5.0.8) -->
     <div id="whatsNewSheet" onclick="if(event.target===this)closeWhatsNew()" style="position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.3s,visibility 0.3s;">
         <div id="whatsNewBox" style="background:var(--surface);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:8px 22px 0;transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.2,0,0,1);">
             <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
@@ -4071,7 +4160,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </div>
                 <div>
-                    <div style="font-family:'Quicksand',sans-serif;font-size:19px;font-weight:800;color:var(--text);">What's New — v5.0.7</div>
+                    <div style="font-family:'Quicksand',sans-serif;font-size:19px;font-weight:800;color:var(--text);">What's New — v5.0.8</div>
                     <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">My Day Matcha has been updated</div>
                 </div>
             </div>
