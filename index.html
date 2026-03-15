@@ -887,6 +887,43 @@
         .fin-inv-name { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
         .fin-inv-qty { font-size:11px; font-weight:500; color:var(--text-muted); }
         .fin-inv-cost { font-size:15px; font-weight:800; color:#FF3B30; flex-shrink:0; margin-left:12px; }
+        /* Stock Management — summary banner */
+        .fstock-summary-card {
+            display: flex; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 16px;
+            overflow: hidden; margin-bottom: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+        .fstock-summary-item { flex: 1; padding: 16px 18px; }
+        .fstock-summary-divider { width: 1px; background: var(--border); flex-shrink: 0; }
+        .fstock-summary-label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.9px; color: var(--text-muted); margin-bottom: 6px;
+        }
+        .fstock-summary-val {
+            font-size: 20px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; line-height: 1.1;
+        }
+        .fstock-spending { color: #FF3B30; }
+        /* Stock Management — Add Expense button */
+        .fstock-add-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 13px 20px; margin-bottom: 14px;
+            background: var(--primary); color: #fff; border: none; border-radius: 14px;
+            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+            transition: opacity 0.15s, transform 0.12s; letter-spacing: 0.2px;
+        }
+        .fstock-add-btn:hover { opacity: 0.9; }
+        .fstock-add-btn:active { transform: scale(0.98); }
+        /* Add Expense modal (reuses oem-overlay/oem-sheet styles) */
+        #addExpenseModal .oem-footer-confirm {
+            flex: 1; padding: 14px; background: var(--primary);
+            border: none; border-radius: 14px; color: #fff;
+            font-weight: 700; font-size: 13px; cursor: pointer;
+            font-family: inherit; transition: opacity 0.15s;
+        }
+        #addExpenseModal .oem-footer-confirm:hover { opacity: 0.88; }
+        #addExpenseModal .oem-footer-confirm:disabled { opacity: 0.5; cursor: default; }
+
         .fin-inv-actions { display:flex; gap:4px; flex-shrink:0; }
         .fin-action-btn { background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:10px; font-weight:700; letter-spacing:0.5px; padding:3px 8px; cursor:pointer; color:var(--text-muted); transition:0.15s; }
         .fin-action-btn:hover { color:var(--text); border-color:var(--text-muted); }
@@ -1210,8 +1247,8 @@
             }
 
             /* FinView — Analysis: 2-column layout (metrics left, trend/daily right) */
+            /* NOTE: display is controlled by JS inline style — do NOT add display here */
             #finAnalysisPanel {
-                display: grid !important;
                 grid-template-columns: 320px 1fr !important;
                 gap: 18px !important;
                 align-items: start !important;
@@ -1232,44 +1269,12 @@
             .chart-container { padding: 14px !important; margin-top: 14px !important; }
             .pie-chart { width: 80px !important; height: 80px !important; min-width: 80px !important; }
 
-            /* FinView — Stock Management: 2-col desktop layout */
-            .fin-stock-grid {
-                display: grid !important;
-                grid-template-columns: 280px 1fr !important;
-                gap: 20px !important;
-                align-items: start !important;
-            }
-            /* Force both sections always open on desktop — collapsing not needed */
-            #addExpenseBody,
-            #recentPurchasesBody {
-                max-height: none !important;
-                overflow: visible !important;
-            }
-            /* Disable collapse toggle on desktop */
-            .fin-stock-add .fin-card-header-clickable,
-            .fin-stock-list .fin-card-header-clickable {
-                cursor: default !important;
-                pointer-events: none !important;
-            }
-            #addExpenseArrow,
-            #recentPurchasesArrow { display: none !important; }
-            /* Compact add-expense form */
-            .fin-stock-add .fin-card-body { padding: 10px 14px 14px !important; }
-            .fin-stock-add .form-group { margin-bottom: 8px !important; }
-            .fin-stock-add .form-label {
-                font-size: 10px !important; font-weight: 700 !important;
-                margin-bottom: 3px !important; letter-spacing: 0.3px !important;
-            }
-            .fin-stock-add .form-input {
-                padding: 7px 10px !important; font-size: 12px !important;
-                border-radius: 7px !important;
-            }
-            .fin-stock-add .btn {
-                font-size: 12px !important; padding: 9px 12px !important;
-                border-radius: 9px !important;
-            }
-            /* Purchase list */
-            .fin-stock-list .fin-card-body { padding: 10px 14px !important; }
+            /* Stock Management — constrained single-column, no h-scroll */
+            #finStockPanel { max-width: 680px !important; margin: 0 auto !important; }
+            .fstock-summary-item { padding: 18px 22px !important; }
+            .fstock-summary-val { font-size: 22px !important; }
+            .fstock-add-btn { font-size: 13px !important; padding: 12px 20px !important; }
+            /* Purchase list desktop */
             .fin-inv-card { padding: 9px 13px !important; margin-bottom: 6px !important; }
             .fin-inv-name { font-size: 12px !important; }
             .fin-inv-qty { font-size: 11px !important; }
@@ -1491,7 +1496,7 @@
                 <svg class="desk-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Logout
             </button>
-            <div class="desk-version" id="deskVersionDisplay">v5.0.8</div>
+            <div class="desk-version" id="deskVersionDisplay">v5.0.9</div>
         </div>
     </aside>
 
@@ -1619,7 +1624,7 @@
                 </div>
             </div>
 
-            <div class="settings-footer" id="settingsVersionDisplay">v5.0.8</div>
+            <div class="settings-footer" id="settingsVersionDisplay">v5.0.9</div>
         </div>
     </div>
 
@@ -1766,67 +1771,41 @@
 
             <!-- Stock Management Panel -->
             <div id="finStockPanel" class="fin-panel" style="display:none;">
-                <div class="fin-stock-grid">
 
-                    <div class="fin-stock-add">
-                        <div class="dashboard-card" style="padding:0; overflow:hidden;">
-                            <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('addExpenseBody','addExpenseArrow')">
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                                    <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Add Expense</div>
-                                </div>
-                                <button class="fin-collapse-btn" id="addExpenseArrow">▾</button>
-                            </div>
-                            <div class="fin-collapsible" id="addExpenseBody">
-                                <div class="fin-card-body">
-                                    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--primary); margin-bottom:12px; opacity:0.85;">Fill in item details then tap + Add</div>
-                                    <div class="form-group">
-                                        <label class="form-label">Item / Ingredient Name</label>
-                                        <input id="invItem" class="form-input" placeholder="e.g., Matcha Powder, Milk, Cups…" autocomplete="off">
-                                    </div>
-                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                                        <div class="form-group">
-                                            <label class="form-label">Unit / Size</label>
-                                            <input id="invUnit" class="form-input" placeholder="e.g., 1 kg" autocomplete="off">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Qty Bought</label>
-                                            <input id="invAmount" type="number" inputmode="numeric" class="form-input" placeholder="e.g., 2">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label">Total Cost (KHR)</label>
-                                        <input id="invCost" type="number" inputmode="numeric" class="form-input" placeholder="0">
-                                    </div>
-                                    <button class="btn btn-confirm" style="width:100%; margin-top:4px; font-size:13px;" onclick="addPendingInventory()">+ Add to List</button>
-                                    <div id="pendingInvList" style="margin-top:14px; display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px;"></div>
-                                    <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; margin-top:12px; display:none; background:#2E7D32;" onclick="saveInventory()">✓ Save All Records</button>
-                                </div>
-                            </div>
+                <!-- Monthly summary banner -->
+                <div class="fstock-summary-card">
+                    <div class="fstock-summary-item">
+                        <div class="fstock-summary-label">Items Restocked</div>
+                        <div class="fstock-summary-val" id="stockSummaryItems">—</div>
+                    </div>
+                    <div class="fstock-summary-divider"></div>
+                    <div class="fstock-summary-item">
+                        <div class="fstock-summary-label">Spending on Stock</div>
+                        <div class="fstock-summary-val fstock-spending" id="stockSummarySpend">0 KHR</div>
+                    </div>
+                </div>
+
+                <!-- Add Expense button -->
+                <button class="fstock-add-btn" onclick="_openAddExpenseModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add Expense
+                </button>
+
+                <!-- Purchase history -->
+                <div class="dashboard-card" style="padding:0; overflow:hidden;">
+                    <div class="fin-card-header">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Purchase History</div>
+                        <div id="stockMonthLabel" style="font-size:11px; font-weight:700; color:var(--text-muted);"></div>
+                    </div>
+                    <div class="fin-card-body" style="padding-top:10px;">
+                        <div class="day-date-scroll-wrap" id="invDateScrollWrap" style="margin-bottom:10px; display:none;">
+                            <div id="invDateScroll" class="day-date-scroll"></div>
                         </div>
-                    </div><!-- end fin-stock-add -->
+                        <div id="invDailyTotal" style="display:none; text-align:right; font-size:11px; font-weight:700; color:#FF3B30; margin-bottom:10px; letter-spacing:0.3px;"></div>
+                        <div id="inventoryList"></div>
+                    </div>
+                </div>
 
-                    <div class="fin-stock-list">
-                        <div class="dashboard-card" style="padding:0; overflow:hidden;">
-                            <div class="fin-card-header fin-card-header-clickable" onclick="toggleFinSection('recentPurchasesBody','recentPurchasesArrow')">
-                                <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Recent Purchases</div>
-                                <button class="fin-collapse-btn" id="recentPurchasesArrow">▾</button>
-                            </div>
-                            <div class="fin-collapsible" id="recentPurchasesBody">
-                                <div class="fin-card-body" style="padding-top:10px;">
-                                    <!-- Date pills — browse purchases by day -->
-                                    <div class="day-date-scroll-wrap" id="invDateScrollWrap" style="margin-bottom:10px; display:none;">
-                                        <div id="invDateScroll" class="day-date-scroll"></div>
-                                    </div>
-                                    <!-- Daily total badge -->
-                                    <div id="invDailyTotal" style="display:none; text-align:right; font-size:11px; font-weight:700; color:#FF3B30; margin-bottom:10px; letter-spacing:0.3px;"></div>
-                                    <div id="inventoryList"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div><!-- end fin-stock-list -->
-
-                </div><!-- end fin-stock-grid -->
             </div><!-- end finStockPanel -->
 
         </div>
@@ -1875,7 +1854,7 @@
     <div id="receiptContainer"></div>
 
     <script>
-        const APP_VERSION = 'v5.0.8';
+        const APP_VERSION = 'v5.0.9';
 
         function showToast(msg, duration = 2200) {
             const t = document.getElementById('toast');
@@ -1886,7 +1865,7 @@
 
         // Force all users to re-login on this version update
         (function() {
-            const FL_VER = 'v5.0.8';
+            const FL_VER = 'v5.0.9';
             if (localStorage.getItem('myday_force_logout_ver') !== FL_VER) {
                 localStorage.removeItem('myday_session');
                 localStorage.setItem('myday_force_logout_ver', FL_VER);
@@ -1935,10 +1914,15 @@
             if(e.key === 'Enter') checkPin();
         });
 
-        // Auto-lock: trigger lockApp whenever the tab/app goes to background or is hidden
-        document.addEventListener('visibilitychange', () => { if (document.hidden) lockApp(); });
-        // iOS Safari PWA fallback — fires when user leaves the app via home button
-        window.addEventListener('pagehide', lockApp);
+        // Auto-lock: lock after 10 minutes away — cancel if user returns within that time
+        let _lockTimer = null;
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                _lockTimer = setTimeout(lockApp, 10 * 60 * 1000);
+            } else {
+                if (_lockTimer) { clearTimeout(_lockTimer); _lockTimer = null; }
+            }
+        });
 
         function hardRefreshApp() {
             const btn = document.getElementById('updateRefreshBtn');
@@ -3549,8 +3533,8 @@
 
         function saveInventory() {
             if(pendingInventory.length === 0) return;
-            document.getElementById('inventoryList').innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted)">Saving Records...</div>';
-            
+            const saveBtn = document.getElementById('btnSaveInv');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -3558,10 +3542,11 @@
             }).then(res => res.json()).then(data => {
                 pendingInventory = [];
                 renderPendingInv();
+                _closeAddExpenseModal();
                 fetchInventoryAndStats();
             }).catch(e => {
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save All Records'; }
                 openModal('ERROR', 'Failed to save inventory.', null, 'CLOSE');
-                fetchInventoryAndStats();
             });
         }
 
@@ -3654,6 +3639,20 @@
             const totalEl    = document.getElementById('invDailyTotal');
             if (!listEl) return;
 
+            // Update summary banner
+            const sumItems = document.getElementById('stockSummaryItems');
+            const sumSpend = document.getElementById('stockSummarySpend');
+            if (sumItems && sumSpend) {
+                if (!invData || invData.length === 0) {
+                    sumItems.textContent = '0 items';
+                    sumSpend.textContent = '0 KHR';
+                } else {
+                    const totalCost = invData.reduce((s, l) => s + Number(l.cost), 0);
+                    sumItems.textContent = invData.length + (invData.length === 1 ? ' item' : ' items') + ' restocked';
+                    sumSpend.textContent = totalCost.toLocaleString() + ' KHR';
+                }
+            }
+
             if (!invData || invData.length === 0) {
                 if (scrollWrap) scrollWrap.style.display = 'none';
                 if (totalEl) totalEl.style.display = 'none';
@@ -3742,6 +3741,14 @@
             }
         }
 
+        function _openAddExpenseModal() {
+            document.getElementById('addExpenseModal').classList.add('open');
+            setTimeout(() => { const el = document.getElementById('invItem'); if (el) el.focus(); }, 320);
+        }
+        function _closeAddExpenseModal() {
+            document.getElementById('addExpenseModal').classList.remove('open');
+        }
+
         function toggleFinSection(bodyId, arrowId) {
             const body = document.getElementById(bodyId);
             const arrow = document.getElementById(arrowId);
@@ -3755,7 +3762,7 @@
             var sP = document.getElementById('finStockPanel');
             if (!aP || !sP) return;
             if (tab === 'analysis') {
-                aP.style.display = 'flex';
+                aP.style.display = window.innerWidth >= 1024 ? 'grid' : 'flex';
                 sP.style.display = 'none';
             } else {
                 aP.style.display = 'none';
@@ -4186,7 +4193,7 @@
         });
     }
     </script>
-    <!-- What's New Sheet (v5.0.8) -->
+    <!-- What's New Sheet (v5.0.9) -->
     <div id="whatsNewSheet" onclick="if(event.target===this)closeWhatsNew()" style="position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;transition:opacity 0.3s,visibility 0.3s;">
         <div id="whatsNewBox" style="background:var(--surface);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:8px 22px 0;transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.2,0,0,1);">
             <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;"></div>
@@ -4195,7 +4202,7 @@
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </div>
                 <div>
-                    <div style="font-family:'Quicksand',sans-serif;font-size:19px;font-weight:800;color:var(--text);">What's New — v5.0.8</div>
+                    <div style="font-family:'Quicksand',sans-serif;font-size:19px;font-weight:800;color:var(--text);">What's New — v5.0.9</div>
                     <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">My Day Matcha has been updated</div>
                 </div>
             </div>
@@ -4247,6 +4254,45 @@
     </div>
 
     <!-- Drink Picker Sheet -->
+    <!-- Add Expense Modal -->
+    <div id="addExpenseModal" class="oem-overlay" onclick="if(event.target===this)_closeAddExpenseModal()">
+        <div class="oem-sheet" style="max-width:480px;">
+            <div class="oem-handle"></div>
+            <div class="oem-header">
+                <div class="oem-title">Add Expense</div>
+                <button class="oem-close" onclick="_closeAddExpenseModal()">&times;</button>
+            </div>
+            <div class="oem-body" style="padding:14px 20px 4px; overflow-y:auto;">
+                <div class="form-group">
+                    <label class="form-label">Item / Ingredient Name</label>
+                    <input id="invItem" class="form-input" placeholder="e.g., Matcha Powder, Milk, Cups…" autocomplete="off">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label class="form-label">Unit / Size</label>
+                        <input id="invUnit" class="form-input" placeholder="e.g., 1 kg" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Qty Bought</label>
+                        <input id="invAmount" type="number" inputmode="numeric" class="form-input" placeholder="e.g., 2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Total Cost (KHR)</label>
+                    <input id="invCost" type="number" inputmode="numeric" class="form-input" placeholder="0">
+                </div>
+                <div id="pendingInvList" style="display:flex; flex-direction:column; gap:8px; max-height:180px; overflow-y:auto; padding-right:2px; margin-top:2px;"></div>
+            </div>
+            <div class="oem-footer">
+                <button class="oem-footer-close" onclick="_closeAddExpenseModal()">Cancel</button>
+                <button class="oem-footer-confirm" onclick="addPendingInventory()" id="aeAddBtn">+ Add to List</button>
+            </div>
+            <div style="padding:0 20px 16px;">
+                <button id="btnSaveInv" class="btn btn-confirm" style="width:100%; display:none; background:#2E7D32; font-size:13px;" onclick="saveInventory()">Save All Records</button>
+            </div>
+        </div>
+    </div>
+
     <div id="drinkPickerOverlay" class="dp-overlay" onclick="if(event.target===this)closeDrinkPicker()">
         <div class="dp-sheet">
             <div class="dp-handle" style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 0;flex-shrink:0;"></div>
