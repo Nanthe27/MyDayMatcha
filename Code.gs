@@ -1,7 +1,7 @@
 var SHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
 function doGet(e) {
   // Guard for manual test-runs from the Apps Script editor (no HTTP event object)
-  if (!e || !e.parameter) return ContentService.createTextOutput('My Day Matcha API — OK').setMimeType(ContentService.MimeType.TEXT);
+  if (!e || !e.parameter) return ContentService.createTextOutput('So-A API — OK').setMimeType(ContentService.MimeType.TEXT);
   var action = e.parameter.action;
   if (action == 'get_users') {
     var sheet = getOrCreateSheet("Users", ["Name", "Pin"]);
@@ -112,27 +112,22 @@ function doGet(e) {
     }
     return ContentService.createTextOutput(JSON.stringify({ sales: totalSales, cost: totalInvCost })).setMimeType(ContentService.MimeType.JSON);
   }
-
-  // --- Face ID: return stored credential status for a specific user ---
-  if (action == 'get_faceid_status') {
-    var user = e.parameter.user;
-    if (!user) return ContentService.createTextOutput(JSON.stringify({enabled: false, credentialId: ''})).setMimeType(ContentService.MimeType.JSON);
-    var ss = SpreadsheetApp.openById(SHEET_ID);
-    var sheet = ss.getSheetByName("Users");
-    if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify({enabled: false, credentialId: ''})).setMimeType(ContentService.MimeType.JSON);
+  if (action == 'get_rates') {
+    var sheet = getOrCreateSheet("Config", ["Key", "Value"]);
     var lastRow = sheet.getLastRow();
-    var numCols = Math.max(sheet.getLastColumn(), 4);
-    var users = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
-    for (var i = 0; i < users.length; i++) {
-      if (String(users[i][0]).trim() === user.trim()) {
-        return ContentService.createTextOutput(JSON.stringify({
-          enabled: String(users[i][2] || '').trim() === 'Yes',
-          credentialId: String(users[i][3] || '').trim()
-        })).setMimeType(ContentService.MimeType.JSON);
-      }
+    if (lastRow < 2) {
+      sheet.getRange(2, 1, 2, 2).setValues([["usd_rate", "4000"], ["thb_rate", "10000"]]);
+      lastRow = 3;
     }
-    return ContentService.createTextOutput(JSON.stringify({enabled: false, credentialId: ''})).setMimeType(ContentService.MimeType.JSON);
+    var data = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
+    var rates = { usd_rate: 4000, thb_rate: 10000 };
+    for (var i = 0; i < data.length; i++) {
+      if (data[i][0] === "usd_rate") rates.usd_rate = parseFloat(data[i][1]) || 4000;
+      if (data[i][0] === "thb_rate") rates.thb_rate = parseFloat(data[i][1]) || 10000;
+    }
+    return ContentService.createTextOutput(JSON.stringify(rates)).setMimeType(ContentService.MimeType.JSON);
   }
+
 }
 function doPost(e) {
   try {
@@ -160,26 +155,7 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": "Invalid username or PIN"})).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // --- Face ID: save or clear the WebAuthn credential ID for a user ---
-    // Stores result in Users sheet columns 3 (FaceID_Enabled) and 4 (CredentialID)
-    if (data.action === 'save_faceid') {
-      var username = String(data.user || '').trim();
-      if (!username) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Missing user'})).setMimeType(ContentService.MimeType.JSON);
-      var ss = SpreadsheetApp.openById(SHEET_ID);
-      var sheet = ss.getSheetByName("Users");
-      if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Users sheet not found'})).setMimeType(ContentService.MimeType.JSON);
-      var lastRow = sheet.getLastRow();
-      var users = sheet.getRange(2, 1, lastRow - 1, 2).getValues();
-      for (var i = 0; i < users.length; i++) {
-        if (String(users[i][0]).trim() === username) {
-          // Write FaceID_Enabled (col 3) and CredentialID (col 4)
-          sheet.getRange(i + 2, 3).setValue(data.enabled ? 'Yes' : 'No');
-          sheet.getRange(i + 2, 4).setValue(data.enabled && data.credentialId ? String(data.credentialId) : '');
-          return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({status:'error', message:'User not found'})).setMimeType(ContentService.MimeType.JSON);
-    }
+
 
     // --- Update user profile: write Image_URL (col 5) for a user ---
     if (data.action === 'update_user_profile') {
@@ -199,33 +175,7 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({status:'error', message:'User not found'})).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // --- Face ID: verify login by matching the credential ID stored for this user ---
-    // The device OS has already verified the biometric; GAS checks the credential ID matches
-    if (data.action === 'faceid_login') {
-      var username = String(data.user || '').trim();
-      var credId = String(data.credentialId || '').trim();
-      if (!username || !credId) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Missing credentials'})).setMimeType(ContentService.MimeType.JSON);
-      var ss = SpreadsheetApp.openById(SHEET_ID);
-      var sheet = ss.getSheetByName("Users");
-      if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Users sheet not found'})).setMimeType(ContentService.MimeType.JSON);
-      var lastRow = sheet.getLastRow();
-      var numCols = Math.max(sheet.getLastColumn(), 4);
-      var users = sheet.getRange(2, 1, lastRow - 1, numCols).getValues();
-      for (var i = 0; i < users.length; i++) {
-        if (String(users[i][0]).trim() === username) {
-          var faceEnabled = String(users[i][2] || '').trim() === 'Yes';
-          var storedCred = String(users[i][3] || '').trim();
-          if (!faceEnabled || !storedCred) {
-            return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Face ID not enabled'})).setMimeType(ContentService.MimeType.JSON);
-          }
-          if (storedCred === credId) {
-            return ContentService.createTextOutput(JSON.stringify({status:'success'})).setMimeType(ContentService.MimeType.JSON);
-          }
-          return ContentService.createTextOutput(JSON.stringify({status:'error', message:'Credential mismatch'})).setMimeType(ContentService.MimeType.JSON);
-        }
-      }
-      return ContentService.createTextOutput(JSON.stringify({status:'error', message:'User not found'})).setMimeType(ContentService.MimeType.JSON);
-    }
+
 
     if (data.action === 'save_inventory') {
       var monthSheetName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy") + "_Inv";
@@ -431,6 +381,31 @@ function doPost(e) {
     sheet.getRange(finalRow, 7).setFormula("=SUM(G2:G" + lastDataRow + ")").setFontWeight("bold");
     sheet.getRange(finalRow, 8).setFormula("=SUM(H2:H" + lastDataRow + ")").setFontWeight("bold");
     sheet.getRange(finalRow, 9).setFormula("=SUM(I2:I" + lastDataRow + ")").setFontWeight("bold");
+    if (data.action === 'save_rates') {
+      var sheet = getOrCreateSheet("Config", ["Key", "Value"]);
+      var lastRow = sheet.getLastRow();
+      if (lastRow < 2) {
+        sheet.getRange(2, 1, 2, 2).setValues([["usd_rate", "4000"], ["thb_rate", "10000"]]);
+        lastRow = 3;
+      }
+      var range = sheet.getRange(2, 1, lastRow - 1, 2);
+      var values = range.getValues();
+      var usdFound = false, thbFound = false;
+      for (var i = 0; i < values.length; i++) {
+        if (values[i][0] === "usd_rate") {
+          values[i][1] = String(data.usd_rate);
+          usdFound = true;
+        }
+        if (values[i][0] === "thb_rate") {
+          values[i][1] = String(data.thb_rate);
+          thbFound = true;
+        }
+      }
+      range.setValues(values);
+      if (!usdFound) sheet.appendRow(["usd_rate", String(data.usd_rate)]);
+      if (!thbFound) sheet.appendRow(["thb_rate", String(data.thb_rate)]);
+      return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
+    }
     return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
@@ -445,7 +420,7 @@ function getOrCreateSheet(name, headers) {
 }
 
 // ============================================================
-// TELEGRAM DAILY REPORT — My Day Matcha
+// TELEGRAM DAILY REPORT — So-A
 // ============================================================
 // Store secrets in: Apps Script > Project Settings > Script Properties
 // Add: TELEGRAM_TOKEN = <your bot token>  |  TELEGRAM_CHAT_ID = <your chat id>
@@ -539,18 +514,18 @@ function sendDailyReport() {
   var msg;
 
   if (orders.length === 0) {
-    msg = "🍵 Looks like we're on a day off today, Goodnight. 🌙";
+    msg = "Looks like we're on a day off today, Goodnight.";
   } else {
     var s = sumOrders_(orders);
-    msg = "🍵 <b>Sell day</b>\n\n"
-        + "Goodnight My Beautiful owner 🌙\n"
+    msg = "<b>Sell day</b>\n\n"
+        + "Goodnight My Beautiful owner\n"
         + "Here is your report of the day,\n\n"
-        + "📅 <b>Date:</b> " + today + "\n"
-        + "🧋 <b>Drinks sell:</b> " + s.drinks + " cups\n"
-        + "💰 <b>Income:</b> " + fmtKHR_(s.income) + "\n"
-        + "📦 <b>Cost:</b> " + fmtKHR_(s.cost) + "\n"
-        + "✨ <b>Profit:</b> " + fmtKHR_(s.profit) + "\n\n"
-        + "<i>⚠️ Note: Day's Net Profit is NOT Monthly Actual Profit</i>";
+        + "<b>Date:</b> " + today + "\n"
+        + "<b>Drinks sell:</b> " + s.drinks + " cups\n"
+        + "<b>Income:</b> " + fmtKHR_(s.income) + "\n"
+        + "<b>Cost:</b> " + fmtKHR_(s.cost) + "\n"
+        + "<b>Profit:</b> " + fmtKHR_(s.profit) + "\n\n"
+        + "<i>Note: Day's Net Profit is NOT Monthly Actual Profit</i>";
   }
   sendTelegram_(msg);
 }
@@ -563,14 +538,14 @@ function sendLateReport() {
   if (orders.length === 0) return; // Nothing to report — stay quiet
 
   var s   = sumOrders_(orders);
-  var msg = "⏰ <b>Looks like someone forgot to do Homework.</b>\n\n"
+  var msg = "<b>Looks like someone forgot to do Homework.</b>\n\n"
           + "Here is your late report of the day,\n\n"
-          + "📅 <b>Date:</b> " + yStr + "\n"
-          + "🧋 <b>Drinks sell:</b> " + s.drinks + " cups\n"
-          + "💰 <b>Income:</b> " + fmtKHR_(s.income) + "\n"
-          + "📦 <b>Cost:</b> " + fmtKHR_(s.cost) + "\n"
-          + "✨ <b>Profit:</b> " + fmtKHR_(s.profit) + "\n\n"
-          + "<i>⚠️ Note: Day's Net Profit is NOT Monthly Actual Profit</i>";
+          + "<b>Date:</b> " + yStr + "\n"
+          + "<b>Drinks sell:</b> " + s.drinks + " cups\n"
+          + "<b>Income:</b> " + fmtKHR_(s.income) + "\n"
+          + "<b>Cost:</b> " + fmtKHR_(s.cost) + "\n"
+          + "<b>Profit:</b> " + fmtKHR_(s.profit) + "\n\n"
+          + "<i>Note: Day's Net Profit is NOT Monthly Actual Profit</i>";
   sendTelegram_(msg);
 }
 
