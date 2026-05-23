@@ -1849,7 +1849,14 @@
                     <div class="setting-divider"></div>
                     <div class="setting-card" onclick="openStock()">
                         <div class="setting-icon" style="background:#34aadc"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
-                        <div class="setting-label">Stock Management</div>
+                        <div class="setting-label">Inventory & Stock</div>
+                        <div class="setting-val">›</div>
+                    </div>
+                    
+                    <div class="setting-divider"></div>
+                    <div class="setting-card" onclick="openOpex()">
+                        <div class="setting-icon" style="background:#ff3b30"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="8" y1="12" x2="8" y2="16"/><line x1="16" y1="12" x2="16" y2="16"/></svg></div>
+                        <div class="setting-label">Operating Expenses</div>
                         <div class="setting-val">›</div>
                     </div>
 
@@ -2114,6 +2121,45 @@
                 </div>
 
             </div><!-- end finStockPanel -->
+            
+            <!-- Operating Expenses Panel -->
+            <div id="finOpexPanel" class="fin-panel" style="display:none; max-width: 680px; margin: 0 auto;">
+
+                <!-- Monthly summary banner -->
+                <div class="fstock-summary-card">
+                    <div class="fstock-summary-item">
+                        <div class="fstock-summary-label">Total Bills Paid</div>
+                        <div class="fstock-summary-val" id="opexSummaryItems">—</div>
+                    </div>
+                    <div class="fstock-summary-divider"></div>
+                    <div class="fstock-summary-item">
+                        <div class="fstock-summary-label">Total Operating Expenses</div>
+                        <div class="fstock-summary-val fstock-spending" id="opexSummarySpend">0 KHR</div>
+                    </div>
+                </div>
+
+                <!-- Add Expense button -->
+                <button class="fstock-add-btn" onclick="_openAddOpexModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    Add Operating Expense
+                </button>
+
+                <!-- Purchase history -->
+                <div class="dashboard-card" style="padding:0; overflow:hidden;">
+                    <div class="fin-card-header">
+                        <div style="font-size:11px; font-weight:800; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase;">Expense History</div>
+                        <div id="opexMonthLabel" style="font-size:11px; font-weight:700; color:var(--text-muted);"></div>
+                    </div>
+                    <div class="fin-card-body" style="padding-top:10px;">
+                        <div class="day-date-scroll-wrap" id="opexDateScrollWrap" style="margin-bottom:10px; display:none;">
+                            <div id="opexDateScroll" class="day-date-scroll"></div>
+                        </div>
+                        <div id="opexDailyTotal" style="display:none; text-align:right; font-size:11px; font-weight:700; color:#FF3B30; margin-bottom:10px; letter-spacing:0.3px;"></div>
+                        <div id="opexList"></div>
+                    </div>
+                </div>
+
+            </div><!-- end finOpexPanel -->
 
         </div>
     </div>
@@ -4191,9 +4237,9 @@
             const dash = document.getElementById('invDashboard');
 
             const cachedInv = localStorage.getItem('myday_inv_' + mk);
-            const cachedHist = localStorage.getItem('myday_history_' + mk);
-            if (cachedInv && cachedHist) {
-                _renderFinView(JSON.parse(cachedInv), JSON.parse(cachedHist));
+            const cachedOpex = localStorage.getItem('myday_opex_' + mk);
+            if (cachedInv && cachedHist && cachedOpex) {
+                _renderFinView(JSON.parse(cachedInv), JSON.parse(cachedHist), JSON.parse(cachedOpex));
                 fetchAndRenderTrendChart();
             } else {
                 list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">Loading...</div>';
@@ -4202,11 +4248,13 @@
 
             Promise.all([
                 fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + mk).then(r => r.json()),
-                fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json())
-            ]).then(([invData, histData]) => {
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + mk).then(r => r.json()),
+                fetch(GOOGLE_SCRIPT_URL + '?action=get_opex&month=' + mk).then(r => r.json()).catch(() => [])
+            ]).then(([invData, histData, opexData]) => {
                 localStorage.setItem('myday_inv_' + mk, JSON.stringify(invData));
                 localStorage.setItem('myday_history_' + mk, JSON.stringify(histData));
-                _renderFinView(invData, histData);
+                localStorage.setItem('myday_opex_' + mk, JSON.stringify(opexData));
+                _renderFinView(invData, histData, opexData);
                 fetchAndRenderTrendChart();
             }).catch(e => {
                 if (!cachedInv) {
@@ -4217,22 +4265,25 @@
             });
         }
 
-        function _renderFinView(invData, histData) {
+        function _renderFinView(invData, histData, opexData) {
             const dash = document.getElementById('invDashboard');
             let totalInvCost = 0;
             if (invData.length > 0) invData.forEach(log => { totalInvCost += Number(log.cost); });
+            let totalOpexCost = 0;
+            if (opexData && opexData.length > 0) opexData.forEach(log => { totalOpexCost += Number(log.cost); });
 
             let totalSales = 0;
             if (histData.length > 0) histData.forEach(item => { totalSales += Number(item.price); });
 
-            let realProfit = totalSales - totalInvCost;
-            let totalCombined = totalSales + totalInvCost;
+            let realProfit = totalSales - totalInvCost - totalOpexCost;
+            let totalCost = totalInvCost + totalOpexCost;
+            let totalCombined = totalSales + totalCost;
             let salesPct = totalCombined > 0 ? Math.round((totalSales / totalCombined) * 100) : 50;
-            let expPct = totalCombined > 0 ? Math.round((totalInvCost / totalCombined) * 100) : 50;
+            let expPct = totalCombined > 0 ? Math.round((totalCost / totalCombined) * 100) : 50;
             let profitColor = realProfit >= 0 ? "var(--primary)" : "#FF3B30";
 
             document.getElementById('dashSales').innerText = '+' + totalSales.toLocaleString() + ' KHR';
-            document.getElementById('dashCost').innerText = '-' + totalInvCost.toLocaleString() + ' KHR';
+            document.getElementById('dashCost').innerText = '-' + totalCost.toLocaleString() + ' KHR';
             const dProfit = document.getElementById('dashProfit');
             dProfit.innerText = (realProfit >= 0 ? '+' : '') + realProfit.toLocaleString() + ' KHR';
             dProfit.style.color = profitColor;
@@ -4360,6 +4411,10 @@
 
         function _openAddExpenseModal() {
             document.getElementById('addExpenseModal').classList.add('open');
+            document.querySelector('#addExpenseModal .oem-title').innerText = "Add Expense";
+            document.getElementById('invItem').placeholder = "e.g., Matcha Powder, Milk, Cups…";
+            document.getElementById('aeAddBtn').onclick = addPendingInventory;
+            document.getElementById('btnSaveInv').onclick = saveInventory;
             setTimeout(() => { const el = document.getElementById('invItem'); if (el) el.focus(); }, 320);
         }
         function _closeAddExpenseModal() {
@@ -4377,19 +4432,25 @@
         function switchFinView(tab) {
             var aP = document.getElementById('finAnalysisPanel');
             var sP = document.getElementById('finStockPanel');
-            if (!aP || !sP) return;
+            var oP = document.getElementById('finOpexPanel');
+            if (!aP || !sP || !oP) return;
             if (tab === 'analysis') {
                 aP.style.display = window.innerWidth >= 1024 ? 'grid' : 'flex';
                 sP.style.display = 'none';
+                oP.style.display = 'none';
+            } else if (tab === 'opex') {
+                aP.style.display = 'none';
+                sP.style.display = 'none';
+                oP.style.display = 'flex';
             } else {
                 aP.style.display = 'none';
                 sP.style.display = 'flex';
+                oP.style.display = 'none';
                 var recBody = document.getElementById('recentPurchasesBody');
                 var recArrow = document.getElementById('recentPurchasesArrow');
                 var addBody = document.getElementById('addExpenseBody');
                 var addArrow = document.getElementById('addExpenseArrow');
                 if (recBody && !recBody.classList.contains('open')) { recBody.classList.add('open'); if (recArrow) recArrow.classList.add('open'); }
-                // On desktop open Add Expense too
                 if (window.innerWidth >= 1024 && addBody && !addBody.classList.contains('open')) { addBody.classList.add('open'); if (addArrow) addArrow.classList.add('open'); }
             }
         }
@@ -4407,8 +4468,10 @@
             const chartData = months.map(m => {
                 const inv = localStorage.getItem('myday_inv_' + m.key);
                 const hist = localStorage.getItem('myday_history_' + m.key);
+                const opex = localStorage.getItem('myday_opex_' + m.key);
                 if (inv && hist) {
-                    const cost = JSON.parse(inv).reduce((s, x) => s + Number(x.cost || 0), 0);
+                    let cost = JSON.parse(inv).reduce((s, x) => s + Number(x.cost || 0), 0);
+                    if (opex) cost += JSON.parse(opex).reduce((s, x) => s + Number(x.cost || 0), 0);
                     const sales = JSON.parse(hist).reduce((s, x) => s + Number(x.price || 0), 0);
                     return { label: m.label, cost, profit: sales - cost, pending: false };
                 }
@@ -4425,11 +4488,14 @@
                 const m = months[i];
                 return Promise.all([
                     fetch(GOOGLE_SCRIPT_URL + '?action=get_inventory&month=' + m.key).then(r => r.json()).catch(() => []),
-                    fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + m.key).then(r => r.json()).catch(() => [])
-                ]).then(([inv, hist]) => {
+                    fetch(GOOGLE_SCRIPT_URL + '?action=get_history&month=' + m.key).then(r => r.json()).catch(() => []),
+                    fetch(GOOGLE_SCRIPT_URL + '?action=get_opex&month=' + m.key).then(r => r.json()).catch(() => [])
+                ]).then(([inv, hist, opexData]) => {
                     localStorage.setItem('myday_inv_' + m.key, JSON.stringify(inv));
                     localStorage.setItem('myday_history_' + m.key, JSON.stringify(hist));
-                    const cost = inv.reduce((s, x) => s + Number(x.cost || 0), 0);
+                    localStorage.setItem('myday_opex_' + m.key, JSON.stringify(opexData));
+                    let cost = inv.reduce((s, x) => s + Number(x.cost || 0), 0);
+                    if (opexData) cost += opexData.reduce((s, x) => s + Number(x.cost || 0), 0);
                     const sales = hist.reduce((s, x) => s + Number(x.price || 0), 0);
                     chartData[i] = { label: m.label, cost, profit: sales - cost, pending: false };
                 });
@@ -4498,10 +4564,12 @@
                 .then(data => {
                     let sales = data.sales || 0;
                     let cost = data.cost || 0;
-                    let profit = sales - cost;
+                    let opex = data.opex || 0;
+                    let totalCost = cost + opex;
+                    let profit = sales - totalCost;
 
                     document.getElementById('atSales').innerText = '+' + sales.toLocaleString() + ' KHR';
-                    document.getElementById('atCost').innerText = '-' + cost.toLocaleString() + ' KHR';
+                    document.getElementById('atCost').innerText = '-' + totalCost.toLocaleString() + ' KHR';
                     
                     let pEl = document.getElementById('atProfit');
                     pEl.innerText = (profit >= 0 ? '+' : '') + profit.toLocaleString() + ' KHR';
@@ -4882,7 +4950,224 @@
                 .catch(() => {});
         }
 
+        // --- OPEX Logic ---
+        function openOpex() {
+            switchFinView('opex');
+            document.getElementById('inventoryPage').classList.add('open');
+            document.getElementById('finPageTitle').innerText = 'Operating Expenses';
+            document.getElementById('settingsPanel').classList.remove('open');
+            fetchOpexAndStats();
+        }
+
+        function fetchOpexAndStats() {
+            const mk = fmtMonthKey(finMonthDate);
+            const atCurrent = isCurrentMonth(finMonthDate);
+
+            const opexLabel = document.getElementById('opexMonthLabel');
+            if (opexLabel) opexLabel.innerText = atCurrent ? 'This Month' : fmtMonthLabel(finMonthDate);
+
+            const list = document.getElementById('opexList');
+            const cachedOpex = localStorage.getItem('myday_opex_' + mk);
+            
+            if (cachedOpex) {
+                _renderOpexByDate(JSON.parse(cachedOpex));
+            } else {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">Loading...</div>';
+            }
+
+            fetch(GOOGLE_SCRIPT_URL + '?action=get_opex&month=' + mk)
+                .then(r => r.json())
+                .then(data => {
+                    localStorage.setItem('myday_opex_' + mk, JSON.stringify(data));
+                    _renderOpexByDate(data);
+                }).catch(e => {
+                    if (!cachedOpex) list.innerHTML = '<div style="text-align:center; color:red;">Connection Error</div>';
+                });
+        }
+
+        window._opexByDate = {};
+        function _renderOpexByDate(opexData) {
+            const scrollWrap = document.getElementById('opexDateScrollWrap');
+            const scrollEl   = document.getElementById('opexDateScroll');
+            const listEl     = document.getElementById('opexList');
+            const totalEl    = document.getElementById('opexDailyTotal');
+            if (!listEl) return;
+
+            const sumItems = document.getElementById('opexSummaryItems');
+            const sumSpend = document.getElementById('opexSummarySpend');
+            if (sumItems && sumSpend) {
+                if (!opexData || opexData.length === 0) {
+                    sumItems.textContent = '0 bills';
+                    sumSpend.textContent = '0 KHR';
+                } else {
+                    const totalCost = opexData.reduce((s, l) => s + Number(l.cost), 0);
+                    sumItems.textContent = opexData.length + (opexData.length === 1 ? ' bill' : ' bills') + ' paid';
+                    sumSpend.textContent = totalCost.toLocaleString() + ' KHR';
+                }
+            }
+
+            if (!opexData || opexData.length === 0) {
+                if (scrollWrap) scrollWrap.style.display = 'none';
+                if (totalEl) totalEl.style.display = 'none';
+                listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px; font-weight:500;">No expenses this month.</div>';
+                return;
+            }
+
+            const byDate = {};
+            opexData.forEach(log => {
+                const d = log.date;
+                if (!byDate[d]) byDate[d] = [];
+                byDate[d].push(log);
+            });
+            window._opexByDate = byDate;
+            const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
+            if (scrollEl) {
+                scrollEl.innerHTML = dates.map((d, i) =>
+                    `<div class="day-date-pill${i === 0 ? ' selected' : ''}" onclick="_onOpexDatePillClick('${d}')">${d}</div>`
+                ).join('');
+                const first = scrollEl.querySelector('.selected');
+                if (first) first.scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'instant' });
+            }
+            if (scrollWrap) scrollWrap.style.display = 'block';
+            _renderOpexForDate(dates[0]);
+        }
+
+        function _onOpexDatePillClick(date) {
+            const scrollEl = document.getElementById('opexDateScroll');
+            if (scrollEl) {
+                scrollEl.querySelectorAll('.day-date-pill').forEach(p => {
+                    p.classList.toggle('selected', p.getAttribute('onclick') === `_onOpexDatePillClick('${date}')`);
+                });
+            }
+            _renderOpexForDate(date);
+        }
+
+        function _renderOpexForDate(date) {
+            const listEl  = document.getElementById('opexList');
+            const totalEl = document.getElementById('opexDailyTotal');
+            if (!listEl) return;
+            const records = window._opexByDate[date];
+            if (!records || records.length === 0) {
+                listEl.innerHTML = '';
+                if (totalEl) totalEl.style.display = 'none';
+                return;
+            }
+
+            let dailyCost = 0;
+            const frag = document.createDocumentFragment();
+            records.forEach(log => {
+                dailyCost += Number(log.cost);
+                const div = document.createElement('div');
+                div.className = 'fin-inv-card';
+                const logStr = encodeURIComponent(JSON.stringify(log));
+                div.innerHTML = `
+                    <div class="fin-inv-meta">
+                        <span>${log.time} · <span style="opacity:0.75;">${log.user}</span></span>
+                        <div class="fin-inv-actions">
+                            <button class="fin-action-btn delete" onclick="confirmDeleteOpex('${logStr}')">Del</button>
+                        </div>
+                    </div>
+                    <div class="fin-inv-body">
+                        <div>
+                            <div class="fin-inv-name">${log.item}</div>
+                            <div class="fin-inv-qty">${log.qty}</div>
+                        </div>
+                        <div class="fin-inv-cost">-${Number(log.cost).toLocaleString()} KHR</div>
+                    </div>`;
+                frag.appendChild(div);
+            });
+            listEl.innerHTML = '';
+            listEl.appendChild(frag);
+            if (totalEl) {
+                totalEl.innerText = `Day total: -${dailyCost.toLocaleString()} KHR`;
+                totalEl.style.display = 'block';
+            }
+        }
+
+        function _openAddOpexModal() {
+            // we will reuse addExpenseModal but override the save button logic
+            document.getElementById('addExpenseModal').classList.add('open');
+            document.querySelector('#addExpenseModal .oem-title').innerText = "Add Operating Expense";
+            document.getElementById('invItem').placeholder = "e.g., Electricity, Rent, Water...";
+            
+            // Override save logic for OPEX
+            const addBtn = document.getElementById('aeAddBtn');
+            addBtn.onclick = addPendingOpex;
+            
+            const saveBtn = document.getElementById('btnSaveInv');
+            saveBtn.onclick = saveOpex;
+            
+            setTimeout(() => { const el = document.getElementById('invItem'); if (el) el.focus(); }, 320);
+        }
+        
+        let pendingOpex = [];
+        function addPendingOpex() {
+            const item = document.getElementById('invItem').value.trim();
+            const unit = document.getElementById('invUnit').value.trim();
+            const amt = document.getElementById('invAmount').value.trim() || '1';
+            const cost = parseInt(document.getElementById('invCost').value) || 0;
+            if(!item || cost <= 0) { openModal('ERROR', 'Enter valid name and cost.', null, 'CLOSE'); return; }
+            pendingOpex.push({ item: item, qty: amt + ' ' + unit, cost: cost });
+            document.getElementById('invItem').value = '';
+            document.getElementById('invUnit').value = '';
+            document.getElementById('invAmount').value = '';
+            document.getElementById('invCost').value = '';
+            renderPendingOpex();
+            document.getElementById('invItem').focus();
+        }
+
+        function renderPendingOpex() {
+            const list = document.getElementById('pendingInvList');
+            const saveBtn = document.getElementById('btnSaveInv');
+            list.innerHTML = '';
+            if(pendingOpex.length === 0) { saveBtn.style.display = 'none'; return; }
+            pendingOpex.forEach((p, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; background:var(--surface); padding:8px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px;';
+                row.innerHTML = `<div><div style="font-weight:700;">${p.item}</div><div style="color:var(--text-muted); font-size:11px;">${p.qty}</div></div><div style="display:flex;align-items:center;gap:12px;"><div style="font-weight:700;">${p.cost.toLocaleString()}៛</div><button style="background:none;border:none;color:#FF3B30;font-size:16px;cursor:pointer;" onclick="pendingOpex.splice(${idx},1);renderPendingOpex();">×</button></div>`;
+                list.appendChild(row);
+            });
+            saveBtn.style.display = 'block';
+        }
+
+        function saveOpex() {
+            if(pendingOpex.length === 0) return;
+            const saveBtn = document.getElementById('btnSaveInv');
+            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'save_opex', user: deviceName, items: pendingOpex })
+            }).then(res => res.json()).then(data => {
+                pendingOpex = [];
+                renderPendingOpex();
+                _closeAddExpenseModal();
+                fetchOpexAndStats();
+                // Restore button for inventory
+                saveBtn.onclick = saveInventory;
+            }).catch(e => {
+                if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save All Records'; }
+                openModal('ERROR', 'Failed to save expense.', null, 'CLOSE');
+            });
+        }
+        
+        function confirmDeleteOpex(logStr) {
+            const log = JSON.parse(decodeURIComponent(logStr));
+            openModal('DELETE EXPENSE', `Delete "${log.item}" (-${Number(log.cost).toLocaleString()} KHR)?`, () => deleteOpex(logStr), 'CANCEL');
+        }
+        function deleteOpex(logStr) {
+            const log = JSON.parse(decodeURIComponent(logStr));
+            closeModal();
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'delete_opex', date: log.date, time: log.time, item: log.item, month: fmtMonthKey(finMonthDate) })
+            }).then(r => r.json()).then(() => { fetchOpexAndStats(); });
+        }
+
     /* ── PWA: Register Service Worker ── */
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js', { scope: './' })
