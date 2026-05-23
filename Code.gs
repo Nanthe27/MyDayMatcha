@@ -88,29 +88,57 @@ function doGet(e) {
     }
     return ContentService.createTextOutput(JSON.stringify(inv.reverse())).setMimeType(ContentService.MimeType.JSON);
   }
+  if (action == 'get_opex') {
+    var monthParam = e.parameter.month;
+    var monthSheetName = (monthParam || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy")) + "_Opex";
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = ss.getSheetByName(monthSheetName);
+    if (!sheet || sheet.getLastRow() < 2) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+
+    var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getValues();
+    var displayValues = sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getDisplayValues();
+
+    var opex = [];
+    for (var i = 0; i < values.length; i++) {
+      if (values[i][0] === "TOTALS") continue;
+      opex.push({
+          date: displayValues[i][0],
+          time: displayValues[i][1],
+          user: displayValues[i][2],
+          item: displayValues[i][3],
+          qty: displayValues[i][4],
+          cost: values[i][5]
+      });
+    }
+    return ContentService.createTextOutput(JSON.stringify(opex.reverse())).setMimeType(ContentService.MimeType.JSON);
+  }
   if (action == 'get_all_time_stats') {
     var ss = SpreadsheetApp.openById(SHEET_ID);
     var sheets = ss.getSheets();
     var totalSales = 0;
     var totalInvCost = 0;
+    var totalOpexCost = 0;
     for (var i = 0; i < sheets.length; i++) {
       var sheet = sheets[i];
       var sheetName = sheet.getName();
 
       var isInv = sheetName.endsWith("_Inv");
+      var isOpex = sheetName.endsWith("_Opex");
       var isSales = /^[A-Z][a-z]{2}_\d{4}$/.test(sheetName);
-      if (!isInv && !isSales) continue;
+      if (!isInv && !isSales && !isOpex) continue;
       var lastRow = sheet.getLastRow();
       if (lastRow < 2) continue;
       var lastRowTotal = parseFloat(sheet.getRange(lastRow, 6).getValue()) || 0;
 
       if (isInv) {
         totalInvCost += lastRowTotal;
+      } else if (isOpex) {
+        totalOpexCost += lastRowTotal;
       } else {
         totalSales += lastRowTotal;
       }
     }
-    return ContentService.createTextOutput(JSON.stringify({ sales: totalSales, cost: totalInvCost })).setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({ sales: totalSales, cost: totalInvCost, opex: totalOpexCost })).setMimeType(ContentService.MimeType.JSON);
   }
   if (action == 'get_rates') {
     var sheet = getOrCreateSheet("Config", ["Key", "Value"]);
@@ -232,6 +260,63 @@ function doPost(e) {
       }
       return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
     }
+    
+    if (data.action === 'save_opex') {
+      var monthSheetName = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy") + "_Opex";
+      var sheet = getOrCreateSheet(monthSheetName, ["Date", "Time", "User", "Expense", "Quantity", "Cost"]);
+
+      var lastRow = sheet.getLastRow();
+      if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") sheet.deleteRow(lastRow);
+      var time = new Date().toLocaleTimeString('en-GB');
+      var date = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy");
+
+      if (data.items && data.items.length > 0) {
+        var newRows = [];
+        data.items.forEach(function(i) {
+          newRows.push([date, time, data.user, i.item, i.qty, i.cost]);
+        });
+        sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, 6).setValues(newRows);
+      }
+      var finalRow = sheet.getLastRow() + 1;
+      var lastDataRow = finalRow - 1;
+      sheet.getRange(finalRow, 1).setValue("TOTALS").setFontWeight("bold");
+      sheet.getRange(finalRow, 6).setFormula("=SUM(F2:F" + lastDataRow + ")").setFontWeight("bold");
+      return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
+    }
+    if (data.action === 'edit_opex') {
+      var monthSheetName = (data.month || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy")) + "_Opex";
+      var sheet = getOrCreateSheet(monthSheetName, ["Date", "Time", "User", "Expense", "Quantity", "Cost"]);
+      var displayValues = sheet.getDataRange().getDisplayValues();
+      for (var i = 1; i < displayValues.length; i++) {
+        if (displayValues[i][0] == data.old_date && displayValues[i][1] == data.old_time && displayValues[i][3] == data.old_item) {
+          sheet.getRange(i + 1, 4, 1, 3).setValues([[data.new_item, data.new_qty, data.new_cost]]);
+          var lastRow = sheet.getLastRow();
+          if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") {
+              sheet.getRange(lastRow, 6).setFormula("=SUM(F2:F" + (lastRow - 1) + ")");
+          }
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
+    }
+    if (data.action === 'delete_opex') {
+      var monthSheetName = (data.month || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "MMM_yyyy")) + "_Opex";
+      var sheet = getOrCreateSheet(monthSheetName, ["Date", "Time", "User", "Expense", "Quantity", "Cost"]);
+      var displayValues = sheet.getDataRange().getDisplayValues();
+      for (var i = 1; i < displayValues.length; i++) {
+        if (displayValues[i][0] == data.date && displayValues[i][1] == data.time && displayValues[i][3] == data.item) {
+          sheet.deleteRow(i + 1);
+          var lastRow = sheet.getLastRow();
+          if (lastRow > 1 && sheet.getRange(lastRow, 1).getValue() === "TOTALS") {
+              if (lastRow === 2) sheet.getRange(lastRow, 6).setValue(0);
+              else sheet.getRange(lastRow, 6).setFormula("=SUM(F2:F" + (lastRow - 1) + ")");
+          }
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
+    }
+    
     if (data.action === 'save_item') {
       var sheet = getOrCreateSheet("Menu", ["Category", "ID", "Name", "Price", "Cost", "Milk_Option", "Oat_Price", "Image_URL"]);
       var values = sheet.getDataRange().getValues();
@@ -350,6 +435,31 @@ function doPost(e) {
       }
       return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
     }
+    if (data.action === 'save_rates') {
+      var sheet = getOrCreateSheet("Config", ["Key", "Value"]);
+      var lastRow = sheet.getLastRow();
+      if (lastRow < 2) {
+        sheet.getRange(2, 1, 2, 2).setValues([["usd_rate", "4000"], ["thb_rate", "10000"]]);
+        lastRow = 3;
+      }
+      var range = sheet.getRange(2, 1, lastRow - 1, 2);
+      var values = range.getValues();
+      var usdFound = false, thbFound = false;
+      for (var i = 0; i < values.length; i++) {
+        if (values[i][0] === "usd_rate") {
+          values[i][1] = String(data.usd_rate);
+          usdFound = true;
+        }
+        if (values[i][0] === "thb_rate") {
+          values[i][1] = String(data.thb_rate);
+          thbFound = true;
+        }
+      }
+      range.setValues(values);
+      if (!usdFound) sheet.appendRow(["usd_rate", String(data.usd_rate)]);
+      if (!thbFound) sheet.appendRow(["thb_rate", String(data.thb_rate)]);
+      return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
+    }
     // --- ORDER SAVING: use orderDate from app if provided, otherwise use current date ---
     var targetDate;
     if (data.orderDate) {
@@ -381,32 +491,7 @@ function doPost(e) {
     sheet.getRange(finalRow, 7).setFormula("=SUM(G2:G" + lastDataRow + ")").setFontWeight("bold");
     sheet.getRange(finalRow, 8).setFormula("=SUM(H2:H" + lastDataRow + ")").setFontWeight("bold");
     sheet.getRange(finalRow, 9).setFormula("=SUM(I2:I" + lastDataRow + ")").setFontWeight("bold");
-    if (data.action === 'save_rates') {
-      var sheet = getOrCreateSheet("Config", ["Key", "Value"]);
-      var lastRow = sheet.getLastRow();
-      if (lastRow < 2) {
-        sheet.getRange(2, 1, 2, 2).setValues([["usd_rate", "4000"], ["thb_rate", "10000"]]);
-        lastRow = 3;
-      }
-      var range = sheet.getRange(2, 1, lastRow - 1, 2);
-      var values = range.getValues();
-      var usdFound = false, thbFound = false;
-      for (var i = 0; i < values.length; i++) {
-        if (values[i][0] === "usd_rate") {
-          values[i][1] = String(data.usd_rate);
-          usdFound = true;
-        }
-        if (values[i][0] === "thb_rate") {
-          values[i][1] = String(data.thb_rate);
-          thbFound = true;
-        }
-      }
-      range.setValues(values);
-      if (!usdFound) sheet.appendRow(["usd_rate", String(data.usd_rate)]);
-      if (!thbFound) sheet.appendRow(["thb_rate", String(data.thb_rate)]);
-      return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
-    }
-    return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({"status":"success"})).setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": err.toString()})).setMimeType(ContentService.MimeType.JSON);
